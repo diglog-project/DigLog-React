@@ -1,8 +1,12 @@
+import BasicLayout from "../layout/BasicLayout.tsx";
+
 function MainPage() {
     return (
-        <div className="">
-            MainPage
-        </div>
+        <BasicLayout>
+            <div className="">
+                MainPage
+            </div>
+        </BasicLayout>
     );
 }
 
