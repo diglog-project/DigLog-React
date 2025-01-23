@@ -28,3 +28,7 @@ export const logoutApi = async (email: string) =>
     await axiosApi.post("/member/logout", {
         email: email
     }, {withCredentials: true});
+
+export const handleKakaoLogin = () => {
+    location.href = `${import.meta.env.VITE_SERVER_URL}/oauth2/authorization/kakao`;
+}

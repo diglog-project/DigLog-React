@@ -2,7 +2,7 @@ import BasicLayout from "../../layout/BasicLayout.tsx";
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 import {useDispatch} from "react-redux";
-import {loginApi} from "../../apis/member.tsx";
+import {handleKakaoLogin, loginApi} from "../../apis/member.tsx";
 import {login} from "../../slices/loginSlice.tsx";
 
 function LoginPage() {
@@ -30,20 +30,25 @@ function LoginPage() {
 
     return (
         <BasicLayout>
-            <input
-                type="email"
-                value={loginInfo.email}
-                placeholder="email"
-                onChange={(e) => setLoginInfo({...loginInfo, email: e.target.value})}/>
-            <input
-                type="password"
-                value={loginInfo.password}
-                placeholder="password"
-                onChange={(e) => setLoginInfo({...loginInfo, password: e.target.value})}/>
-            <button
-                onClick={handleLogin}>
-                Login
-            </button>
+            <div className="flex flex-col justify-start items-center gap-4 w-full">
+                <input
+                    type="email"
+                    value={loginInfo.email}
+                    placeholder="email"
+                    onChange={(e) => setLoginInfo({...loginInfo, email: e.target.value})}/>
+                <input
+                    type="password"
+                    value={loginInfo.password}
+                    placeholder="password"
+                    onChange={(e) => setLoginInfo({...loginInfo, password: e.target.value})}/>
+                <button
+                    onClick={handleLogin}>
+                    Login
+                </button>
+                <button onClick={handleKakaoLogin}>
+                    <img src="/kakao_login_medium_wide.png" alt="kakao login"/>
+                </button>
+            </div>
         </BasicLayout>
     );
 }
