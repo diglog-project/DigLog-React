@@ -8,7 +8,7 @@ const axiosApi = axios.create({
 
 axiosApi.interceptors.request.use(
     (config) => {
-        config.headers['Authorization'] = `Bearer ${store.getState().loginSlice.accessToken}`
+        config.headers['Authorization'] = store.getState().loginSlice.accessToken
         return config;
     },
     (error) => {
@@ -34,7 +34,7 @@ axiosApi.interceptors.response.use(
                         email: refreshResponse.data.email,
                         username: refreshResponse.data.username,
                         roles: refreshResponse.data.roles,
-                        accessToken: refreshResponse.headers.authorization.substring(7),
+                        accessToken: refreshResponse.headers.authorization,
                     }))
                 } else {
                     return Promise.reject();
