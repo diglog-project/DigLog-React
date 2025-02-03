@@ -33,6 +33,18 @@ function BlogPage() {
         document.title = username || "DIGLOG";
     }, []);
 
+    useEffect(() => {
+        if (isOpen) {
+            document.body.classList.remove('overflow-x-hidden');
+        } else {
+            document.body.classList.add('overflow-x-hidden');
+        }
+
+        return () => {
+            document.body.classList.remove('overflow-x-hidden');
+        };
+    }, [isOpen]);
+
     return (
         <BasicLayout>
             <div className=" flex justify-between items-center text-2xl font-black px-4 py-8">
@@ -43,7 +55,7 @@ function BlogPage() {
             </div>
             <div className="md:grid md:grid-cols-3">
                 <div className="col-span-2 flex flex-col gap-y-4 p-4 mx-auto md:border-r border-r-gray-200">
-                    {[Array.from({length: 3}).map(() => (
+                    {[Array.from({length: 4}).map(() => (
                         <PostCard
                             key={faker.number.int().toString()}
                             id={faker.number.int().toString()}
