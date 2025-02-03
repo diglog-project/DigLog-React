@@ -7,7 +7,7 @@ const blogRouter = () => {
         {
             path: ':username',
             element: <Suspense fallback={Loading}><Blog/></Suspense>
-        }
+        },
     ];
 }
 

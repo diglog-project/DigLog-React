@@ -23,7 +23,7 @@ function PostCard(post: PostResponse) {
             </Link>
             <div className="flex flex-col gap-y-2 my-4">
                 <div className="flex items-center gap-4">
-                    <Link to={"/"}
+                    <Link to={`/blog/${post.username}`}
                           className="text-sm font-semibold text-lime-700 hover:text-lime-400">
                         {post.username}
                     </Link>

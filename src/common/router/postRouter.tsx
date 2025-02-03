@@ -1,13 +1,17 @@
 import {Suspense} from "react";
-import {Loading, Post} from "./page.tsx";
+import {Loading, Post, Write} from "./page.tsx";
 
 const postRouter = () => {
 
     return [
         {
+            path: 'write',
+            element: <Suspense fallback={Loading}><Write/></Suspense>
+        },
+        {
             path: ':id',
             element: <Suspense fallback={Loading}><Post/></Suspense>
-        }
+        },
     ];
 }
 
