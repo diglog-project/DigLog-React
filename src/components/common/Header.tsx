@@ -7,7 +7,7 @@ function Header() {
     const loginState = useSelector((state: RootState) => state.loginSlice);
 
     return (
-        <div className="flex justify-between items-center w-full">
+        <div className="px-4 flex justify-between items-center w-full">
             <Link to={"/"}>
                 <div
                     className="flex items-center justify-center w-full">

@@ -2,8 +2,8 @@ import BasicLayout from "../../layout/BasicLayout.tsx";
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 import {useDispatch} from "react-redux";
-import {handleKakaoLogin, loginApi} from "../../apis/member.tsx";
-import {login} from "../../slices/loginSlice.tsx";
+import {handleKakaoLogin, loginApi} from "../../common/apis/member.tsx";
+import {login} from "../../common/slices/loginSlice.tsx";
 
 function LoginPage() {
 

@@ -1,5 +1,5 @@
 import axios from "axios";
-import store from "../store";
+import store from "../../store.tsx";
 import {login} from "../slices/loginSlice.tsx";
 
 const axiosApi = axios.create({

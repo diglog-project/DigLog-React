@@ -14,5 +14,7 @@ export const Loading =
         </svg>
     </div>;
 
-export const Main = lazy(() => import('../pages/MainPage'));
-export const Login = lazy(() => import('../pages/member/LoginPage'));
+export const Main = lazy(() => import('../../pages/MainPage.tsx'));
+export const Login = lazy(() => import('../../pages/member/LoginPage.tsx'));
+export const Post = lazy(() => import('../../pages/post/PostPage.tsx'));
+export const Blog = lazy(() => import('../../pages/blog/BlogPage.tsx'));
