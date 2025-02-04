@@ -34,7 +34,7 @@ function Header() {
         <div className="border border-b-2 border-gray-200 px-4 flex justify-between items-center w-full">
             <Link to={"/"} className="flex items-center justify-center gap-x-3 ml-4">
                 <img src="/logo.png" alt="logo"
-                     className="h-10 w-10 mb-1"/>
+                     className="size-10 mb-1"/>
                 <div className="flex items-center text-xl h-16 font-jalnan">
                     DIGLOG
                 </div>
@@ -75,7 +75,7 @@ function Header() {
                     </div>
                     : <div className="flex justify-center items-center mr-4">
                         <TextLink text={"로그인"} to={"/login"} addStyle={"hover:text-lime-700"}/>
-                        <TextLink text={"회원가입"} to={"/signup"} addStyle={"text-lime-700 hover:text-lime-400"}/>
+                        <TextLink text={"회원가입"} to={"/signup"} addStyle={"hover:text-lime-700"}/>
                     </div>}
             </div>
         </div>

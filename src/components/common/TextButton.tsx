@@ -1,10 +1,10 @@
 import {Link} from "react-router-dom";
 
-const className = " bg-transparent py-2 px-4";
+const className = " flex justify-center items-center bg-transparent py-2 px-4 hover:cursor-pointer";
 
-export function TextButton({text, onClick}: { text: string, onClick?: () => void }) {
+export function TextButton({text, onClick, addStyle}: { text: string, onClick?: () => void, addStyle?: string }) {
     return (
-        <button onClick={onClick} className={className}>
+        <button onClick={onClick} className={(addStyle) ? addStyle + className : className}>
             {text}
         </button>
     );
