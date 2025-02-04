@@ -16,6 +16,7 @@ export const Loading =
 
 export const Main = lazy(() => import('../../pages/MainPage.tsx'));
 export const Login = lazy(() => import('../../pages/member/LoginPage.tsx'));
+export const SignUp = lazy(() => import('../../pages/member/SignUpPage.tsx'));
 export const Profile = lazy(() => import('../../pages/member/ProfilePage.tsx'));
 
 export const Search = lazy(() => import('../../pages/post/SearchPage.tsx'));

@@ -41,7 +41,7 @@ function PostPage() {
                         {fullDateToKorean(post.createdAt)}
                     </div>
                 </div>
-                <div className="text-center leading-relaxed text-4xl font-black">
+                <div className="text-center leading-relaxed text-4xl text-gray-900 font-jalnan">
                     {post.title}
                 </div>
                 <div className="flex flex-wrap justify-center items-center gap-4 my-2">

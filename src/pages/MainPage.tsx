@@ -30,7 +30,7 @@ function MainPage() {
 
     return (
         <BasicLayout>
-            <div className="text-2xl font-black my-4">
+            <div className="text-2xl font-black my-8 font-jalnan">
                 인기 있는 게시글
             </div>
             <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8">

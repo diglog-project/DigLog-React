@@ -32,7 +32,7 @@ function PostCard(post: PostResponse) {
                     </div>
                 </div>
                 <Link to={`/post/${post.id}`}>
-                    <div className="line-clamp-2 text-lg hover:text-gray-600 font-semibold">
+                    <div className="line-clamp-2 text-lg hover:text-gray-600 font-medium">
                         {post.title}
                     </div>
                 </Link>

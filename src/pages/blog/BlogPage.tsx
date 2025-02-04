@@ -24,13 +24,12 @@ function BlogPage() {
 
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
+        document.title = username || "DIGLOG";
+
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
+            document.title = "DIGLOG";
         };
-    }, []);
-
-    useEffect(() => {
-        document.title = username || "DIGLOG";
     }, []);
 
     useEffect(() => {
