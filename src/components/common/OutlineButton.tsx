@@ -1,6 +1,6 @@
 import {Link} from "react-router-dom";
 
-const className = "bg-transparent hover:bg-lime-300 text-lime-700 font-semibold hover:text-white py-2 px-4 border border-lime-500 hover:border-transparent rounded";
+const className = "bg-transparent hover:bg-lime-300 text-lime-700 font-semibold hover:text-white py-2 px-4 border border-lime-500 hover:border-transparent rounded hover:cursor-pointer";
 
 export function OutlineButton({text, onClick}: { text: string, onClick?: () => void }) {
     return (

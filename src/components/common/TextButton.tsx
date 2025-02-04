@@ -1,6 +1,6 @@
 import {Link} from "react-router-dom";
 
-const className = "bg-transparent hover:text-lime-700 py-2 px-4";
+const className = " bg-transparent py-2 px-4";
 
 export function TextButton({text, onClick}: { text: string, onClick?: () => void }) {
     return (
@@ -10,10 +10,10 @@ export function TextButton({text, onClick}: { text: string, onClick?: () => void
     );
 }
 
-export function TextLink({text, to, color}: { text: string, to: string, color?: string }) {
+export function TextLink({text, to, addStyle}: { text: string, to: string, addStyle?: string }) {
 
     return (
-        <Link to={to} className={(color === "lime") ? "text-lime-700 hover:text-lime-400 " : "" + className}>
+        <Link to={to} className={(addStyle) ? addStyle + className : className}>
             {text}
         </Link>
     );

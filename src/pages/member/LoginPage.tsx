@@ -4,6 +4,7 @@ import {useState} from "react";
 import {useDispatch} from "react-redux";
 import {handleKakaoLogin, loginApi} from "../../common/apis/member.tsx";
 import {login} from "../../common/slices/loginSlice.tsx";
+import {FillButton} from "../../components/common/FillButton.tsx";
 
 function LoginPage() {
 
@@ -30,7 +31,7 @@ function LoginPage() {
 
     return (
         <BasicLayout>
-            <div className="flex flex-col justify-start items-center gap-4 w-full">
+            <div className="flex flex-col justify-center items-center gap-4 w-full h-[calc(100vh-232px)]">
                 <input
                     type="email"
                     value={loginInfo.email}
@@ -41,11 +42,8 @@ function LoginPage() {
                     value={loginInfo.password}
                     placeholder="password"
                     onChange={(e) => setLoginInfo({...loginInfo, password: e.target.value})}/>
-                <button
-                    onClick={handleLogin}>
-                    Login
-                </button>
-                <button onClick={handleKakaoLogin}>
+                <FillButton text={"로그인"} onClick={handleLogin} addStyle={"w-75"} />
+                <button onClick={handleKakaoLogin} className="hover:cursor-pointer hover:brightness-105">
                     <img src="/kakao_login_medium_wide.png" alt="kakao login"/>
                 </button>
             </div>
