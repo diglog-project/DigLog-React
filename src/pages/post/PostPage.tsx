@@ -1,4 +1,4 @@
-import {Link, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import BasicLayout from "../../layout/BasicLayout.tsx";
 import {PostResponse} from "../../common/types/post.tsx";
 import {faker} from "@faker-js/faker/locale/ko";
@@ -10,6 +10,7 @@ function PostPage() {
 
     const {id} = useParams();
     console.log(id);
+    const navigate = useNavigate();
 
     const post: PostResponse = {
         id: faker.number.int().toString(),
@@ -45,7 +46,10 @@ function PostPage() {
                     {post.title}
                 </div>
                 <div className="flex flex-wrap justify-center items-center gap-4">
-                    {post.tags.map(tag => <TagCard key={tag.id} tag={tag}/>)}
+                    {post.tags.map(tag =>
+                        <TagCard key={tag.id} tag={tag} onClick={() => {
+                            navigate(`/search?word=${tag.name}&option=태그`)
+                        }}/>)}
                 </div>
                 <div className="flex justify-between items-center">
 
