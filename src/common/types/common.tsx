@@ -1,5 +1,5 @@
 export interface PageResponse {
-    page: number;
+    size: number;
     number: number;
     totalElements: number;
     totalPages: number;

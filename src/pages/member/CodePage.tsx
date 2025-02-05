@@ -70,7 +70,7 @@ function CodePage() {
     return (
         <BasicLayout>
             <div
-                className="w-full h-[calc(100vh-220px)] max-w-[calc(420px)] flex flex-col justify-center items-center gap-x-2 mb-8 m-auto">
+                className="w-full h-[calc(100vh-220px)] max-w-[calc(420px)] flex flex-col justify-center items-center gap-y-2 mb-8 m-auto">
                 <div className="flex flex-col gap-y-1 mb-4 text-center font-normal text-gray-600">
                     <p><span className="font-black text-gray-900">{email}</span> 로 보내진</p>
                     <p>인증코드 6자리를 입력해주세요.</p>
@@ -96,7 +96,7 @@ function CodePage() {
                         </React.Fragment>
                     ))}
                 </div>
-                <div>
+                <div className="mt-4">
                     유효시간 : {formatTimer(timer)}
                 </div>
             </div>

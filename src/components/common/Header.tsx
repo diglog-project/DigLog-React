@@ -1,14 +1,16 @@
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store.tsx";
 import {faker} from "@faker-js/faker/locale/ko";
 import {useEffect, useRef, useState} from "react";
 import {TextLink} from "./TextButton.tsx";
 import {MdOutlineSearch} from "react-icons/md";
+import IconButton from "./IconButton.tsx";
 
 function Header() {
 
     const loginState = useSelector((state: RootState) => state.loginSlice);
+    const navigate = useNavigate();
 
     const dashboardRef = useRef<HTMLDivElement | null>(null);
     const [isOpen, setIsOpen] = useState(false);
@@ -24,6 +26,8 @@ function Header() {
     };
 
     useEffect(() => {
+        window.scrollTo(0, 0);
+
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
@@ -40,7 +44,10 @@ function Header() {
                 </div>
             </Link>
             <div className="flex justify-center items-center gap-x-3">
-                <MdOutlineSearch className="h-6 w-6"/>
+                <IconButton
+                    icon={<MdOutlineSearch
+                        className="size-5"/>}
+                    onClick={() => navigate("/search")}/>
                 {loginState.isLogin
                     ? <div ref={dashboardRef}>
                         <div
