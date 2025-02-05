@@ -6,6 +6,8 @@ import {useEffect, useRef, useState} from "react";
 import {TextLink} from "./TextButton.tsx";
 import {MdOutlineSearch} from "react-icons/md";
 import IconButton from "./IconButton.tsx";
+import {logoutApi} from "../../common/apis/member.tsx";
+import {logout} from "../../common/slices/loginSlice.tsx";
 
 function Header() {
 
@@ -24,6 +26,19 @@ function Header() {
             setIsOpen(false);
         }
     };
+
+    const handleLogout = () => {
+        logoutApi(loginState.email)
+            .then(() => {
+                logout();
+            })
+            .catch((error) => {
+                alert(`알 수 없는 에러 : ${error.message}`);
+            })
+            .finally(() => {
+                navigate(0);
+            });
+    }
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -66,6 +81,10 @@ function Header() {
                                           className="w-full block px-4 py-2 text-gray-700 hover:bg-gray-100">
                                         내 블로그
                                     </Link>
+                                    <Link to={`/blog/${loginState.username}/setting`}
+                                          className="w-full block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                        내 블로그 설정
+                                    </Link>
                                     <Link to={"/profile"}
                                           className="w-full block px-4 py-2 text-gray-700 hover:bg-gray-100">
                                         프로필
@@ -73,6 +92,7 @@ function Header() {
                                 </div>
                                 <div className="py-1">
                                     <button
+                                        onClick={handleLogout}
                                         className="w-full block px-4 py-2 text-start text-sm text-gray-700 hover:bg-gray-100 hover:cursor-pointer">
                                         로그아웃
                                     </button>

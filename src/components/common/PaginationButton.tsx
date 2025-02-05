@@ -17,8 +17,8 @@ function PaginationButton({pageInfo, setPage}: {
     }
 
     useEffect(() => {
-        if (pageInfo.totalPages < paginationSize) {
-            setPageList(getArray(startPage, pageInfo.totalPages));
+        if (pageInfo.totalPages < startPage + paginationSize) {
+            setPageList(getArray(startPage, pageInfo.totalPages - startPage));
         } else {
             setPageList(getArray(startPage, paginationSize));
         }

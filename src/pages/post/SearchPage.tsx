@@ -9,20 +9,29 @@ import {LoadMoreButton} from "../../components/common/FillButton.tsx";
 
 function SearchPage() {
 
+    const optionRef = useRef<HTMLDivElement | null>(null);
     const sortRef = useRef<HTMLDivElement | null>(null);
 
+    const [openOption, setOpenOption] = useState(false);
     const [openSort, setOpenSort] = useState(false);
 
-    const [searchParams, setSearchParams] = useSearchParams({"word": "", "sort": "전체", "tab": "게시글"});
+    const [searchParams, setSearchParams] = useSearchParams({"word": "", "option": "전체", "sort": "최신순", "tab": "게시글"});
     const [searchWord, setSearchWord] = useState<string>(searchParams.get("word") || "");
-    const [sort, setSort] = useState<string>(searchParams.get("sort") || "전체");
+    const [option, setOption] = useState<string>(searchParams.get("option") || "전체");
+    const [sort, setSort] = useState<string>(searchParams.get("sort") || "최신순");
     const [selectedTab, setSelectedTab] = useState<string>(searchParams.get("tab") || "게시글");
 
+    const handleOpenOption = () => {
+        setOpenOption(cur => !cur);
+    }
     const handleOpenSort = () => {
         setOpenSort(cur => !cur);
     }
 
     const handleClickOutside = (event: MouseEvent) => {
+        if (optionRef.current && !optionRef.current.contains(event.target as Node)) {
+            setOpenOption(false);
+        }
         if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
             setOpenSort(false);
         }
@@ -42,6 +51,7 @@ function SearchPage() {
 
         setSearchParams({
             "word": searchWord,
+            "option": option,
             "sort": sort,
             "tab": selectedTab,
         });
@@ -50,10 +60,11 @@ function SearchPage() {
     useEffect(() => {
         setSearchParams({
             "word": searchWord,
+            "option": option,
             "sort": sort,
             "tab": selectedTab,
         });
-    }, [sort, selectedTab]);
+    }, [option, sort, selectedTab]);
 
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
@@ -87,12 +98,22 @@ function SearchPage() {
             <div className="max-w-4xl mx-auto flex flex-col gap-y-2">
                 <div className="w-full flex justify-between items-center">
                     <div className="text-lg"><span className="font-bold">99</span>개의 검색결과</div>
-                    <SearchSortMenu
-                        openSort={openSort}
-                        handleOpenSort={handleOpenSort}
-                        sort={sort}
-                        setSort={setSort}
-                        customRef={sortRef}/>
+                    <div className="flex items-center justify-end">
+                        <SearchMenu
+                            type={"option"}
+                            open={openOption}
+                            handleOpen={handleOpenOption}
+                            value={option}
+                            setValue={setOption}
+                            customRef={optionRef}/>
+                        <SearchMenu
+                            type={"sort"}
+                            open={openSort}
+                            handleOpen={handleOpenSort}
+                            value={sort}
+                            setValue={setSort}
+                            customRef={sortRef}/>
+                    </div>
                 </div>
                 <SearchTab selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>
                 <SearchResults selectedTab={selectedTab}/>
@@ -174,34 +195,43 @@ function SearchResults({selectedTab}: { selectedTab: string }) {
     return <></>;
 }
 
-function SearchSortMenu({openSort, handleOpenSort, sort, setSort, customRef}: {
-    openSort: boolean,
-    handleOpenSort: () => void,
-    sort: string,
-    setSort: (newSort: string) => void,
+function SearchMenu({type, open, handleOpen, value, setValue, customRef}: {
+    type: string,
+    open: boolean,
+    handleOpen: () => void,
+    value: string,
+    setValue: (newOption: string) => void,
     customRef: Ref<HTMLDivElement>,
 }) {
 
-    const sortOptions = ["전체", "제목", "내용", "태그", "작성자"];
+    let title = "";
+    let searchMenuList: string[] = [];
+    if (type === "option") {
+        title = "검색 조건";
+        searchMenuList = ["전체", "제목", "내용", "태그", "작성자"];
+    } else if (type === "sort") {
+        title = "정렬 조건";
+        searchMenuList = ["최신순", "오래된순", "조회순"];
+    }
 
     return (
         <div ref={customRef} className="z-50">
             <div className="flex justify-start items-center">
-                <p>정렬 조건</p>
+                <p>{title}</p>
                 <div className="relative">
                     <button
-                        className="w-24 shrink-0 z-10 inline-flex justify-between items-center py-2.5 px-4 text-sm font-medium text-gray-900 hover:cursor-pointer"
-                        onClick={handleOpenSort}
+                        className="w-28 shrink-0 z-10 inline-flex justify-between items-center py-2.5 px-4 text-sm font-medium text-gray-900 hover:cursor-pointer"
+                        onClick={handleOpen}
                     >
-                        {sort}
+                        {value}
                         <MdArrowDropDown className="size-4"/>
                     </button>
                     <div
-                        className={`${(openSort) ? "" : "hidden"} absolute top-10 left-0 flex flex-col z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44`}>
+                        className={`${(open) ? "" : "hidden"} absolute top-10 left-0 flex flex-col z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44`}>
                         <ul className="py-2 text-sm text-gray-700r">
-                            {sortOptions.map((option) => (
-                                <SortMenu sort={option} currentSort={sort} setSort={setSort}
-                                          handleOpenSort={handleOpenSort}/>
+                            {searchMenuList.map((menu) => (
+                                <SortMenu value={menu} current={value} setValue={setValue}
+                                          handleOpen={handleOpen}/>
                             ))}
                         </ul>
                     </div>
@@ -211,21 +241,21 @@ function SearchSortMenu({openSort, handleOpenSort, sort, setSort, customRef}: {
     );
 }
 
-function SortMenu({sort, currentSort, setSort, handleOpenSort}: {
-    sort: string,
-    currentSort: string,
-    setSort: (newSort: string) => void,
-    handleOpenSort: () => void
+function SortMenu({value, current, setValue, handleOpen}: {
+    value: string,
+    current: string,
+    setValue: (newSort: string) => void,
+    handleOpen: () => void
 }) {
     return (
         <li>
             <button type="button"
                     onClick={() => {
-                        setSort(sort);
-                        handleOpenSort();
+                        setValue(value);
+                        handleOpen();
                     }}
-                    className={`${(sort === currentSort) ? "bg-gray-100" : ""} inline-flex w-full px-4 py-2 hover:bg-gray-200 hover:cursor-pointer`}>
-                {sort}
+                    className={`${(value === current) ? "bg-gray-100" : ""} inline-flex w-full px-4 py-2 hover:bg-gray-200 hover:cursor-pointer`}>
+                {value}
             </button>
         </li>
     );

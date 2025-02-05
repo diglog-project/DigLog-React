@@ -28,7 +28,7 @@ function PostPage() {
                 <div className="flex justify-center items-center gap-x-4">
                     <Link to={`/blog/${post.username}`} className="text-xs">Home</Link>
                     <div className="text-xs">{` > `}</div>
-                    <Link to={`/blog/${post.username}/category`} className="text-xs">카테고리</Link>
+                    <Link to={`/blog/${post.username}?category=카테고리`} className="text-xs">카테고리</Link>
                     <div>{` > `}</div>
                     <div className="text-xs text-gray-600">{post.title}</div>
                 </div>

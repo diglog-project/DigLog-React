@@ -1,13 +1,13 @@
-import {Link} from "react-router-dom";
 import {TagResponse} from "../../common/types/post.tsx";
 
-function TagCard({tag}: { tag: TagResponse }) {
+function TagCard({tag, onClick}: { tag: TagResponse, onClick: (tagName: string) => void }) {
     return (
-        <Link to={`/search?tag=${tag.name}`}
-              className="border border-lime-50 shadow text-lime-700 rounded-4xl px-4 py-2 font-semibold text-sm
-               transform transition-all hover:bg-lime-50 hover:text-lime-500">
+        <button
+            className="border border-lime-50 shadow text-lime-700 rounded-4xl px-4 py-2 font-semibold text-sm
+               transform transition-all hover:bg-lime-50 hover:text-lime-500"
+            onClick={() => onClick(tag.name)}>
             {tag.name}
-        </Link>
+        </button>
     );
 }
 

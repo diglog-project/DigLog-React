@@ -1,5 +1,5 @@
 import {Suspense} from "react";
-import {Blog, Loading} from "./page.tsx";
+import {Blog, BlogSetting, Loading} from "./page.tsx";
 
 const blogRouter = () => {
 
@@ -7,6 +7,10 @@ const blogRouter = () => {
         {
             path: ':username',
             element: <Suspense fallback={Loading}><Blog/></Suspense>
+        },
+        {
+            path: ':username/setting',
+            element: <Suspense fallback={Loading}><BlogSetting/></Suspense>
         },
     ];
 }

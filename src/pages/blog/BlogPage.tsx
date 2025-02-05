@@ -1,18 +1,23 @@
 import BasicLayout from "../../layout/BasicLayout.tsx";
-import {useParams} from "react-router-dom";
+import {useParams, useSearchParams} from "react-router-dom";
 import {faker} from "@faker-js/faker/locale/ko";
 import PostCard from "../../components/post/PostCard.tsx";
 import TagCard from "../../components/post/TagCard.tsx";
 import {useEffect, useRef, useState} from "react";
 import {MdMenu, MdOutlineExitToApp} from "react-icons/md";
 import PaginationButton from "../../components/common/PaginationButton.tsx";
+import TagChip from "../../components/post/TagChip.tsx";
 
 function BlogPage() {
 
     const {username} = useParams();
 
+    const [searchParams, setSearchParams] = useSearchParams({"category": ""});
+
     const sideBarRef = useRef<HTMLDivElement | null>(null);
     const [isOpen, setIsOpen] = useState(false);
+    const [selectedFolder, setSelectedFolder] = useState(searchParams.get("category") || "");
+    const [selectedTagList, setSelectedTagList] = useState<string[]>([]);
 
     const handleMenuOpen = () => {
         setIsOpen(cur => !cur);
@@ -23,6 +28,19 @@ function BlogPage() {
         }
     };
 
+    const addTag = (selectTag: string) => {
+        setSelectedTagList([...selectedTagList, selectTag]);
+    }
+
+    const removeTag = (selectTag: string) => {
+        setSelectedTagList(prevState => prevState.filter(tag => tag !== selectTag));
+    }
+
+    const removeFolder = (selectFolder: string) => {
+        console.log(selectFolder);
+        setSelectedFolder("");
+    }
+
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
         document.title = username || "DIGLOG";
@@ -32,6 +50,12 @@ function BlogPage() {
             document.title = "DIGLOG";
         };
     }, []);
+
+    useEffect(() => {
+        setSearchParams({
+            "category": selectedFolder
+        })
+    }, [selectedFolder]);
 
     useEffect(() => {
         if (isOpen) {
@@ -54,6 +78,12 @@ function BlogPage() {
                         <MdMenu className="size-8"/>
                     </button>
                 </div>
+                <div className="flex gap-x-4 pb-4">
+                    폴더 : {selectedFolder !== "" && <TagChip name={selectedFolder} removeTag={removeFolder}/>}
+                </div>
+                <div className="flex flex-wrap justify-start items-center gap-x-4 gap-y-2">
+                    태그 : {selectedTagList.map((tag) => <TagChip name={tag} removeTag={removeTag}/>)}
+                </div>
                 <div className="md:grid md:grid-cols-3">
                     <div className="col-span-2 flex flex-col gap-y-4 p-4 mx-auto md:border-r border-r-gray-200">
                         {[Array.from({length: 3}).map(() => (
@@ -73,11 +103,14 @@ function BlogPage() {
                                 createdAt={new Date()}/>
                         ))]}
                         <PaginationButton
-                            pageInfo={{size: 5, number: 0, totalPages: 30, totalElements: 148}} setPage={() => {
+                            pageInfo={{size: 5, number: 0, totalPages: 25, totalElements: 120}} setPage={() => {
                         }}/>
                     </div>
                     <div className="hidden md:block col-span-1 flex-col">
-                        <SideBar username={username}/>
+                        <SideBar
+                            username={username}
+                            addTag={addTag}
+                            setSelectedFolder={setSelectedFolder}/>
                     </div>
                 </div>
             </div>
@@ -88,13 +121,22 @@ function BlogPage() {
                         onClick={() => setIsOpen(false)}>
                     <MdOutlineExitToApp className="size-8 text-gray-500"/>
                 </button>
-                <SideBar username={username} bgColor={"bg-gray-50"}/>
+                <SideBar
+                    username={username}
+                    addTag={addTag}
+                    setSelectedFolder={setSelectedFolder}
+                    bgColor={"bg-gray-50"}/>
             </div>
         </BasicLayout>
     );
 }
 
-function SideBar({username, bgColor}: { username: string | undefined, bgColor?: string }) {
+function SideBar({username, addTag, setSelectedFolder, bgColor}: {
+    username: string | undefined,
+    addTag: (tagName: string) => void,
+    setSelectedFolder: (folder: string) => void,
+    bgColor?: string
+}) {
 
     return (
         <div className={bgColor}>
@@ -110,20 +152,18 @@ function SideBar({username, bgColor}: { username: string | undefined, bgColor?: 
                 <div className="flex flex-col gap-y-4 p-2">
                     {[Array.from({length: 10}).map((_, i) => (
                         <div key={i} className="flex flex-col gap-y-2 font-semibold">
-                            <button className="flex justify-start items-center hover:cursor-pointer">
+                            <button className="flex justify-start items-center hover:cursor-pointer"
+                                    onClick={() => setSelectedFolder(faker.word.words())}>
                                 {faker.word.words()}
                             </button>
                             <div
                                 className="flex flex-col gap-y-1 font-normal text-gray-400 border-l border-gray-300 pl-2">
-                                <button className="flex justify-start hover:cursor-pointer">
-                                    {faker.word.words()}
-                                </button>
-                                <button className="flex justify-start hover:cursor-pointer">
-                                    {faker.word.words()}
-                                </button>
-                                <button className="flex justify-start hover:cursor-pointer">
-                                    {faker.word.words()}
-                                </button>
+                                {Array.from({length: 3}).map((_, i) => (
+                                    <button key={i} className="flex justify-start hover:cursor-pointer"
+                                            onClick={() => setSelectedFolder(`${faker.word.words()} > ${faker.word.words()}`)}>
+                                        {faker.word.words()}
+                                    </button>
+                                ))}
                             </div>
                         </div>
                     ))]}
@@ -137,7 +177,8 @@ function SideBar({username, bgColor}: { username: string | undefined, bgColor?: 
                                  tag={{
                                      id: faker.number.int().toString(),
                                      name: faker.word.sample()
-                                 }}/>
+                                 }}
+                                 onClick={addTag}/>
                     ))]}
                 </div>
             </div>
