@@ -48,7 +48,7 @@ function LoginPage() {
     return (
         <BasicLayout>
             <div
-                className="flex flex-col justify-center items-center gap-4 w-full max-w-[calc(420px)] h-[calc(100vh-220px)] mx-auto">
+                className="flex flex-col justify-center items-center gap-y-4 w-full max-w-[calc(420px)] h-[calc(100vh-220px)] mx-auto">
                 <div className="flex justify-center items-center gap-x-2 mb-8">
                     <img src="/logo.png" alt="logo"
                          className="size-16 mb-1"/>
@@ -56,23 +56,27 @@ function LoginPage() {
                         DIGLOG
                     </div>
                 </div>
-                <LoginTextField
-                    label={"이메일"}
-                    type={"email"}
-                    placeholder={"diglog@example.com"}
-                    value={loginInfo.email}
-                    setValue={(value) => setLoginInfo({...loginInfo, email: value})}/>
-                <LoginTextField
-                    label={"비밀번호"}
-                    type={"password"}
-                    placeholder={"영문, 숫자 포함 8-16자"}
-                    value={loginInfo.password}
-                    setValue={(value) => setLoginInfo({...loginInfo, password: value})}
-                    onKeyDown={handlePasswordEnter}/>
-                <LoginButton text={"로그인"} onClick={handleLogin} bgColor={"bg-lime-300"}/>
-                <LoginButton text={"카카오로 시작하기"} onClick={handleKakaoLogin} bgColor={"bg-[#FEE500]"}
-                             icon={<img src={"/kakao-logo.png"} alt={"Kakao Login"} className="size-5"/>}/>
-                <TextLink text={"회원가입"} to={"/signup"} addStyle={"w-full h-14 hover:text-gray-600"}/>
+                <div className="flex flex-col justify-center items-center w-full">
+                    <LoginTextField
+                        label={"이메일"}
+                        type={"email"}
+                        placeholder={"diglog@example.com"}
+                        value={loginInfo.email}
+                        setValue={(value) => setLoginInfo({...loginInfo, email: value})}/>
+                    <LoginTextField
+                        label={"비밀번호"}
+                        type={"password"}
+                        placeholder={"영문, 숫자 포함 8-16자"}
+                        value={loginInfo.password}
+                        setValue={(value) => setLoginInfo({...loginInfo, password: value})}
+                        onKeyDown={handlePasswordEnter}/>
+                </div>
+                <div className="flex flex-col justify-center items-center gap-y-4 w-full">
+                    <LoginButton text={"로그인"} onClick={handleLogin} bgColor={"bg-lime-300"}/>
+                    <LoginButton text={"카카오로 시작하기"} onClick={handleKakaoLogin} bgColor={"bg-[#FEE500]"}
+                                 icon={<img src={"/kakao-logo.png"} alt={"Kakao Login"} className="size-5"/>}/>
+                    <TextLink text={"회원가입"} to={"/signup/platform"} addStyle={"w-full h-14 hover:text-gray-600"}/>
+                </div>
             </div>
         </BasicLayout>
     );

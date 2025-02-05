@@ -1,0 +1,109 @@
+import React, {useEffect, useRef, useState} from "react";
+import BasicLayout from "../../layout/BasicLayout.tsx";
+import {useLocation, useNavigate} from "react-router-dom";
+import {formatTimer} from "../../common/util/date.tsx";
+import LoadingLayout from "../../layout/LoadingLayout.tsx";
+
+function CodePage() {
+
+    const {state} = useLocation();
+    const {email} = state;
+    const navigate = useNavigate();
+
+    const [loading, setLoading] = useState(false);
+
+    const inputRefs = useRef<HTMLInputElement[]>([]);
+    const [code, setCode] = useState<string[]>(Array(6).fill(""));
+
+    const [timer, setTimer] = useState(600);
+
+    const handleChange = (index: number, value: string) => {
+        if (/[^0-9]/g.test(value)) {
+            return;
+        }
+
+        const newCode = [...code];
+
+        newCode[index] = value.replace(/[^0-9]/g, "");
+        setCode(newCode);
+
+        if (value && index < inputRefs.current.length - 1) {
+            inputRefs.current[index + 1].focus();
+        }
+    };
+
+    const handleBackspace = (event: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+        if (event.key === "Backspace" && !event.currentTarget.value && index > 0) {
+            inputRefs.current[index - 1].focus();
+        }
+    };
+
+    useEffect(() => {
+        if (inputRefs.current) {
+            inputRefs.current[0].focus();
+        }
+    }, []);
+
+    useEffect(() => {
+        let interval = null;
+
+        if (timer > 0) {
+            interval = setInterval(() => {
+                setTimer((prev) => prev - 1);
+            }, 1000);
+        } else if (timer === 0) {
+            clearInterval(interval!);
+            alert("유효 시간이 만료되었습니다. 회원가입을 다시 시도해주세요.");
+        }
+
+        return () => clearInterval(interval!);
+    }, [timer]);
+
+    useEffect(() => {
+        if (code[5] !== "") {
+            setLoading(true);
+
+            navigate("/signup", {state: {email: email, code: code.join("")}});
+        }
+    }, [code]);
+
+    return (
+        <BasicLayout>
+            <div
+                className="w-full h-[calc(100vh-220px)] max-w-[calc(420px)] flex flex-col justify-center items-center gap-x-2 mb-8 m-auto">
+                <div className="flex flex-col gap-y-1 mb-4 text-center font-normal text-gray-600">
+                    <p><span className="font-black text-gray-900">{email}</span> 로 보내진</p>
+                    <p>인증코드 6자리를 입력해주세요.</p>
+                </div>
+                <div className="flex items-center justify-center gap-2 my-4">
+                    {code.map((digit, index) => (
+                        <React.Fragment key={index}>
+                            <input
+                                ref={(el) => {
+                                    if (el) {
+                                        inputRefs.current[index] = el;
+                                    }
+                                }}
+                                type=" text"
+                                maxLength={1}
+                                className="w-12 h-16 rounded-lg font-bold text-lg appearance-none border border-gray-200 text-center focus:outline-1"
+                                value={digit}
+                                onChange={(e) => handleChange(index, e.target.value)}
+                                onKeyDown={(e) => {
+                                    handleBackspace(e, index)
+                                }}
+                            />
+                        </React.Fragment>
+                    ))}
+                </div>
+                <div>
+                    유효시간 : {formatTimer(timer)}
+                </div>
+            </div>
+            <LoadingLayout loading={loading}/>
+        </BasicLayout>
+    )
+        ;
+}
+
+export default CodePage;

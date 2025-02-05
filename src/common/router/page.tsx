@@ -16,8 +16,10 @@ export const Loading =
 
 export const Main = lazy(() => import('../../pages/MainPage.tsx'));
 export const Login = lazy(() => import('../../pages/member/LoginPage.tsx'));
-export const SignUp = lazy(() => import('../../pages/member/SignUpPage.tsx'));
+export const Platform = lazy(() => import('../../pages/member/PlatformPage.tsx'));
 export const Email = lazy(() => import('../../pages/member/EmailPage.tsx'));
+export const Code = lazy(() => import('../../pages/member/CodePage.tsx'));
+export const Signup = lazy(() => import('../../pages/member/SignupPage.tsx'));
 export const Profile = lazy(() => import('../../pages/member/ProfilePage.tsx'));
 
 export const Search = lazy(() => import('../../pages/post/SearchPage.tsx'));

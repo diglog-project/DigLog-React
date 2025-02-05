@@ -3,6 +3,8 @@ import LoginTextField from "../../components/member/LoginTextField.tsx";
 import {useState} from "react";
 import LoginButton from "../../components/member/LoginButton.tsx";
 import {useNavigate} from "react-router-dom";
+import * as React from "react";
+import {checkEmail} from "../../common/util/regex.tsx";
 
 function EmailPage() {
 
@@ -10,18 +12,35 @@ function EmailPage() {
 
     const navigate = useNavigate();
 
+    const handleEmailEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key !== "Enter") {
+            return;
+        }
+
+        handleVerifyEmail();
+    }
+
+    const handleVerifyEmail = () => {
+        if (!checkEmail(signupInfo.email)) {
+            alert("이메일 형식을 확인해주세요.");
+            return;
+        }
+
+        navigate("/signup/code", {state: {email: signupInfo.email}});
+    }
+
     return (
         <BasicLayout>
-            <div className="flex flex-col gap-y-4 justify-center items-start h-[calc(100vh-220px)]">
+            <div
+                className="w-full max-w-[calc(420px)] flex flex-col justify-center items-start h-[calc(100vh-220px)] mx-auto">
                 <LoginTextField
                     label={"이메일"}
                     type={"email"}
                     placeholder={"diglog@example.com"}
                     value={signupInfo.email}
-                    setValue={(value) => setSignupInfo({...signupInfo, email: value})}/>
-                <LoginButton text={"인증코드 전송"} onClick={() => {
-                    navigate("/signup/code");
-                }} bgColor={"bg-lime-400"}/>
+                    setValue={(value) => setSignupInfo({...signupInfo, email: value})}
+                    onKeyDown={handleEmailEnter}/>
+                <LoginButton text={"인증코드 전송"} onClick={handleVerifyEmail} bgColor={"bg-lime-400"}/>
             </div>
         </BasicLayout>
     );

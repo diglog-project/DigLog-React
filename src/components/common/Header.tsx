@@ -75,7 +75,7 @@ function Header() {
                     </div>
                     : <div className="flex justify-center items-center mr-4">
                         <TextLink text={"로그인"} to={"/login"} addStyle={"hover:text-lime-700"}/>
-                        <TextLink text={"회원가입"} to={"/signup"} addStyle={"hover:text-lime-700"}/>
+                        <TextLink text={"회원가입"} to={"/signup/platform"} addStyle={"hover:text-lime-700"}/>
                     </div>}
             </div>
         </div>
