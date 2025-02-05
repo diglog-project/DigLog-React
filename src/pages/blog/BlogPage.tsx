@@ -79,10 +79,10 @@ function BlogPage() {
                     </button>
                 </div>
                 <div className="flex gap-x-4 pb-4">
-                    폴더 : {selectedFolder !== "" && <TagChip name={selectedFolder} removeTag={removeFolder}/>}
+                    폴더 {selectedFolder !== "" && <TagChip name={selectedFolder} removeTag={removeFolder}/>}
                 </div>
                 <div className="flex flex-wrap justify-start items-center gap-x-4 gap-y-2">
-                    태그 : {selectedTagList.map((tag) => <TagChip name={tag} removeTag={removeTag}/>)}
+                    태그 {selectedTagList.map((tag) => <TagChip name={tag} removeTag={removeTag}/>)}
                 </div>
                 <div className="md:grid md:grid-cols-3">
                     <div className="col-span-2 flex flex-col gap-y-4 p-4 mx-auto md:border-r border-r-gray-200">
