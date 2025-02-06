@@ -44,10 +44,8 @@ function BlogPage() {
     }
 
     useEffect(() => {
-        const mainHeight = mainRef.current?.offsetHeight;
-
-        if (sideBarRef.current) {
-            sideBarRef.current.style.height = `${mainHeight + 220}px`;
+        if (sideBarRef.current && mainRef.current) {
+            sideBarRef.current.style.height = `${mainRef.current.offsetHeight + 220}px`;
         }
     }, []);
 
