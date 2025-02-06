@@ -14,10 +14,12 @@ function BlogPage() {
 
     const [searchParams, setSearchParams] = useSearchParams({"category": ""});
 
-    const sideBarRef = useRef<HTMLDivElement | null>(null);
     const [isOpen, setIsOpen] = useState(false);
     const [selectedFolder, setSelectedFolder] = useState(searchParams.get("category") || "");
     const [selectedTagList, setSelectedTagList] = useState<string[]>([]);
+
+    const mainRef = useRef<HTMLDivElement | null>(null);
+    const sideBarRef = useRef<HTMLDivElement | null>(null);
 
     const handleMenuOpen = () => {
         setIsOpen(cur => !cur);
@@ -40,6 +42,15 @@ function BlogPage() {
         console.log(selectFolder);
         setSelectedFolder("");
     }
+
+    useEffect(() => {
+        const mainHeight = mainRef.current?.offsetHeight;
+
+        if (sideBarRef.current) {
+            sideBarRef.current.style.height = `${mainHeight + 220}px`;
+        }
+    }, []);
+
 
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
@@ -71,10 +82,11 @@ function BlogPage() {
 
     return (
         <BasicLayout>
-            <div className={(isOpen) ? "opacity-50 backdrop-blur-sm z-10" : "z-10"}>
+            <div ref={mainRef}
+                 className={(isOpen) ? "opacity-50 backdrop-blur-sm z-10" : "z-10"}>
                 <div className=" flex justify-between items-center text-2xl font-black px-4 py-8">
                     <div>{username}의 블로그</div>
-                    <button onClick={handleMenuOpen} className="md:hidden hover:cursor-pointer">
+                    <button onClick={handleMenuOpen} className="lg:hidden hover:cursor-pointer">
                         <MdMenu className="size-8"/>
                     </button>
                 </div>
@@ -84,8 +96,8 @@ function BlogPage() {
                 <div className="flex flex-wrap justify-start items-center gap-x-4 gap-y-2">
                     태그 {selectedTagList.map((tag) => <TagChip name={tag} removeTag={removeTag}/>)}
                 </div>
-                <div className="md:grid md:grid-cols-3">
-                    <div className="col-span-2 flex flex-col gap-y-4 p-4 mx-auto md:border-r border-r-gray-200">
+                <div className="grid lg:grid-cols-3">
+                    <div className="lg:col-span-2 flex flex-col gap-y-4 p-4 md:border-r border-r-gray-200">
                         {[Array.from({length: 3}).map(() => (
                             <PostCard
                                 key={faker.number.int().toString()}
@@ -106,7 +118,7 @@ function BlogPage() {
                             pageInfo={{size: 5, number: 0, totalPages: 25, totalElements: 120}} setPage={() => {
                         }}/>
                     </div>
-                    <div className="hidden md:block col-span-1 flex-col">
+                    <div className="col-span-1 hidden lg:block flex-col">
                         <SideBar
                             username={username}
                             addTag={addTag}
@@ -115,9 +127,9 @@ function BlogPage() {
                 </div>
             </div>
             <div ref={sideBarRef}
-                 className={`${isOpen ? "translate-x-0 overflow-y-auto" : "translate-x-full overflow-y-hidden"} absolute top-0 right-0 w-96 flex-col
+                 className={`${isOpen ? "translate-x-0 overflow-y-scroll" : "translate-x-full overflow-y-hidden"} absolute top-0 right-0 w-96 flex-col
                      transform transition-transform duration-300 ease-out`}>
-                <button className="absolute top-4 right-[calc(336px)] hover:cursor-pointer"
+                <button className="absolute top-4 right-[calc(320px)] hover:cursor-pointer"
                         onClick={() => setIsOpen(false)}>
                     <MdOutlineExitToApp className="size-8 text-gray-500"/>
                 </button>

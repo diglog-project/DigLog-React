@@ -7,7 +7,7 @@ function PaginationButton({pageInfo, setPage}: {
     setPage: (page: number) => void,
 }) {
 
-    const paginationSize = 10;
+    const paginationSize = 5;
 
     const [pageList, setPageList] = useState<number[]>([]);
     const [startPage, setStartPage] = useState(0);
@@ -41,7 +41,7 @@ function PaginationButton({pageInfo, setPage}: {
                     onClick={() => {
                         setPage(page)
                     }}
-                    className="min-w-9 rounded-full bg-white py-2 px-3.5 border border-transparent text-center text-sm transition-all shadow-md hover:shadow-lg focus:bg-lime-400 focus:shadow-none active:bg-lime-400 hover:bg-lime-400 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none hover:cursor-pointer ml-2">
+                    className={`${pageInfo.number === page ? "bg-lime-400" : ""} min-w-9 rounded-full bg-white py-2 px-3.5 border border-transparent text-center text-sm transition-all shadow-md hover:shadow-lg focus:bg-lime-400 focus:shadow-none active:bg-lime-400 hover:bg-lime-400 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none hover:cursor-pointer ml-2`}>
                     {page + 1}
                 </button>
             ))}
