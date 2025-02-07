@@ -31,7 +31,7 @@ function MainPage() {
     return (
         <BasicLayout>
             <div className="flex flex-col justify-center items-start">
-                <div className="text-2xl font-black font-jalnan mb-8">
+                <div className="text-2xl font-jalnan mb-8">
                     인기 있는 게시글
                 </div>
                 <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8">

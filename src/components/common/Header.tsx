@@ -77,6 +77,10 @@ function Header() {
                                     <div className="font-medium truncate">{loginState.email}</div>
                                 </div>
                                 <div className="py-2 text-sm">
+                                    <Link to={`/write`}
+                                          className="w-full block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                        게시글 작성
+                                    </Link>
                                     <Link to={`/blog/${loginState.username}`}
                                           className="w-full block px-4 py-2 text-gray-700 hover:bg-gray-100">
                                         내 블로그
