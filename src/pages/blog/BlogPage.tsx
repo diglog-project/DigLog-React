@@ -81,18 +81,20 @@ function BlogPage() {
     return (
         <BasicLayout>
             <div ref={mainRef}
-                 className={(isOpen) ? "opacity-50 backdrop-blur-sm z-10" : "z-10"}>
-                <div className=" flex justify-between items-center text-2xl font-black px-4 py-8">
+                 className={`${(isOpen) ? "opacity-50 backdrop-blur-sm z-10" : "z-10"} flex flex-col`}>
+                <div className="flex justify-between items-center text-2xl font-jalnan px-4">
                     <div>{username}의 블로그</div>
                     <button onClick={handleMenuOpen} className="lg:hidden hover:cursor-pointer">
                         <MdMenu className="size-8"/>
                     </button>
                 </div>
-                <div className="flex gap-x-4 pb-4">
-                    폴더 {selectedFolder !== "" && <TagChip name={selectedFolder} removeTag={removeFolder}/>}
-                </div>
-                <div className="flex flex-wrap justify-start items-center gap-x-4 gap-y-2">
-                    태그 {selectedTagList.map((tag) => <TagChip name={tag} removeTag={removeTag}/>)}
+                <div className="flex flex-col flex-wrap gap-4 justify-center items-start px-4 py-4">
+                    <div className="flex flex-wrap justify-start items-center gap-x-4">
+                        폴더 {selectedFolder !== "" && <TagChip name={selectedFolder} removeTag={removeFolder}/>}
+                    </div>
+                    <div className="flex flex-wrap justify-start items-center gap-x-4 gap-y-2">
+                        태그 {selectedTagList.map((tag) => <TagChip name={tag} removeTag={removeTag}/>)}
+                    </div>
                 </div>
                 <div className="grid lg:grid-cols-3">
                     <div className="lg:col-span-2 flex flex-col gap-y-4 p-4 md:border-r border-r-gray-200">

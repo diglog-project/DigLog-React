@@ -30,9 +30,9 @@ function EmailPage() {
     }
 
     return (
-        <BasicLayout>
+        <BasicLayout center={true}>
             <div
-                className="w-full max-w-[calc(420px)] flex flex-col justify-center items-start h-[calc(100vh-220px)] mx-auto">
+                className="w-full max-w-[calc(420px)] flex flex-col justify-center items-start">
                 <LoginTextField
                     label={"이메일"}
                     type={"email"}

@@ -75,48 +75,50 @@ function SearchPage() {
 
     return (
         <BasicLayout>
-            <div className="flex flex-col max-w-xl mx-auto my-8">
-                <div className="w-full flex">
-                    <div className="relative w-full flex justify-between items-center">
-                        <input value={searchWord}
-                               onChange={(e) => setSearchWord(e.target.value)}
-                               placeholder={"검색어를 입력해주세요."}
-                               className="block mt-0.5 p-3 mr-4 w-full font-jalnan text-xl text-gray-900 border-b-2 border-white focus:outline-none focus:border-black"
-                               onKeyDown={handleSearchEnter}/>
-                        <button
-                            className={`${searchWord === "" ? "hidden" : ""} absolute right-16 rounded-full hover:cursor-pointer hover:bg-gray-1000`}
-                            onClick={() => setSearchWord("")}>
-                            <MdOutlineClear className="size-6 p-1"/>
-                        </button>
-                        <button className="hover:cursor-pointer"
-                                onClick={handleSearchWord}>
-                            <MdOutlineSearch className="size-7 text-gray-600 hover:text-gray-900"/>
-                        </button>
+            <div className="w-full flex flex-col gap-y-8">
+                <div className="w-full flex flex-col max-w-xl mx-auto">
+                    <div className="flex">
+                        <div className="w-full relative flex justify-between items-center">
+                            <input value={searchWord}
+                                   onChange={(e) => setSearchWord(e.target.value)}
+                                   placeholder={"검색어를 입력해주세요."}
+                                   className="w-full block mt-0.5 p-3 mr-4 font-jalnan text-xl text-gray-900 border-b-2 border-white focus:outline-none focus:border-black"
+                                   onKeyDown={handleSearchEnter}/>
+                            <button
+                                className={`${searchWord === "" ? "hidden" : ""} absolute right-16 rounded-full hover:cursor-pointer hover:bg-gray-1000`}
+                                onClick={() => setSearchWord("")}>
+                                <MdOutlineClear className="size-6 p-1"/>
+                            </button>
+                            <button className="hover:cursor-pointer"
+                                    onClick={handleSearchWord}>
+                                <MdOutlineSearch className="size-7 text-gray-600 hover:text-gray-900"/>
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div className="max-w-4xl mx-auto flex flex-col gap-y-2">
-                <div className="w-full flex justify-between items-center">
-                    <div className="text-lg"><span className="font-bold">99</span>개의 검색결과</div>
-                    <div className="flex items-center justify-end">
-                        <SearchMenu
-                            type={"option"}
-                            open={openOption}
-                            handleOpen={handleOpenOption}
-                            value={option}
-                            setValue={setOption}
-                            customRef={optionRef}/>
-                        <SearchMenu
-                            type={"sort"}
-                            open={openSort}
-                            handleOpen={handleOpenSort}
-                            value={sort}
-                            setValue={setSort}
-                            customRef={sortRef}/>
+                <div className="w-full max-w-4xl mx-auto flex flex-col gap-y-2">
+                    <div className="flex justify-between items-center">
+                        <div className="text-lg"><span className="font-bold">99</span>개의 검색결과</div>
+                        <div className="flex items-center justify-end">
+                            <SearchMenu
+                                type={"option"}
+                                open={openOption}
+                                handleOpen={handleOpenOption}
+                                value={option}
+                                setValue={setOption}
+                                customRef={optionRef}/>
+                            <SearchMenu
+                                type={"sort"}
+                                open={openSort}
+                                handleOpen={handleOpenSort}
+                                value={sort}
+                                setValue={setSort}
+                                customRef={sortRef}/>
+                        </div>
                     </div>
+                    <SearchTab selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>
+                    <SearchResults selectedTab={selectedTab}/>
                 </div>
-                <SearchTab selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>
-                <SearchResults selectedTab={selectedTab}/>
             </div>
         </BasicLayout>
     );
@@ -150,7 +152,7 @@ function SearchResults({selectedTab}: { selectedTab: string }) {
 
     if (selectedTab === "게시글") {
         return (
-            <div>
+            <div className="my-2">
                 {(Array.from({length: 5}).map(() => (
                     <PostCard
                         key={faker.number.int().toString()}

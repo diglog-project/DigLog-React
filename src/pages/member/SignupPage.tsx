@@ -28,10 +28,7 @@ function SignupPage() {
         setLoading(true);
         console.log(email, code);
 
-        console.log(!checkPassword(passwordInfo.password));
-
         if (!checkPassword(passwordInfo.password) || passwordInfo.password !== passwordInfo.confirmPassword) {
-            alert("비밀번호를 확인해주세요.");
             setLoading(false);
             return;
         }
@@ -42,9 +39,9 @@ function SignupPage() {
     }
 
     return (
-        <BasicLayout>
+        <BasicLayout center={true}>
             <div
-                className="w-full max-w-[calc(420px)] h-[calc(100vh-220px)] flex flex-col justify-center items-center gap-y-4 mx-auto">
+                className="w-full max-w-[calc(420px)] flex flex-col justify-center items-center gap-y-4">
                 <p className="mb-4">비밀번호 설정을 마치면 회원가입이 완료됩니다.</p>
                 <div className="w-full">
                     <LoginTextField

@@ -46,9 +46,9 @@ function LoginPage() {
     }
 
     return (
-        <BasicLayout>
+        <BasicLayout center={true}>
             <div
-                className="flex flex-col justify-center items-center gap-y-4 w-full max-w-[calc(420px)] h-[calc(100vh-220px)] mx-auto">
+                className="w-full max-w-[calc(420px)] flex flex-col justify-center items-center gap-y-4">
                 <div className="flex justify-center items-center gap-x-2 mb-8">
                     <img src="/logo.png" alt="logo"
                          className="size-16 mb-1"/>
