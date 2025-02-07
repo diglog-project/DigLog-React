@@ -201,8 +201,8 @@ function WritePage() {
                     init={{
                         min_height: 400,
                         max_height: 4000,
-                        plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
-                        // autoresize: true,
+                        plugins: 'anchor autolink autoresize charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
+                        autoresize: true,
                         menubar: false,
                         statusbar: false,
                         inline_boundaries: false,
