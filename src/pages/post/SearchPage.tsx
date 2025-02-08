@@ -232,7 +232,7 @@ function SearchMenu({type, open, handleOpen, value, setValue, customRef}: {
                         className={`${(open) ? "" : "hidden"} absolute top-10 left-0 flex flex-col z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44`}>
                         <ul className="py-2 text-sm text-gray-700r">
                             {searchMenuList.map((menu) => (
-                                <SortMenu value={menu} current={value} setValue={setValue}
+                                <SortMenu key={menu} value={menu} current={value} setValue={setValue}
                                           handleOpen={handleOpen}/>
                             ))}
                         </ul>

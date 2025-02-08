@@ -134,7 +134,7 @@ function WritePage() {
                             className={`${folderOpen ? "" : "hidden"} absolute z-50 top-12 left-0 bg-white divide-y divide-gray-500 rounded-lg shadow-sm`}>
                             {folders.map((folder: FolderType) => {
                                 if (!folder.subFolder) {
-                                    return <div className="py-2 w-auto text-sm">
+                                    return <div key={folder.name} className="py-2 w-auto text-sm">
                                         <button
                                             className="px-4 py-2 text-gray-700 text-start hover:bg-gray-100 w-full hover:cursor-pointer"
                                             onClick={() => {
@@ -145,7 +145,7 @@ function WritePage() {
                                         </button>
                                     </div>
                                 } else {
-                                    return <div className="flex flex-col items-start py-2 w-auto text-sm">
+                                    return <div key={folder.name} className="flex flex-col items-start py-2 w-auto text-sm">
                                         <button
                                             className="px-4 py-2 text-gray-700 text-start border-gray-200 hover:bg-gray-100 w-full hover:cursor-pointer"
                                             onClick={() => {
@@ -156,6 +156,7 @@ function WritePage() {
                                         </button>
                                         {folder.subFolder.map((subFolder: FolderType) =>
                                             <button
+                                                key={subFolder.name}
                                                 className="px-4 py-2 text-gray-700 text-start hover:bg-gray-100 w-full hover:cursor-pointer"
                                                 onClick={() => {
                                                     setSelectedFolder(`${folder.name} > ${subFolder.name}`);

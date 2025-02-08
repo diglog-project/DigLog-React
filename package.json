@@ -10,8 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@reduxjs/toolkit": "^2.5.0",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/modifiers": "^9.0.0",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@faker-js/faker": "^9.4.0",
+    "@reduxjs/toolkit": "^2.5.0",
     "@tailwindcss/vite": "^4.0.0",
     "@tinymce/tinymce-react": "^5.1.1",
     "axios": "^1.7.9",
