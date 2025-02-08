@@ -8,7 +8,6 @@ import {CSS} from "@dnd-kit/utilities";
 import {restrictToVerticalAxis} from "@dnd-kit/modifiers";
 import {FillButton} from "../../components/common/FillButton.tsx";
 import {useNavigate} from "react-router-dom";
-import {TextButton} from "../../components/common/TextButton.tsx";
 
 function BlogSettingPage() {
 
