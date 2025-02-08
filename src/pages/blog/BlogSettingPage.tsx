@@ -1,18 +1,108 @@
 import BasicLayout from "../../layout/BasicLayout.tsx";
 import {useState} from "react";
 import {faker} from "@faker-js/faker/locale/ko";
-import {DndContext, DragEndEvent} from "@dnd-kit/core";
-import {arrayMove, SortableContext, useSortable} from "@dnd-kit/sortable";
-import {MdOutlineMenu} from "react-icons/md";
-import {CSS} from "@dnd-kit/utilities";
-import {restrictToVerticalAxis} from "@dnd-kit/modifiers";
-import {FillButton} from "../../components/common/FillButton.tsx";
+import {DragEndEvent} from "@dnd-kit/core";
+import {arrayMove} from "@dnd-kit/sortable";
 import {useNavigate} from "react-router-dom";
+import CategorySettingPage from "./CategorySettingPage.tsx";
+import PostSettingPage from "./PostSettingPage.tsx";
+
+export interface CategoryType {
+    id: string;
+    name: string;
+    subCategories?: CategoryType[];
+}
 
 function BlogSettingPage() {
 
-    const [selectedTab, setSelectedTab] = useState("카테고리");
+    const navigate = useNavigate();
+
     const tabList = ["카테고리", "게시글"];
+    const categoryData: CategoryType[] = [
+        {
+            id: "1",
+            name: faker.lorem.words(),
+            subCategories: [
+                {id: "4", name: faker.lorem.words()},
+                {id: "5", name: faker.lorem.words()}
+            ]
+        },
+        {
+            id: "2",
+            name: faker.lorem.words(),
+        },
+        {
+            id: "3",
+            name: faker.lorem.words(),
+            subCategories: [
+                {id: "6", name: faker.lorem.words()},
+                {id: "7", name: faker.lorem.words()},
+                {id: "8", name: faker.lorem.words()}
+            ]
+        },
+    ];
+
+    const [selectedTab, setSelectedTab] = useState("카테고리");
+    const [categories, setCategories] = useState<CategoryType[]>(categoryData);
+    const [isHover, setIsHover] = useState(false);
+
+    const handleHover = (hover: boolean) => {
+        setIsHover(hover);
+    }
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const {active, over} = event;
+
+        if (!over || active.id === over.id) {
+            return;
+        }
+
+        let categoryIndex = -1;
+        let oldIndex = -1;
+        let newIndex = -1;
+
+        oldIndex = categories.findIndex(category => category.id === active.id);
+        newIndex = categories.findIndex(category => category.id === over.id);
+
+        if (oldIndex !== -1 && newIndex !== -1) {
+            setCategories(category => {
+                return arrayMove(category, oldIndex, newIndex);
+            });
+            return;
+        }
+
+        for (const category of categories) {
+            if (category.subCategories) {
+                oldIndex = category.subCategories.findIndex(category => category.id === active.id);
+                newIndex = category.subCategories.findIndex(category => category.id === over.id);
+
+                if (oldIndex !== -1 && newIndex !== -1) {
+                    categoryIndex = categories.indexOf(category);
+                    break;
+                }
+            }
+        }
+
+        if (categoryIndex !== -1 && oldIndex !== -1 && newIndex !== -1) {
+            setCategories(currentCategories => {
+                const updatedSubCategories = [...currentCategories[categoryIndex].subCategories!];
+                const [movedCategory] = updatedSubCategories.splice(oldIndex, 1);
+                updatedSubCategories.splice(newIndex, 0, movedCategory);
+
+                const updatedCategories = [...currentCategories];
+                updatedCategories[categoryIndex] = {...updatedCategories[categoryIndex], subCategories: updatedSubCategories};
+
+                return updatedCategories;
+            });
+        }
+    }
+
+    const submitCategoryChange = () => {
+        if (confirm("변경사항을 저장하시겠습니까?")) {
+            alert("저장되었습니다.");
+            navigate(0);
+        }
+    }
 
     return (
         <BasicLayout>
@@ -30,194 +120,21 @@ function BlogSettingPage() {
                             </li>)}
                     </ul>
                 </div>
-                <BlogSettingMain selectedTab={selectedTab}/>
+                {(selectedTab === "카테고리") &&
+                    <div className="border-l border-gray-200 w-full ps-8">
+                        <CategorySettingPage
+                            categories={categories}
+                            handleDragEnd={handleDragEnd}
+                            isHover={isHover}
+                            handleHover={handleHover}
+                            submitCategoryChange={submitCategoryChange}/>
+                    </div>}
+                {(selectedTab === "게시글") &&
+                    <div className="border-l border-gray-200 w-full ps-8">
+                        <PostSettingPage/>
+                    </div>}
             </div>
         </BasicLayout>
-    );
-}
-
-interface FolderType {
-    id: string;
-    name: string;
-    subFolder?: FolderType[];
-}
-
-function BlogSettingMain({selectedTab}: { selectedTab: string }) {
-
-    const navigate = useNavigate();
-
-    const folderData: FolderType[] = [
-        {
-            id: "1",
-            name: faker.lorem.words(),
-            subFolder: [
-                {id: "4", name: faker.lorem.words()},
-                {id: "5", name: faker.lorem.words()}
-            ]
-        },
-        {
-            id: "2",
-            name: faker.lorem.words(),
-        },
-        {
-            id: "3",
-            name: faker.lorem.words(),
-            subFolder: [
-                {id: "6", name: faker.lorem.words()},
-                {id: "7", name: faker.lorem.words()},
-                {id: "8", name: faker.lorem.words()}
-            ]
-        },
-    ];
-
-    const [folders, setFolders] = useState<FolderType[]>(folderData);
-
-    const handleDragEnd = (event: DragEndEvent) => {
-        const {active, over} = event;
-
-        if (!over || active.id === over.id) {
-            return;
-        }
-
-        setFolders(folder => {
-            const oldIndex = folders.findIndex(folder => folder.id === active.id);
-            const newIndex = folders.findIndex(folder => folder.id === over.id);
-
-            return arrayMove(folder, oldIndex, newIndex);
-        });
-    }
-
-    const handleDragEndSubFolder = (event: DragEndEvent) => {
-        const {active, over} = event;
-
-        if (!over || active.id === over.id) {
-            return;
-        }
-
-        let folderIndex = -1;
-        let oldIndex = -1;
-        let newIndex = -1;
-
-        for (const folder of folders) {
-            if (folder.subFolder) {
-                oldIndex = folder.subFolder.findIndex(folder => folder.id === active.id);
-                newIndex = folder.subFolder.findIndex(folder => folder.id === over.id);
-
-                if (oldIndex !== -1 && newIndex !== -1) {
-                    folderIndex = folders.indexOf(folder);
-                    break;
-                }
-            }
-        }
-
-        if (folderIndex !== -1 && oldIndex !== -1 && newIndex !== -1) {
-            setFolders(currentFolders => {
-                const updatedSubFolders = [...currentFolders[folderIndex].subFolder!];
-                const [movedFolder] = updatedSubFolders.splice(oldIndex, 1);
-                updatedSubFolders.splice(newIndex, 0, movedFolder);
-
-                const updatedFolders = [...currentFolders];
-                updatedFolders[folderIndex] = {...updatedFolders[folderIndex], subFolder: updatedSubFolders};
-
-                return updatedFolders;
-            });
-        }
-    }
-
-    const submitFolderChange = () => {
-        if (confirm("변경사항을 저장하시겠습니까?")) {
-            alert("저장되었습니다.");
-            navigate(0);
-        }
-    }
-
-    if (selectedTab === "카테고리") {
-        return (
-            <div className="border-l border-gray-200 w-full ps-8">
-                <div>
-                    <p className="font-semibold text-xl my-4">카테고리 관리</p>
-                    <div className="flex flex-col w-full">
-                        <DndContext modifiers={[restrictToVerticalAxis]}
-                                    onDragEnd={handleDragEnd}>
-                            <SortableContext items={folders}>
-                                {folders.map((folder) => (
-                                    <FolderCard key={folder.id} folder={folder} handleDrag={handleDragEndSubFolder}/>))}
-                            </SortableContext>
-                        </DndContext>
-                    </div>
-                    <div className="flex justify-between w-full my-4">
-                        <div></div>
-                        <FillButton text={"변경사항 저장"} onClick={submitFolderChange} addStyle={"font-normal"}/>
-                    </div>
-                </div>
-            </div>
-        );
-    } else if (selectedTab === "게시글") {
-        return (
-            <div className="w-full">
-                <div className="">
-                    게시글
-                </div>
-            </div>
-        );
-    }
-
-    return <></>;
-}
-
-function FolderCard({folder, handleDrag}: { folder: FolderType, handleDrag: (event: DragEndEvent) => void }) {
-
-    const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id: folder.id});
-
-    const style = {
-        transform: CSS.Translate.toString(transform),
-        transition,
-    };
-
-    return (
-        <div ref={setNodeRef} style={style}
-             className="flex flex-col w-full border border-gray-200 font-bold gap-x-2 p-4 my-1">
-            <div className="flex justify-between items-center gap-x-4">
-                <button {...attributes} {...listeners}
-                     className="hover:cursor-pointer">
-                    <MdOutlineMenu className="size-6"/>
-                </button>
-                <p className="flex-1">{folder.name}</p>
-            </div>
-            {(folder.subFolder) &&
-                <DndContext modifiers={[restrictToVerticalAxis]}
-                            onDragEnd={handleDrag}>
-                    <SortableContext items={folder.subFolder}>
-                        {folder.subFolder.map((subFolder) => (
-                            <SubFolderCard key={subFolder.id} subFolder={subFolder}/>
-                        ))}
-                    </SortableContext>
-                </DndContext>}
-        </div>
-    );
-}
-
-function SubFolderCard({subFolder}: { subFolder: FolderType }) {
-
-    const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id: subFolder.id});
-
-    const style = {
-        transform: CSS.Translate.toString(transform),
-        transition,
-    };
-
-    return (
-        <div ref={setNodeRef} className="ml-10 mt-4 border border-gray-200 flex flex-col p-2 my-2" style={style}>
-            <div>
-                <div className="flex justify-between items-center gap-x-4">
-                    <div {...attributes} {...listeners}
-                         className="hover:cursor-pointer">
-                        <MdOutlineMenu className="size-6"/>
-                    </div>
-                    <p className="flex-1">{subFolder.name}</p>
-                </div>
-            </div>
-        </div>
     );
 }
 

@@ -15,16 +15,16 @@ interface WritePostType {
     content: string;
 }
 
-interface FolderType {
+interface CategoryType {
     name: string;
-    subFolder?: FolderType[];
+    subCategories?: CategoryType[];
 }
 
 function WritePage() {
 
     const loginState = useSelector((state: RootState) => state.loginSlice);
     const navigate = useNavigate();
-    const folderRef = useRef<HTMLDivElement | null>(null);
+    const categoryRef = useRef<HTMLDivElement | null>(null);
 
     const [post, setPost] = useState<WritePostType>({
         inputTag: "",
@@ -34,12 +34,12 @@ function WritePage() {
     });
     const [showTag, setShowTag] = useState(false);
 
-    const [folderOpen, setFolderOpen] = useState(false);
-    const [selectedFolder, setSelectedFolder] = useState("카테고리 선택");
+    const [categoryOpen, setCategoryOpen] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState("카테고리 선택");
     const [uploadCount, setUploadCount] = useState(0);
     const [exitPage, setExitPage] = useState(false);
-    const handleFolderOpen = () => {
-        setFolderOpen(prev => !prev);
+    const handleCategoryOpen = () => {
+        setCategoryOpen(prev => !prev);
     }
 
     const removeTag = (tag: string | null) => {
@@ -69,8 +69,8 @@ function WritePage() {
     }
 
     const handleClickOutside = (event: MouseEvent) => {
-        if (folderRef.current && !folderRef.current.contains(event.target as Node)) {
-            setFolderOpen(false);
+        if (categoryRef.current && !categoryRef.current.contains(event.target as Node)) {
+            setCategoryOpen(false);
         }
     };
 
@@ -97,10 +97,10 @@ function WritePage() {
         };
     }, []);
 
-    const folders: FolderType[] = [
+    const categoryData: CategoryType[] = [
         {
             name: faker.lorem.words(),
-            subFolder: [
+            subCategories: [
                 {name: faker.lorem.words()},
                 {name: faker.lorem.words()}
             ]
@@ -110,7 +110,7 @@ function WritePage() {
         },
         {
             name: faker.lorem.words(),
-            subFolder: [
+            subCategories: [
                 {name: faker.lorem.words()},
                 {name: faker.lorem.words()},
                 {name: faker.lorem.words()}
@@ -122,47 +122,48 @@ function WritePage() {
         <BasicLayout>
             <div className="flex flex-col w-full">
                 <div className="flex justify-start items-center">
-                    <div ref={folderRef}
+                    <div ref={categoryRef}
                          className="w-full relative flex justify-start text-gray-700 items-center text-sm font-normal">
                         <button
                             className="w-auto flex justify-between items-center gap-x-2 px-3 py-2 border border-gray-200 hover:bg-gray-50 hover:cursor-pointer"
-                            onClick={handleFolderOpen}>
-                            {selectedFolder}
+                            onClick={handleCategoryOpen}>
+                            {selectedCategory}
                             <MdOutlineArrowDropDown/>
                         </button>
                         <div
-                            className={`${folderOpen ? "" : "hidden"} absolute z-50 top-12 left-0 bg-white divide-y divide-gray-500 rounded-lg shadow-sm`}>
-                            {folders.map((folder: FolderType) => {
-                                if (!folder.subFolder) {
-                                    return <div key={folder.name} className="py-2 w-auto text-sm">
+                            className={`${categoryOpen ? "" : "hidden"} absolute z-50 top-12 left-0 bg-white divide-y divide-gray-500 rounded-lg shadow-sm`}>
+                            {categoryData.map((category) => {
+                                if (!category.subCategories) {
+                                    return <div key={category.name} className="py-2 w-auto text-sm">
                                         <button
                                             className="px-4 py-2 text-gray-700 text-start hover:bg-gray-100 w-full hover:cursor-pointer"
                                             onClick={() => {
-                                                setSelectedFolder(folder.name);
-                                                setFolderOpen(false);
+                                                setSelectedCategory(category.name);
+                                                setCategoryOpen(false);
                                             }}>
-                                            {folder.name}
+                                            {category.name}
                                         </button>
                                     </div>
                                 } else {
-                                    return <div key={folder.name} className="flex flex-col items-start py-2 w-auto text-sm">
+                                    return <div key={category.name}
+                                                className="flex flex-col items-start py-2 w-auto text-sm">
                                         <button
                                             className="px-4 py-2 text-gray-700 text-start border-gray-200 hover:bg-gray-100 w-full hover:cursor-pointer"
                                             onClick={() => {
-                                                setSelectedFolder(folder.name);
-                                                setFolderOpen(false);
+                                                setSelectedCategory(category.name);
+                                                setCategoryOpen(false);
                                             }}>
-                                            {folder.name}
+                                            {category.name}
                                         </button>
-                                        {folder.subFolder.map((subFolder: FolderType) =>
+                                        {category.subCategories.map((subCategory: CategoryType) =>
                                             <button
-                                                key={subFolder.name}
+                                                key={subCategory.name}
                                                 className="px-4 py-2 text-gray-700 text-start hover:bg-gray-100 w-full hover:cursor-pointer"
                                                 onClick={() => {
-                                                    setSelectedFolder(`${folder.name} > ${subFolder.name}`);
-                                                    setFolderOpen(false);
+                                                    setSelectedCategory(`${category.name} > ${subCategory.name}`);
+                                                    setCategoryOpen(false);
                                                 }}>
-                                                {`${folder.name} > ${subFolder.name}`}
+                                                {`${category.name} > ${subCategory.name}`}
                                             </button>
                                         )}
                                     </div>;

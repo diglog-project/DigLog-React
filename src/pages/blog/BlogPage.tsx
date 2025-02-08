@@ -15,7 +15,7 @@ function BlogPage() {
     const [searchParams, setSearchParams] = useSearchParams({"category": ""});
 
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedFolder, setSelectedFolder] = useState(searchParams.get("category") || "");
+    const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "");
     const [selectedTagList, setSelectedTagList] = useState<string[]>([]);
 
     const mainRef = useRef<HTMLDivElement | null>(null);
@@ -38,9 +38,9 @@ function BlogPage() {
         setSelectedTagList(prevState => prevState.filter(tag => tag !== selectTag));
     }
 
-    const removeFolder = (selectFolder: string) => {
-        console.log(selectFolder);
-        setSelectedFolder("");
+    const removeCategory = (selectCategory: string) => {
+        console.log(selectCategory);
+        setSelectedCategory("");
     }
 
     useEffect(() => {
@@ -62,9 +62,9 @@ function BlogPage() {
 
     useEffect(() => {
         setSearchParams({
-            "category": selectedFolder
+            "category": selectedCategory
         })
-    }, [selectedFolder]);
+    }, [selectedCategory]);
 
     useEffect(() => {
         if (isOpen) {
@@ -90,7 +90,7 @@ function BlogPage() {
                 </div>
                 <div className="flex flex-col flex-wrap gap-4 justify-center items-start px-4 py-4">
                     <div className="flex flex-wrap justify-start items-center gap-x-4">
-                        폴더 {selectedFolder !== "" && <TagChip name={selectedFolder} removeTag={removeFolder}/>}
+                        카테고리 {selectedCategory !== "" && <TagChip name={selectedCategory} removeTag={removeCategory}/>}
                     </div>
                     <div className="flex flex-wrap justify-start items-center gap-x-4 gap-y-2">
                         태그 {selectedTagList.map((tag) => <TagChip name={tag} removeTag={removeTag}/>)}
@@ -122,7 +122,7 @@ function BlogPage() {
                         <SideBar
                             username={username}
                             addTag={addTag}
-                            setSelectedFolder={setSelectedFolder}/>
+                            setSelectedCategory={setSelectedCategory}/>
                     </div>
                 </div>
             </div>
@@ -136,17 +136,17 @@ function BlogPage() {
                 <SideBar
                     username={username}
                     addTag={addTag}
-                    setSelectedFolder={setSelectedFolder}
+                    setSelectedCategory={setSelectedCategory}
                     bgColor={"bg-gray-50"}/>
             </div>
         </BasicLayout>
     );
 }
 
-function SideBar({username, addTag, setSelectedFolder, bgColor}: {
+function SideBar({username, addTag, setSelectedCategory, bgColor}: {
     username: string | undefined,
     addTag: (tagName: string) => void,
-    setSelectedFolder: (folder: string) => void,
+    setSelectedCategory: (category: string) => void,
     bgColor?: string
 }) {
 
@@ -160,19 +160,19 @@ function SideBar({username, addTag, setSelectedFolder, bgColor}: {
                 </div>
             </div>
             <div className="flex flex-col justify-center items-center gap-4 py-8">
-                <div className="font-bold text-center">폴더</div>
+                <div className="font-bold text-center">카테고리</div>
                 <div className="flex flex-col gap-y-4 p-2">
                     {[Array.from({length: 10}).map((_, i) => (
                         <div key={i} className="flex flex-col gap-y-2 font-semibold">
                             <button className="flex justify-start items-center hover:cursor-pointer"
-                                    onClick={() => setSelectedFolder(faker.word.words())}>
+                                    onClick={() => setSelectedCategory(faker.word.words())}>
                                 {faker.word.words()}
                             </button>
                             <div
                                 className="flex flex-col gap-y-1 font-normal text-gray-400 border-l border-gray-300 pl-2">
                                 {Array.from({length: 3}).map((_, i) => (
                                     <button key={i} className="flex justify-start hover:cursor-pointer"
-                                            onClick={() => setSelectedFolder(`${faker.word.words()} > ${faker.word.words()}`)}>
+                                            onClick={() => setSelectedCategory(`${faker.word.words()} > ${faker.word.words()}`)}>
                                         {faker.word.words()}
                                     </button>
                                 ))}
