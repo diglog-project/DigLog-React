@@ -3,10 +3,20 @@ import {restrictToVerticalAxis} from "@dnd-kit/modifiers";
 import {SortableContext} from "@dnd-kit/sortable";
 import {FillButton} from "../../components/common/FillButton.tsx";
 import {CategoryType} from "./SettingPage.tsx";
-import CategoryCard from "../../components/blog/CategoryCard.tsx";
+import CategoryCard from "../../components/setting/CategoryCard.tsx";
 
-function CategorySettingPage({categories, handleDragEnd, isHover, handleHover, submitCategoryChange}: {
+function CategorySettingPage({
+                                 setSelectedCategory,
+                                 categories,
+                                 setShowModal,
+                                 handleDragEnd,
+                                 isHover,
+                                 handleHover,
+                                 submitCategoryChange
+                             }: {
+    setSelectedCategory: (category: CategoryType) => void,
     categories: CategoryType[],
+    setShowModal: (modal: boolean) => void,
     handleDragEnd: (event: DragEndEvent) => void,
     isHover: boolean,
     handleHover: (hover: boolean) => void,
@@ -22,8 +32,13 @@ function CategorySettingPage({categories, handleDragEnd, isHover, handleHover, s
                     <SortableContext items={categories}>
                         {categories.map((category) => (
                             <div key={category.id}>
-                                <CategoryCard category={category} handleDrag={handleDragEnd} isHover={isHover}
-                                              handleHover={handleHover}/>
+                                <CategoryCard
+                                    setSelectedCategory={setSelectedCategory}
+                                    category={category}
+                                    setShowModal={setShowModal}
+                                    handleDrag={handleDragEnd}
+                                    isHover={isHover}
+                                    handleHover={handleHover}/>
                             </div>
                         ))}
                     </SortableContext>
@@ -33,6 +48,8 @@ function CategorySettingPage({categories, handleDragEnd, isHover, handleHover, s
                 <div></div>
                 <FillButton text={"변경사항 저장"} onClick={submitCategoryChange} addStyle={"font-normal"}/>
             </div>
+
+            {}
         </div>
     );
 }

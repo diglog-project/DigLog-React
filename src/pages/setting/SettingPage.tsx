@@ -7,6 +7,7 @@ import {useNavigate} from "react-router-dom";
 import CategorySettingPage from "./CategorySettingPage.tsx";
 import PostSettingPage from "./PostSettingPage.tsx";
 import ProfileSettingPage from "./ProfileSettingPage.tsx";
+import CategoryMoveModal from "../../components/setting/CategoryMoveModal.tsx";
 
 export interface CategoryType {
     id: string;
@@ -17,6 +18,8 @@ export interface CategoryType {
 function SettingPage() {
 
     const navigate = useNavigate();
+
+    const [showCategoryModal, setShowCategoryModal] = useState(false);
 
     const tabList = ["프로필", "카테고리", "게시글"];
     const categoryData: CategoryType[] = [
@@ -45,6 +48,7 @@ function SettingPage() {
 
     const [selectedTab, setSelectedTab] = useState("프로필");
     const [categories, setCategories] = useState<CategoryType[]>(categoryData);
+    const [selectedCategory, setSelectedCategory] = useState<CategoryType | null>(null);
     const [isHover, setIsHover] = useState(false);
 
     const handleHover = (hover: boolean) => {
@@ -101,6 +105,49 @@ function SettingPage() {
         }
     }
 
+    const handleCategoryMove = (categoryId: string) => {
+        setCategories(prevCategories => {
+            const newCategories = [...prevCategories];
+            let categoryToMove;
+            let targetCategory: CategoryType | undefined;
+
+            newCategories.forEach(category => {
+                if (category.subCategories) {
+                    const subCategoryIndex = category.subCategories.findIndex(sub => sub.id === selectedCategory?.id);
+                    if (subCategoryIndex !== -1) {
+                        categoryToMove = category.subCategories[subCategoryIndex];
+                        category.subCategories.splice(subCategoryIndex, 1);
+                    }
+                }
+
+                if (category.id === categoryId) {
+                    targetCategory = category;
+                }
+            });
+
+            if (!categoryToMove) {
+                return prevCategories;
+            }
+
+            if (categoryId === "top") {
+                newCategories.push(categoryToMove);
+                return newCategories;
+            }
+
+            if (!targetCategory) {
+                return prevCategories;
+            }
+
+            if (!targetCategory.subCategories) {
+                targetCategory.subCategories = [];
+            }
+
+            targetCategory.subCategories.push(categoryToMove);
+
+            return newCategories;
+        });
+    }
+
     const submitCategoryChange = () => {
         if (confirm("변경사항을 저장하시겠습니까?")) {
             alert("저장되었습니다.");
@@ -127,7 +174,9 @@ function SettingPage() {
                 {(selectedTab === "카테고리") &&
                     <div className="border-l border-gray-200 w-full ps-8">
                         <CategorySettingPage
+                            setSelectedCategory={setSelectedCategory}
                             categories={categories}
+                            setShowModal={setShowCategoryModal}
                             handleDragEnd={handleDragEnd}
                             isHover={isHover}
                             handleHover={handleHover}
@@ -142,6 +191,11 @@ function SettingPage() {
                         <ProfileSettingPage/>
                     </div>}
             </div>
+            {showCategoryModal && <CategoryMoveModal
+                selectedCategory={selectedCategory}
+                categories={categories}
+                handleCategoryMove={handleCategoryMove}
+                setShowModal={setShowCategoryModal}/>}
         </BasicLayout>
     );
 }

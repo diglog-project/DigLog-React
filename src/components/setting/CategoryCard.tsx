@@ -6,8 +6,10 @@ import {MdOutlineMenu} from "react-icons/md";
 import {TextButton} from "../common/TextButton.tsx";
 import {restrictToVerticalAxis} from "@dnd-kit/modifiers";
 
-function CategoryCard({category, handleDrag, isHover, handleHover, isSub}: {
+function CategoryCard({setSelectedCategory, category, setShowModal, handleDrag, isHover, handleHover, isSub}: {
+    setSelectedCategory: (category: CategoryType) => void,
     category: CategoryType,
+    setShowModal: (modal: boolean) => void,
     handleDrag?: (event: DragEndEvent) => void,
     isHover: boolean,
     handleHover: (hover: boolean) => void,
@@ -41,16 +43,30 @@ function CategoryCard({category, handleDrag, isHover, handleHover, isSub}: {
                 </button>
                 <p className="flex-1 py-4">{category.name}</p>
                 <div className={`flex justify-end items-center gap-x-4`}>
-                    {(isSub) && <TextButton text={"이동"} addStyle={"font-normal text-sm hover:bg-gray-200"}/>}
-                    <TextButton text={"수정"} addStyle={"font-normal text-sm hover:bg-gray-200"}/>
+                    {(isSub) &&
+                        <TextButton
+                            text={"이동"}
+                            addStyle={"font-normal text-sm hover:bg-gray-200"}
+                            onClick={() => {
+                                setSelectedCategory(category);
+                                setShowModal(true);
+                            }}/>}
+                    <TextButton
+                        text={"수정"}
+                        addStyle={"font-normal text-sm hover:bg-gray-200"}/>
                 </div>
             </div>
             {category.subCategories && (
                 <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={handleDrag}>
                     <SortableContext items={category.subCategories}>
                         {category.subCategories.map((subCategory) => (
-                            <CategoryCard key={subCategory.id} category={subCategory} isSub={true} isHover={isHover}
-                                        handleHover={handleHover}/>
+                            <CategoryCard
+                                key={subCategory.id}
+                                setSelectedCategory={setSelectedCategory}
+                                category={subCategory}
+                                setShowModal={setShowModal}
+                                isSub={true} isHover={isHover}
+                                handleHover={handleHover}/>
                         ))}
                     </SortableContext>
                 </DndContext>
