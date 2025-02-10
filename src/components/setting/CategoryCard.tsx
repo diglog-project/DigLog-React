@@ -5,6 +5,8 @@ import {CSS} from "@dnd-kit/utilities";
 import {MdOutlineMenu} from "react-icons/md";
 import {TextButton} from "../common/TextButton.tsx";
 import {restrictToVerticalAxis} from "@dnd-kit/modifiers";
+import {useState} from "react";
+import {FillButton} from "../common/FillButton.tsx";
 
 function CategoryCard({setSelectedCategory, category, setShowModal, handleDrag, isHover, handleHover, isSub}: {
     setSelectedCategory: (category: CategoryType) => void,
@@ -16,12 +18,20 @@ function CategoryCard({setSelectedCategory, category, setShowModal, handleDrag, 
     isSub?: boolean
 }) {
 
+    const [isEdit, setIsEdit] = useState(false);
+    const [categoryNameInput, setCategoryNameInput] = useState(category.name);
+
     const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id: category.id});
 
     const style = {
         transform: CSS.Translate.toString(transform),
         transition,
     };
+
+    const handleCategoryNameChange = () => {
+        category.name = categoryNameInput;
+        setIsEdit(false);
+    }
 
     return (
         <div ref={setNodeRef} style={style}
@@ -41,9 +51,17 @@ function CategoryCard({setSelectedCategory, category, setShowModal, handleDrag, 
                         className="hover:cursor-move">
                     <MdOutlineMenu className="size-6"/>
                 </button>
-                <p className="flex-1 py-4">{category.name}</p>
+                {(isEdit)
+                    ? <input
+                        className="w-full p-2 border"
+                        type="text"
+                        value={categoryNameInput}
+                        onChange={(e) => {
+                            setCategoryNameInput(e.target.value)
+                        }}/>
+                    : <p className="flex-1 py-4">{category.name}</p>}
                 <div className={`flex justify-end items-center gap-x-4`}>
-                    {(isSub) &&
+                    {(isSub && !isEdit) &&
                         <TextButton
                             text={"이동"}
                             addStyle={"font-normal text-sm hover:bg-gray-200"}
@@ -51,9 +69,15 @@ function CategoryCard({setSelectedCategory, category, setShowModal, handleDrag, 
                                 setSelectedCategory(category);
                                 setShowModal(true);
                             }}/>}
-                    <TextButton
-                        text={"수정"}
-                        addStyle={"font-normal text-sm hover:bg-gray-200"}/>
+                    {(isEdit)
+                        ? <FillButton
+                            text={"변경"}
+                            onClick={handleCategoryNameChange}
+                            addStyle={"w-16 font-normal text-sm"}/>
+                        : <TextButton
+                            text={"수정"}
+                            addStyle={"font-normal text-sm hover:bg-gray-200"}
+                            onClick={() => setIsEdit(true)}/>}
                 </div>
             </div>
             {category.subCategories && (
