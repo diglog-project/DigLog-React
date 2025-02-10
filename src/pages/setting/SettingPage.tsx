@@ -8,6 +8,7 @@ import CategorySettingPage from "./CategorySettingPage.tsx";
 import PostSettingPage from "./PostSettingPage.tsx";
 import ProfileSettingPage from "./ProfileSettingPage.tsx";
 import CategoryMoveModal from "../../components/setting/CategoryMoveModal.tsx";
+import CategoryAddModal from "../../components/setting/CategoryAddModal.tsx";
 
 export interface CategoryType {
     id: string;
@@ -20,6 +21,7 @@ function SettingPage() {
     const navigate = useNavigate();
 
     const [showCategoryModal, setShowCategoryModal] = useState(false);
+    const [showCategoryAddModal, setShowCategoryAddModal] = useState(false);
 
     const tabList = ["프로필", "카테고리", "게시글"];
     const categoryData: CategoryType[] = [
@@ -177,6 +179,7 @@ function SettingPage() {
                             setSelectedCategory={setSelectedCategory}
                             categories={categories}
                             setShowModal={setShowCategoryModal}
+                            setShowCategoryAddModal={setShowCategoryAddModal}
                             handleDragEnd={handleDragEnd}
                             isHover={isHover}
                             handleHover={handleHover}
@@ -196,6 +199,9 @@ function SettingPage() {
                 categories={categories}
                 handleCategoryMove={handleCategoryMove}
                 setShowModal={setShowCategoryModal}/>}
+            {showCategoryAddModal && <CategoryAddModal
+                categories={categories}
+                setShowCategoryAddModal={setShowCategoryAddModal}/>}
         </BasicLayout>
     );
 }

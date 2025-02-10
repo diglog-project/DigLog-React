@@ -4,6 +4,7 @@ import {useState} from "react";
 import {TextButton} from "../common/TextButton.tsx";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store.tsx";
+import ModalLayout from "../../layout/ModalLayout.tsx";
 
 function CategoryMoveModal({selectedCategory, categories, handleCategoryMove, setShowModal}: {
     selectedCategory: CategoryType | null,
@@ -23,10 +24,9 @@ function CategoryMoveModal({selectedCategory, categories, handleCategoryMove, se
     }
 
     return (
-        <div className="fixed inset-0 flex justify-center items-center">
-            <div className="absolute inset-0 z-20 bg-black opacity-50" />
-            <div className="z-50 max-w-240 w-full shadow-lg bg-white rounded-2xl p-8 flex flex-col gap-y-4">
-                <p className="font-bold mb-8">
+        <ModalLayout>
+            <div className="flex flex-col gap-y-4">
+                <p className="font-bold mb-4">
                     "{selectedCategory?.name}" 카테고리를 이동할 곳을 골라주세요.
                 </p>
                 <button
@@ -46,7 +46,7 @@ function CategoryMoveModal({selectedCategory, categories, handleCategoryMove, se
                     <FillButton text={"이동"} onClick={handleCategoryChange}/>
                 </div>
             </div>
-        </div>
+        </ModalLayout>
     );
 }
 

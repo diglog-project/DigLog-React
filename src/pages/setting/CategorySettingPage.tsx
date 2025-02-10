@@ -4,11 +4,13 @@ import {SortableContext} from "@dnd-kit/sortable";
 import {FillButton} from "../../components/common/FillButton.tsx";
 import {CategoryType} from "./SettingPage.tsx";
 import CategoryCard from "../../components/setting/CategoryCard.tsx";
+import {OutlineButton} from "../../components/common/OutlineButton.tsx";
 
 function CategorySettingPage({
                                  setSelectedCategory,
                                  categories,
                                  setShowModal,
+                                 setShowCategoryAddModal,
                                  handleDragEnd,
                                  isHover,
                                  handleHover,
@@ -17,6 +19,7 @@ function CategorySettingPage({
     setSelectedCategory: (category: CategoryType) => void,
     categories: CategoryType[],
     setShowModal: (modal: boolean) => void,
+    setShowCategoryAddModal: (modal: boolean) => void,
     handleDragEnd: (event: DragEndEvent) => void,
     isHover: boolean,
     handleHover: (hover: boolean) => void,
@@ -44,12 +47,10 @@ function CategorySettingPage({
                     </SortableContext>
                 </DndContext>
             </div>
-            <div className="flex justify-between w-full my-4">
-                <div></div>
+            <div className="flex justify-end w-full my-4 gap-x-4">
+                <OutlineButton text={"카테고리 추가"} onClick={() => setShowCategoryAddModal(true)} addStyle={"font-normal"}/>
                 <FillButton text={"변경사항 저장"} onClick={submitCategoryChange} addStyle={"font-normal"}/>
             </div>
-
-            {}
         </div>
     );
 }
