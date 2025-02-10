@@ -14,5 +14,17 @@ export const Loading =
         </svg>
     </div>;
 
-export const Main = lazy(() => import('../pages/MainPage'));
-export const Login = lazy(() => import('../pages/member/LoginPage'));
+export const Main = lazy(() => import('../../pages/MainPage.tsx'));
+export const Login = lazy(() => import('../../pages/member/LoginPage.tsx'));
+export const Platform = lazy(() => import('../../pages/member/PlatformPage.tsx'));
+export const Email = lazy(() => import('../../pages/member/EmailPage.tsx'));
+export const Code = lazy(() => import('../../pages/member/CodePage.tsx'));
+export const Signup = lazy(() => import('../../pages/member/SignupPage.tsx'));
+export const Setting = lazy(() => import('../../pages/setting/SettingPage.tsx'));
+
+export const Search = lazy(() => import('../../pages/post/SearchPage.tsx'));
+
+export const Post = lazy(() => import('../../pages/post/PostPage.tsx'));
+export const Write = lazy(() => import('../../pages/post/WritePage.tsx'));
+
+export const Blog = lazy(() => import('../../pages/blog/BlogPage.tsx'));
