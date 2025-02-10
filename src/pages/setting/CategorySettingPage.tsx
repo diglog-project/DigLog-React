@@ -2,7 +2,7 @@ import {DndContext, DragEndEvent} from "@dnd-kit/core";
 import {restrictToVerticalAxis} from "@dnd-kit/modifiers";
 import {SortableContext} from "@dnd-kit/sortable";
 import {FillButton} from "../../components/common/FillButton.tsx";
-import {CategoryType} from "./BlogSettingPage.tsx";
+import {CategoryType} from "./SettingPage.tsx";
 import CategoryCard from "../../components/blog/CategoryCard.tsx";
 
 function CategorySettingPage({categories, handleDragEnd, isHover, handleHover, submitCategoryChange}: {

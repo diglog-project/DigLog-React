@@ -20,7 +20,7 @@ export const Platform = lazy(() => import('../../pages/member/PlatformPage.tsx')
 export const Email = lazy(() => import('../../pages/member/EmailPage.tsx'));
 export const Code = lazy(() => import('../../pages/member/CodePage.tsx'));
 export const Signup = lazy(() => import('../../pages/member/SignupPage.tsx'));
-export const Profile = lazy(() => import('../../pages/member/ProfilePage.tsx'));
+export const Setting = lazy(() => import('../../pages/setting/SettingPage.tsx'));
 
 export const Search = lazy(() => import('../../pages/post/SearchPage.tsx'));
 
@@ -28,4 +28,3 @@ export const Post = lazy(() => import('../../pages/post/PostPage.tsx'));
 export const Write = lazy(() => import('../../pages/post/WritePage.tsx'));
 
 export const Blog = lazy(() => import('../../pages/blog/BlogPage.tsx'));
-export const BlogSetting = lazy(() => import('../../pages/blog/BlogSettingPage.tsx'));

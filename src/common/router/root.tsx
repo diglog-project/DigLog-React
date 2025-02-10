@@ -1,6 +1,6 @@
 import {createBrowserRouter} from "react-router-dom";
 import {Suspense} from "react";
-import {Loading, Login, Main, Profile, Search, Write} from "./page.tsx";
+import {Loading, Login, Main, Search, Setting, Write} from "./page.tsx";
 import postRouter from "./postRouter.tsx";
 import blogRouter from "./blogRouter.tsx";
 import signupRouter from "./signupRouter.tsx";
@@ -15,8 +15,8 @@ const root = createBrowserRouter([
         element: <Suspense fallback={Loading}><Login/></Suspense>
     },
     {
-        path: '/profile',
-        element: <Suspense fallback={Loading}><Profile/></Suspense>
+        path: '/setting',
+        element: <Suspense fallback={Loading}><Setting/></Suspense>
     },
     {
         path: '/search',

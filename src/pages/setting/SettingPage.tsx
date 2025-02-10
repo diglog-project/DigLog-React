@@ -6,6 +6,7 @@ import {arrayMove} from "@dnd-kit/sortable";
 import {useNavigate} from "react-router-dom";
 import CategorySettingPage from "./CategorySettingPage.tsx";
 import PostSettingPage from "./PostSettingPage.tsx";
+import ProfileSettingPage from "./ProfileSettingPage.tsx";
 
 export interface CategoryType {
     id: string;
@@ -13,11 +14,11 @@ export interface CategoryType {
     subCategories?: CategoryType[];
 }
 
-function BlogSettingPage() {
+function SettingPage() {
 
     const navigate = useNavigate();
 
-    const tabList = ["카테고리", "게시글"];
+    const tabList = ["프로필", "카테고리", "게시글"];
     const categoryData: CategoryType[] = [
         {
             id: "1",
@@ -42,7 +43,7 @@ function BlogSettingPage() {
         },
     ];
 
-    const [selectedTab, setSelectedTab] = useState("카테고리");
+    const [selectedTab, setSelectedTab] = useState("프로필");
     const [categories, setCategories] = useState<CategoryType[]>(categoryData);
     const [isHover, setIsHover] = useState(false);
 
@@ -90,7 +91,10 @@ function BlogSettingPage() {
                 updatedSubCategories.splice(newIndex, 0, movedCategory);
 
                 const updatedCategories = [...currentCategories];
-                updatedCategories[categoryIndex] = {...updatedCategories[categoryIndex], subCategories: updatedSubCategories};
+                updatedCategories[categoryIndex] = {
+                    ...updatedCategories[categoryIndex],
+                    subCategories: updatedSubCategories
+                };
 
                 return updatedCategories;
             });
@@ -133,9 +137,13 @@ function BlogSettingPage() {
                     <div className="border-l border-gray-200 w-full ps-8">
                         <PostSettingPage/>
                     </div>}
+                {(selectedTab === "프로필") &&
+                    <div className="border-l border-gray-200 w-full ps-8">
+                        <ProfileSettingPage/>
+                    </div>}
             </div>
         </BasicLayout>
     );
 }
 
-export default BlogSettingPage;
+export default SettingPage;

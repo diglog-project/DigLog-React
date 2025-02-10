@@ -1,4 +1,4 @@
-import {CategoryType} from "../../pages/blog/BlogSettingPage.tsx";
+import {CategoryType} from "../../pages/setting/SettingPage.tsx";
 import {DndContext, DragEndEvent} from "@dnd-kit/core";
 import {SortableContext, useSortable} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
