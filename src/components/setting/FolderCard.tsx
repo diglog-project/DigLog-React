@@ -1,4 +1,4 @@
-import {CategoryType} from "../../pages/setting/SettingPage.tsx";
+import {FolderType} from "../../pages/setting/SettingPage.tsx";
 import {DndContext, DragEndEvent} from "@dnd-kit/core";
 import {SortableContext, useSortable} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
@@ -8,9 +8,9 @@ import {restrictToVerticalAxis} from "@dnd-kit/modifiers";
 import {useState} from "react";
 import {FillButton} from "../common/FillButton.tsx";
 
-function CategoryCard({setSelectedCategory, category, setShowModal, handleDrag, isHover, handleHover, isSub}: {
-    setSelectedCategory: (category: CategoryType) => void,
-    category: CategoryType,
+function FolderCard({setSelectedFolder, folder, setShowModal, handleDrag, isHover, handleHover, isSub}: {
+    setSelectedFolder: (folder: FolderType) => void,
+    folder: FolderType,
     setShowModal: (modal: boolean) => void,
     handleDrag?: (event: DragEndEvent) => void,
     isHover: boolean,
@@ -19,17 +19,17 @@ function CategoryCard({setSelectedCategory, category, setShowModal, handleDrag, 
 }) {
 
     const [isEdit, setIsEdit] = useState(false);
-    const [categoryNameInput, setCategoryNameInput] = useState(category.name);
+    const [folderNameInput, setFolderNameInput] = useState(folder.name);
 
-    const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id: category.id});
+    const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id: folder.id});
 
     const style = {
         transform: CSS.Translate.toString(transform),
         transition,
     };
 
-    const handleCategoryNameChange = () => {
-        category.name = categoryNameInput;
+    const handleFolderNameChange = () => {
+        folder.name = folderNameInput;
         setIsEdit(false);
     }
 
@@ -55,24 +55,24 @@ function CategoryCard({setSelectedCategory, category, setShowModal, handleDrag, 
                     ? <input
                         className="w-full p-2 border"
                         type="text"
-                        value={categoryNameInput}
+                        value={folderNameInput}
                         onChange={(e) => {
-                            setCategoryNameInput(e.target.value)
+                            setFolderNameInput(e.target.value)
                         }}/>
-                    : <p className="flex-1 py-4">{category.name}</p>}
+                    : <p className="flex-1 py-4">{folder.name}</p>}
                 <div className={`flex justify-end items-center gap-x-4`}>
                     {(isSub && !isEdit) &&
                         <TextButton
                             text={"이동"}
                             addStyle={"font-normal text-sm hover:bg-gray-200"}
                             onClick={() => {
-                                setSelectedCategory(category);
+                                setSelectedFolder(folder);
                                 setShowModal(true);
                             }}/>}
                     {(isEdit)
                         ? <FillButton
                             text={"변경"}
-                            onClick={handleCategoryNameChange}
+                            onClick={handleFolderNameChange}
                             addStyle={"w-16 font-normal text-sm"}/>
                         : <TextButton
                             text={"수정"}
@@ -80,14 +80,14 @@ function CategoryCard({setSelectedCategory, category, setShowModal, handleDrag, 
                             onClick={() => setIsEdit(true)}/>}
                 </div>
             </div>
-            {category.subCategories && (
+            {folder.subFolders && (
                 <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={handleDrag}>
-                    <SortableContext items={category.subCategories}>
-                        {category.subCategories.map((subCategory) => (
-                            <CategoryCard
-                                key={subCategory.id}
-                                setSelectedCategory={setSelectedCategory}
-                                category={subCategory}
+                    <SortableContext items={folder.subFolders}>
+                        {folder.subFolders.map((subFolder) => (
+                            <FolderCard
+                                key={subFolder.id}
+                                setSelectedFolder={setSelectedFolder}
+                                folder={subFolder}
                                 setShowModal={setShowModal}
                                 isSub={true} isHover={isHover}
                                 handleHover={handleHover}/>
@@ -99,4 +99,4 @@ function CategoryCard({setSelectedCategory, category, setShowModal, handleDrag, 
     );
 }
 
-export default CategoryCard;
+export default FolderCard;

@@ -7,15 +7,18 @@ import {useEffect, useRef, useState} from "react";
 import {MdMenu, MdOutlineExitToApp} from "react-icons/md";
 import PaginationButton from "../../components/common/PaginationButton.tsx";
 import TagChip from "../../components/post/TagChip.tsx";
+import {OutlineLink} from "../../components/common/OutlineButton.tsx";
+import {useSelector} from "react-redux";
+import {RootState} from "../../store.tsx";
 
 function BlogPage() {
 
     const {username} = useParams();
 
-    const [searchParams, setSearchParams] = useSearchParams({"category": ""});
+    const [searchParams, setSearchParams] = useSearchParams({"folder": ""});
 
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "");
+    const [selectedFolder, setSelectedFolder] = useState(searchParams.get("folder") || "");
     const [selectedTagList, setSelectedTagList] = useState<string[]>([]);
 
     const mainRef = useRef<HTMLDivElement | null>(null);
@@ -38,9 +41,9 @@ function BlogPage() {
         setSelectedTagList(prevState => prevState.filter(tag => tag !== selectTag));
     }
 
-    const removeCategory = (selectCategory: string) => {
-        console.log(selectCategory);
-        setSelectedCategory("");
+    const removeFolder = (selectFolder: string) => {
+        console.log(selectFolder);
+        setSelectedFolder("");
     }
 
     useEffect(() => {
@@ -62,9 +65,9 @@ function BlogPage() {
 
     useEffect(() => {
         setSearchParams({
-            "category": selectedCategory
+            "folder": selectedFolder
         })
-    }, [selectedCategory]);
+    }, [selectedFolder]);
 
     useEffect(() => {
         if (isOpen) {
@@ -90,7 +93,7 @@ function BlogPage() {
                 </div>
                 <div className="flex flex-col flex-wrap gap-4 justify-center items-start px-4 py-4">
                     <div className="flex flex-wrap justify-start items-center gap-x-4">
-                        카테고리 {selectedCategory !== "" && <TagChip name={selectedCategory} removeTag={removeCategory}/>}
+                        폴더 {selectedFolder !== "" && <TagChip name={selectedFolder} removeTag={removeFolder}/>}
                     </div>
                     <div className="flex flex-wrap justify-start items-center gap-x-4 gap-y-2">
                         태그 {selectedTagList.map((tag) => <TagChip name={tag} removeTag={removeTag}/>)}
@@ -107,7 +110,7 @@ function BlogPage() {
                                     width: 320,
                                     height: 320
                                 })}/>`}
-                                username={faker.animal.cat()}
+                                username={username || faker.animal.cat()}
                                 tags={[{
                                     id: faker.number.int().toString(),
                                     name: faker.word.sample()
@@ -122,7 +125,7 @@ function BlogPage() {
                         <SideBar
                             username={username}
                             addTag={addTag}
-                            setSelectedCategory={setSelectedCategory}/>
+                            setSelectedFolder={setSelectedFolder}/>
                     </div>
                 </div>
             </div>
@@ -136,19 +139,21 @@ function BlogPage() {
                 <SideBar
                     username={username}
                     addTag={addTag}
-                    setSelectedCategory={setSelectedCategory}
+                    setSelectedFolder={setSelectedFolder}
                     bgColor={"bg-gray-50"}/>
             </div>
         </BasicLayout>
     );
 }
 
-function SideBar({username, addTag, setSelectedCategory, bgColor}: {
+function SideBar({username, addTag, setSelectedFolder, bgColor}: {
     username: string | undefined,
     addTag: (tagName: string) => void,
-    setSelectedCategory: (category: string) => void,
+    setSelectedFolder: (folder: string) => void,
     bgColor?: string
 }) {
+
+    const loginState = useSelector((state: RootState) => state.loginSlice);
 
     return (
         <div className={bgColor}>
@@ -158,21 +163,28 @@ function SideBar({username, addTag, setSelectedCategory, bgColor}: {
                 <div className="flex justify-center items-center text-2xl font-black">
                     {username}
                 </div>
+                {username === loginState.username && (
+                    <div className="flex justify-between items-center gap-x-4 text-xs">
+                        <OutlineLink text={"게시글 작성"} to={"/write"}/>
+                        <OutlineLink text={"블로그 설정"} to={"/write"}
+                                     addStyle={"!border-neutral-500 !text-neutral-500 hover:bg-neutral-500 hover:!text-white"}/>
+                    </div>
+                )}
             </div>
             <div className="flex flex-col justify-center items-center gap-4 py-8">
-                <div className="font-bold text-center">카테고리</div>
+                <div className="font-bold text-center">폴더</div>
                 <div className="flex flex-col gap-y-4 p-2">
                     {[Array.from({length: 10}).map((_, i) => (
                         <div key={i} className="flex flex-col gap-y-2 font-semibold">
                             <button className="flex justify-start items-center hover:cursor-pointer"
-                                    onClick={() => setSelectedCategory(faker.word.words())}>
+                                    onClick={() => setSelectedFolder(faker.word.words())}>
                                 {faker.word.words()}
                             </button>
                             <div
                                 className="flex flex-col gap-y-1 font-normal text-gray-400 border-l border-gray-300 pl-2">
                                 {Array.from({length: 3}).map((_, i) => (
                                     <button key={i} className="flex justify-start hover:cursor-pointer"
-                                            onClick={() => setSelectedCategory(`${faker.word.words()} > ${faker.word.words()}`)}>
+                                            onClick={() => setSelectedFolder(`${faker.word.words()} > ${faker.word.words()}`)}>
                                         {faker.word.words()}
                                     </button>
                                 ))}

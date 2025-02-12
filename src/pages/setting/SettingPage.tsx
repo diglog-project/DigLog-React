@@ -4,31 +4,31 @@ import {faker} from "@faker-js/faker/locale/ko";
 import {DragEndEvent} from "@dnd-kit/core";
 import {arrayMove} from "@dnd-kit/sortable";
 import {useNavigate} from "react-router-dom";
-import CategorySettingPage from "./CategorySettingPage.tsx";
+import FolderSettingPage from "./FolderSettingPage.tsx";
 import PostSettingPage from "./PostSettingPage.tsx";
 import ProfileSettingPage from "./ProfileSettingPage.tsx";
-import CategoryMoveModal from "../../components/setting/CategoryMoveModal.tsx";
-import CategoryAddModal from "../../components/setting/CategoryAddModal.tsx";
+import FolderMoveModal from "../../components/setting/FolderMoveModal.tsx";
+import FolderAddModal from "../../components/setting/FolderAddModal.tsx";
 
-export interface CategoryType {
+export interface FolderType {
     id: string;
     name: string;
-    subCategories?: CategoryType[];
+    subFolders?: FolderType[];
 }
 
 function SettingPage() {
 
     const navigate = useNavigate();
 
-    const [showCategoryModal, setShowCategoryModal] = useState(false);
-    const [showCategoryAddModal, setShowCategoryAddModal] = useState(false);
+    const [showFolderModal, setShowFolderModal] = useState(false);
+    const [showFolderAddModal, setShowFolderAddModal] = useState(false);
 
-    const tabList = ["프로필", "카테고리", "게시글"];
-    const categoryData: CategoryType[] = [
+    const tabList = ["프로필", "폴더", "게시글"];
+    const folderData: FolderType[] = [
         {
             id: "1",
             name: faker.lorem.words(),
-            subCategories: [
+            subFolders: [
                 {id: "4", name: faker.lorem.words()},
                 {id: "5", name: faker.lorem.words()}
             ]
@@ -40,7 +40,7 @@ function SettingPage() {
         {
             id: "3",
             name: faker.lorem.words(),
-            subCategories: [
+            subFolders: [
                 {id: "6", name: faker.lorem.words()},
                 {id: "7", name: faker.lorem.words()},
                 {id: "8", name: faker.lorem.words()}
@@ -49,8 +49,8 @@ function SettingPage() {
     ];
 
     const [selectedTab, setSelectedTab] = useState("프로필");
-    const [categories, setCategories] = useState<CategoryType[]>(categoryData);
-    const [selectedCategory, setSelectedCategory] = useState<CategoryType | null>(null);
+    const [folders, setFolders] = useState<FolderType[]>(folderData);
+    const [selectedFolder, setSelectedFolder] = useState<FolderType | null>(null);
     const [isHover, setIsHover] = useState(false);
 
     const handleHover = (hover: boolean) => {
@@ -64,93 +64,93 @@ function SettingPage() {
             return;
         }
 
-        let categoryIndex = -1;
+        let folderIndex = -1;
         let oldIndex = -1;
         let newIndex = -1;
 
-        oldIndex = categories.findIndex(category => category.id === active.id);
-        newIndex = categories.findIndex(category => category.id === over.id);
+        oldIndex = folders.findIndex(folder => folder.id === active.id);
+        newIndex = folders.findIndex(folder => folder.id === over.id);
 
         if (oldIndex !== -1 && newIndex !== -1) {
-            setCategories(category => {
-                return arrayMove(category, oldIndex, newIndex);
+            setFolders(folder => {
+                return arrayMove(folder, oldIndex, newIndex);
             });
             return;
         }
 
-        for (const category of categories) {
-            if (category.subCategories) {
-                oldIndex = category.subCategories.findIndex(category => category.id === active.id);
-                newIndex = category.subCategories.findIndex(category => category.id === over.id);
+        for (const folder of folders) {
+            if (folder.subFolders) {
+                oldIndex = folder.subFolders.findIndex(folder => folder.id === active.id);
+                newIndex = folder.subFolders.findIndex(folder => folder.id === over.id);
 
                 if (oldIndex !== -1 && newIndex !== -1) {
-                    categoryIndex = categories.indexOf(category);
+                    folderIndex = folders.indexOf(folder);
                     break;
                 }
             }
         }
 
-        if (categoryIndex !== -1 && oldIndex !== -1 && newIndex !== -1) {
-            setCategories(currentCategories => {
-                const updatedSubCategories = [...currentCategories[categoryIndex].subCategories!];
-                const [movedCategory] = updatedSubCategories.splice(oldIndex, 1);
-                updatedSubCategories.splice(newIndex, 0, movedCategory);
+        if (folderIndex !== -1 && oldIndex !== -1 && newIndex !== -1) {
+            setFolders(currentFolders => {
+                const updatedSubFolders = [...currentFolders[folderIndex].subFolders!];
+                const [movedFolder] = updatedSubFolders.splice(oldIndex, 1);
+                updatedSubFolders.splice(newIndex, 0, movedFolder);
 
-                const updatedCategories = [...currentCategories];
-                updatedCategories[categoryIndex] = {
-                    ...updatedCategories[categoryIndex],
-                    subCategories: updatedSubCategories
+                const updatedFolders = [...currentFolders];
+                updatedFolders[folderIndex] = {
+                    ...updatedFolders[folderIndex],
+                    subFolders: updatedSubFolders
                 };
 
-                return updatedCategories;
+                return updatedFolders;
             });
         }
     }
 
-    const handleCategoryMove = (categoryId: string) => {
-        setCategories(prevCategories => {
-            const newCategories = [...prevCategories];
-            let categoryToMove;
-            let targetCategory: CategoryType | undefined;
+    const handleFolderMove = (folderId: string) => {
+        setFolders(prevFolders => {
+            const newFolders = [...prevFolders];
+            let folderToMove;
+            let targetFolder: FolderType | undefined;
 
-            newCategories.forEach(category => {
-                if (category.subCategories) {
-                    const subCategoryIndex = category.subCategories.findIndex(sub => sub.id === selectedCategory?.id);
-                    if (subCategoryIndex !== -1) {
-                        categoryToMove = category.subCategories[subCategoryIndex];
-                        category.subCategories.splice(subCategoryIndex, 1);
+            newFolders.forEach(folder => {
+                if (folder.subFolders) {
+                    const subFolderIndex = folder.subFolders.findIndex(sub => sub.id === selectedFolder?.id);
+                    if (subFolderIndex !== -1) {
+                        folderToMove = folder.subFolders[subFolderIndex];
+                        folder.subFolders.splice(subFolderIndex, 1);
                     }
                 }
 
-                if (category.id === categoryId) {
-                    targetCategory = category;
+                if (folder.id === folderId) {
+                    targetFolder = folder;
                 }
             });
 
-            if (!categoryToMove) {
-                return prevCategories;
+            if (!folderToMove) {
+                return prevFolders;
             }
 
-            if (categoryId === "top") {
-                newCategories.push(categoryToMove);
-                return newCategories;
+            if (folderId === "top") {
+                newFolders.push(folderToMove);
+                return newFolders;
             }
 
-            if (!targetCategory) {
-                return prevCategories;
+            if (!targetFolder) {
+                return prevFolders;
             }
 
-            if (!targetCategory.subCategories) {
-                targetCategory.subCategories = [];
+            if (!targetFolder.subFolders) {
+                targetFolder.subFolders = [];
             }
 
-            targetCategory.subCategories.push(categoryToMove);
+            targetFolder.subFolders.push(folderToMove);
 
-            return newCategories;
+            return newFolders;
         });
     }
 
-    const submitCategoryChange = () => {
+    const submitFolderChange = () => {
         if (confirm("변경사항을 저장하시겠습니까?")) {
             alert("저장되었습니다.");
             navigate(0);
@@ -173,17 +173,17 @@ function SettingPage() {
                             </li>)}
                     </ul>
                 </div>
-                {(selectedTab === "카테고리") &&
+                {(selectedTab === "폴더") &&
                     <div className="border-l border-gray-200 w-full ps-8">
-                        <CategorySettingPage
-                            setSelectedCategory={setSelectedCategory}
-                            categories={categories}
-                            setShowModal={setShowCategoryModal}
-                            setShowCategoryAddModal={setShowCategoryAddModal}
+                        <FolderSettingPage
+                            setSelectedFolder={setSelectedFolder}
+                            folders={folders}
+                            setShowModal={setShowFolderModal}
+                            setShowFolderAddModal={setShowFolderAddModal}
                             handleDragEnd={handleDragEnd}
                             isHover={isHover}
                             handleHover={handleHover}
-                            submitCategoryChange={submitCategoryChange}/>
+                            submitFolderChange={submitFolderChange}/>
                     </div>}
                 {(selectedTab === "게시글") &&
                     <div className="border-l border-gray-200 w-full ps-8">
@@ -194,14 +194,14 @@ function SettingPage() {
                         <ProfileSettingPage/>
                     </div>}
             </div>
-            {showCategoryModal && <CategoryMoveModal
-                selectedCategory={selectedCategory}
-                categories={categories}
-                handleCategoryMove={handleCategoryMove}
-                setShowModal={setShowCategoryModal}/>}
-            {showCategoryAddModal && <CategoryAddModal
-                categories={categories}
-                setShowCategoryAddModal={setShowCategoryAddModal}/>}
+            {showFolderModal && <FolderMoveModal
+                selectedFolder={selectedFolder}
+                folders={folders}
+                handleFolderMove={handleFolderMove}
+                setShowModal={setShowFolderModal}/>}
+            {showFolderAddModal && <FolderAddModal
+                folders={folders}
+                setShowFolderAddModal={setShowFolderAddModal}/>}
         </BasicLayout>
     );
 }
