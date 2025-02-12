@@ -10,3 +10,9 @@ export const getImgSrc = (content: string) => {
     const imgTag = doc.querySelector('img');
     return imgTag ? imgTag.src : null;
 }
+
+export const getImgUrls = (content: string) => {
+    const doc = new DOMParser().parseFromString(content, 'text/html');
+    const images = doc.querySelectorAll('img');
+    return Array.from(images).map(img => img.src);
+}

@@ -1,32 +1,8 @@
 import BasicLayout from "../layout/BasicLayout.tsx";
-import {useEffect} from "react";
-import {getProfile} from "../common/apis/member.tsx";
-import {login} from "../common/slices/loginSlice.tsx";
-import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../store.tsx";
 import PostCard from "../components/post/PostCard.tsx";
 import {faker} from "@faker-js/faker/locale/ko";
 
 function MainPage() {
-
-    const dispatch = useDispatch();
-    const loginState = useSelector((state: RootState) => state.loginSlice);
-
-    useEffect(() => {
-        getProfile()
-            .then(res => {
-                    dispatch(login({
-                        ...loginState,
-                        email: res.data.email,
-                        username: res.data.username,
-                    }));
-                }
-            )
-            .catch(err => {
-                console.log(err);
-            });
-    }, []);
-
 
     return (
         <BasicLayout>
@@ -40,7 +16,10 @@ function MainPage() {
                             key={faker.number.int().toString()}
                             id={faker.number.int().toString()}
                             title={faker.lorem.sentence()}
-                            content={`${faker.lorem.paragraphs()}<img src=${faker.image.url({width: 320, height: 320})}/>`}
+                            content={`${faker.lorem.paragraphs()}<img src=${faker.image.url({
+                                width: 320,
+                                height: 320
+                            })}/>`}
                             username={faker.animal.cat()}
                             tags={[{
                                 id: faker.number.int().toString(),

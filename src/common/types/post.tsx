@@ -1,5 +1,12 @@
 import {PageResponse} from "./common.tsx";
 
+export interface PostRequest {
+    title: string,
+    content: string,
+    tagNames: string[],
+    urls: string[],
+}
+
 export interface PostListResponse {
     content: PostResponse[];
     page: PageResponse;

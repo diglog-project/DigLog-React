@@ -1,38 +1,58 @@
 import {Link, useNavigate, useParams} from "react-router-dom";
 import BasicLayout from "../../layout/BasicLayout.tsx";
-import {PostResponse} from "../../common/types/post.tsx";
-import {faker} from "@faker-js/faker/locale/ko";
 import DOMPurify from "dompurify";
 import {fullDateToKorean} from "../../common/util/date.tsx";
 import TagCard from "../../components/post/TagCard.tsx";
+import {getPost} from "../../common/apis/post.tsx";
+import {useEffect, useState} from "react";
+import {PostResponse} from "../../common/types/post.tsx";
+import {checkUUID} from "../../common/util/regex.tsx";
 
 function PostPage() {
 
     const {id} = useParams();
-    console.log(id);
     const navigate = useNavigate();
 
-    const post: PostResponse = {
-        id: faker.number.int().toString(),
-        title: faker.lorem.sentence(),
-        content: `<img src=${faker.image.url({width: 320, height: 320})}/><div>${faker.lorem.paragraphs()}</div>`,
-        username: faker.animal.cat(),
-        tags: [{id: "1", name: faker.lorem.word()}, {id: "2", name: faker.lorem.word()}],
+    const [post, setPost] = useState<PostResponse>({
+        id: "",
+        title: "",
+        content: "",
+        username: "",
+        tags: [],
         createdAt: new Date(),
-    };
+    });
+
+    useEffect(() => {
+        if (id === null || id === undefined || !checkUUID(id)) {
+            alert("올바르지 않은 주소입니다.");
+            navigate(-1);
+            return;
+        }
+
+        getPost(id)
+            .then((res) => {
+                console.log(res.data);
+                setPost({
+                    ...res.data,
+                    id: id,
+                    createdAt: new Date(),
+                });
+            })
+            .catch((error) => alert(error.response.data.message));
+    }, []);
 
     const safeContent = DOMPurify.sanitize(post.content);
 
     return (
         <BasicLayout>
-            <div>
+            <div className="w-full">
                 <div className="flex flex-col gap-y-8">
                     <div className="flex justify-center items-center gap-x-4">
                         <Link to={`/blog/${post.username}`} className="text-xs">Home</Link>
                         <div className="text-xs">{` > `}</div>
                         <Link to={`/blog/${post.username}?category=카테고리`} className="text-xs">카테고리</Link>
                         <div>{` > `}</div>
-                        <div className="text-xs text-gray-600">{post.title}</div>
+                        <div className="text-xs text-gray-600 max-w-96 md:max-w-192 break-words">{post.title}</div>
                     </div>
                     <div className="flex flex-row w-full justify-center text-center items-center gap-4">
                         <Link to={`/blog/${post.username}`}
@@ -43,7 +63,7 @@ function PostPage() {
                             {fullDateToKorean(post.createdAt)}
                         </div>
                     </div>
-                    <div className="text-center leading-relaxed text-4xl text-gray-900 font-jalnan">
+                    <div className="text-center leading-relaxed text-4xl text-gray-900 font-jalnan break-words">
                         {post.title}
                     </div>
                     <div className="flex flex-wrap justify-center items-center gap-4">

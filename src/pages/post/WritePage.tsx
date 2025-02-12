@@ -7,6 +7,10 @@ import {useSelector} from "react-redux";
 import {RootState} from "../../store.tsx";
 import {faker} from "@faker-js/faker/locale/ko";
 import {MdOutlineArrowDropDown, MdOutlineClear} from "react-icons/md";
+import {createPost} from "../../common/apis/post.tsx";
+import LoadingLayout from "../../layout/LoadingLayout.tsx";
+import {getImgUrls} from "../../common/util/html.tsx";
+import {uploadImage} from "../../common/apis/image.tsx";
 
 interface WritePostType {
     inputTag: string;
@@ -26,6 +30,7 @@ function WritePage() {
     const navigate = useNavigate();
     const categoryRef = useRef<HTMLDivElement | null>(null);
 
+    const [loading, setLoading] = useState(false);
     const [post, setPost] = useState<WritePostType>({
         inputTag: "",
         tags: [],
@@ -63,9 +68,23 @@ function WritePage() {
             return;
         }
 
-        alert("작성되었습니다.");
-        setExitPage(true);
-        navigate(`/blog/${loginState.username}username`);
+        setLoading(true);
+
+        const urls: string[] = getImgUrls(post.content);
+
+        createPost({
+            title: post.title,
+            content: post.content,
+            tagNames: post.tags,
+            urls: urls,
+        })
+            .then(() => {
+                alert("작성되었습니다.");
+                setExitPage(true);
+                navigate(`/blog/${loginState.username}username`);
+            })
+            .catch((error) => alert(error.response.data.message))
+            .finally(() => setLoading(false));
     }
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -117,6 +136,13 @@ function WritePage() {
             ]
         },
     ];
+
+    useEffect(() => {
+        if (!loginState.isLogin) {
+            alert("해당 페이지 이용에는 로그인이 필요합니다.");
+            navigate("/login");
+        }
+    }, []);
 
     return (
         <BasicLayout>
@@ -212,12 +238,10 @@ function WritePage() {
                         placeholder: "내용을 작성해주세요.",
                         file_picker_types: "image",
                         images_upload_handler: async (blobInfo) => {
-                            setUploadCount((prev) => prev + 1);
-                            // const res = await uploadImage(blobInfo);
-                            // return res.data.url;
-                            console.log("Image Upload...... ", blobInfo);
-                            setUploadCount((prev) => prev - 1);
-                            return faker.image.url();
+                            setUploadCount(prev => prev + 1);
+                            const res = await uploadImage(blobInfo);
+                            setUploadCount(prev => prev - 1);
+                            return res.data.url;
                         }
                     }}
                     value={post.content}
@@ -227,6 +251,7 @@ function WritePage() {
                     <FillButton text={"게시하기"} onClick={handleSubmit}/>
                 </div>
             </div>
+            <LoadingLayout loading={loading}/>
         </BasicLayout>
     );
 }
