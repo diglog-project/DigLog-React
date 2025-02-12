@@ -1,5 +1,5 @@
 import {PostResponse} from "../../common/types/post.tsx";
-import {getImgSrc, removeImgTags} from "../../common/util/html.tsx";
+import {getImgSrc, removeHtmlTags} from "../../common/util/html.tsx";
 import DOMPurify from "dompurify";
 import {MdImage} from "react-icons/md";
 import {dateToKorean} from "../../common/util/date.tsx";
@@ -17,7 +17,7 @@ function PostCard(post: PostResponse) {
                     ? <img className="w-full h-52 object-cover
                      transform transition-transform duration-300 ease-out hover:scale-105"
                            src={url} alt="post_image"/>
-                    : <div className="flex justify-center items-center w-full h-52">
+                    : <div className="bg-gray-100 flex justify-center items-center w-full h-52">
                         <MdImage className="size-16 text-gray-400"/>
                     </div>}
             </Link>
@@ -37,7 +37,7 @@ function PostCard(post: PostResponse) {
                     </div>
                 </Link>
                 <div className="line-clamp-3 text-gray-500 font-normal">
-                    {removeImgTags(safeContent)}
+                    {removeHtmlTags(safeContent)}
                 </div>
             </div>
         </div>

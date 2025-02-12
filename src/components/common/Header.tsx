@@ -1,21 +1,34 @@
 import {Link, useNavigate} from "react-router-dom";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store.tsx";
 import {faker} from "@faker-js/faker/locale/ko";
 import {useEffect, useRef, useState} from "react";
 import {TextLink} from "./TextButton.tsx";
 import {MdOutlineSearch} from "react-icons/md";
 import IconButton from "./IconButton.tsx";
-import {logoutApi} from "../../common/apis/member.tsx";
-import {logout} from "../../common/slices/loginSlice.tsx";
+import {getProfile, logoutApi} from "../../common/apis/member.tsx";
+import {login, logout} from "../../common/slices/loginSlice.tsx";
 
 function Header() {
 
+
+    const dispatch = useDispatch();
     const loginState = useSelector((state: RootState) => state.loginSlice);
     const navigate = useNavigate();
 
     const dashboardRef = useRef<HTMLDivElement | null>(null);
     const [isOpen, setIsOpen] = useState(false);
+
+    useEffect(() => {
+        getProfile()
+            .then(res => {
+                dispatch(login({
+                    ...loginState,
+                    email: res.data.email,
+                    username: res.data.username,
+                }));
+            })
+    }, []);
 
     const handleDropDown = () => {
         setIsOpen(cur => !cur);

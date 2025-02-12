@@ -28,9 +28,7 @@ function LoginPage() {
                 }));
                 navigate("/");
             })
-            .catch(err => {
-                alert(err);
-            })
+            .catch(error => alert(error.response.data.message));
     }
 
     const handlePasswordEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {

@@ -10,9 +10,9 @@ export function FillButton({text, onClick, addStyle}: { text: string, onClick: (
     );
 }
 
-export function FillLink({text, to}: { text: string, to: string }) {
+export function FillLink({text, to, addStyle}: { text: string, to: string, addStyle?: string }) {
     return (
-        <Link to={to} className={className}>
+        <Link to={to} className={(addStyle) ? addStyle + className : className}>
             {text}
         </Link>
     );
@@ -20,6 +20,6 @@ export function FillLink({text, to}: { text: string, to: string }) {
 
 export function LoadMoreButton({onClick, addStyle}: { onClick: () => void, addStyle?: string }) {
     return (
-        <FillButton text={"더 불러오기"} onClick={onClick} addStyle={addStyle + " !bg-gray-400 hover:brightness-105"} />
+        <FillButton text={"더 불러오기"} onClick={onClick} addStyle={addStyle + " !bg-gray-400 hover:brightness-105"}/>
     );
 }

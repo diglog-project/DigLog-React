@@ -1,12 +1,19 @@
 import BasicLayout from "../../layout/BasicLayout.tsx";
 import {useEffect, useRef, useState} from "react";
-import {useBlocker, useNavigate} from "react-router-dom";
+import {useBlocker, useLocation, useNavigate, useParams} from "react-router-dom";
 import {Editor} from "@tinymce/tinymce-react";
 import {FillButton} from "../../components/common/FillButton.tsx";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store.tsx";
 import {faker} from "@faker-js/faker/locale/ko";
 import {MdOutlineArrowDropDown, MdOutlineClear} from "react-icons/md";
+import {createPost, deletePost, getPost, updatePost} from "../../common/apis/post.tsx";
+import LoadingLayout from "../../layout/LoadingLayout.tsx";
+import {getImgUrls} from "../../common/util/html.tsx";
+import {uploadImage} from "../../common/apis/image.tsx";
+import {checkUUID} from "../../common/util/regex.tsx";
+import {TagResponse} from "../../common/types/post.tsx";
+import {sortByName} from "../../common/util/sort.tsx";
 
 interface WritePostType {
     inputTag: string;
@@ -15,17 +22,23 @@ interface WritePostType {
     content: string;
 }
 
-interface CategoryType {
+interface FolderType {
     name: string;
-    subCategories?: CategoryType[];
+    subFolders?: FolderType[];
 }
 
 function WritePage() {
 
     const loginState = useSelector((state: RootState) => state.loginSlice);
     const navigate = useNavigate();
-    const categoryRef = useRef<HTMLDivElement | null>(null);
+    const folderRef = useRef<HTMLDivElement | null>(null);
+    const path = useLocation().pathname.substring(0, location.pathname.lastIndexOf("/"));
+    const {id} = useParams();
 
+    console.log(path);
+    console.log(id);
+
+    const [loading, setLoading] = useState(false);
     const [post, setPost] = useState<WritePostType>({
         inputTag: "",
         tags: [],
@@ -34,12 +47,12 @@ function WritePage() {
     });
     const [showTag, setShowTag] = useState(false);
 
-    const [categoryOpen, setCategoryOpen] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState("카테고리 선택");
+    const [folderOpen, setFolderOpen] = useState(false);
+    const [selectedFolder, setSelectedFolder] = useState("폴더 선택");
     const [uploadCount, setUploadCount] = useState(0);
     const [exitPage, setExitPage] = useState(false);
-    const handleCategoryOpen = () => {
-        setCategoryOpen(prev => !prev);
+    const handleFolderOpen = () => {
+        setFolderOpen(prev => !prev);
     }
 
     const removeTag = (tag: string | null) => {
@@ -63,14 +76,68 @@ function WritePage() {
             return;
         }
 
-        alert("작성되었습니다.");
-        setExitPage(true);
-        navigate(`/blog/${loginState.username}username`);
+        setLoading(true);
+
+        const urls: string[] = getImgUrls(post.content);
+
+        createPost({
+            title: post.title,
+            content: post.content,
+            tagNames: post.tags,
+            urls: urls,
+        })
+            .then(() => {
+                alert("작성되었습니다.");
+                setExitPage(true);
+                navigate(`/blog/${loginState.username}username`);
+            })
+            .catch((error) => alert(error.response.data.message))
+            .finally(() => setLoading(false));
+    }
+
+    const handleEdit = () => {
+        if (uploadCount > 0) {
+            alert("업로드 중인 이미지가 있습니다. 잠시만 기다려주세요.");
+            return;
+        }
+
+        if (!id) return;
+        setLoading(true);
+
+        const urls: string[] = getImgUrls(post.content);
+
+        updatePost({
+            id: id,
+            title: post.title,
+            content: post.content,
+            tagNames: post.tags,
+            urls: urls,
+        })
+            .then(() => {
+                alert("수정되었습니다.");
+                setExitPage(true);
+                navigate(`/blog/${loginState.username}username`);
+            })
+            .catch((error) => alert(error.response.data.message))
+            .finally(() => setLoading(false));
+    }
+
+    const handleDelete = (id: string | undefined) => {
+        if (!id || !confirm("정말 삭제하시겠습니까?")) {
+            return;
+        }
+
+        deletePost(id)
+            .then(() => {
+                alert("삭제되었습니다.");
+                navigate(`/blog/${loginState.username}`);
+            })
+            .catch((error) => alert(error.response.data.message));
     }
 
     const handleClickOutside = (event: MouseEvent) => {
-        if (categoryRef.current && !categoryRef.current.contains(event.target as Node)) {
-            setCategoryOpen(false);
+        if (folderRef.current && !folderRef.current.contains(event.target as Node)) {
+            setFolderOpen(false);
         }
     };
 
@@ -97,10 +164,10 @@ function WritePage() {
         };
     }, []);
 
-    const categoryData: CategoryType[] = [
+    const folderData: FolderType[] = [
         {
             name: faker.lorem.words(),
-            subCategories: [
+            subFolders: [
                 {name: faker.lorem.words()},
                 {name: faker.lorem.words()}
             ]
@@ -110,7 +177,7 @@ function WritePage() {
         },
         {
             name: faker.lorem.words(),
-            subCategories: [
+            subFolders: [
                 {name: faker.lorem.words()},
                 {name: faker.lorem.words()},
                 {name: faker.lorem.words()}
@@ -118,52 +185,88 @@ function WritePage() {
         },
     ];
 
+    useEffect(() => {
+        if (!path.endsWith("edit")) {
+            return;
+        }
+
+        if (!id || !checkUUID(id)) {
+            alert("올바르지 않은 url입니다.");
+            navigate(-1);
+            return;
+        }
+
+        getPost(id)
+            .then((res) => {
+                setPost({
+                    ...post,
+                    title: res.data.title,
+                    content: res.data.content,
+                    tags: sortByName(res.data.tags.map((tag: TagResponse) => tag.name)),
+                });
+            })
+            .catch((error) => alert(error.response.data.message));
+
+        // 폴더 불러오기 api
+        // if (loginState.isLogin) {
+        //     alert("해당 페이지 이용에는 로그인이 필요합니다.");
+        //     navigate("/login");
+        // }
+    }, []);
+
+    useEffect(() => {
+        if (uploadCount > 0) {
+            setLoading(true);
+        }
+        setLoading(false)
+    }, [uploadCount]);
+
     return (
         <BasicLayout>
             <div className="flex flex-col w-full">
                 <div className="flex justify-start items-center">
-                    <div ref={categoryRef}
+                    <div ref={folderRef}
                          className="w-full relative flex justify-start text-gray-700 items-center text-sm font-normal">
                         <button
                             className="w-auto flex justify-between items-center gap-x-2 px-3 py-2 border border-gray-200 hover:bg-gray-50 hover:cursor-pointer"
-                            onClick={handleCategoryOpen}>
-                            {selectedCategory}
+                            onClick={handleFolderOpen}>
+                            {selectedFolder}
                             <MdOutlineArrowDropDown/>
                         </button>
                         <div
-                            className={`${categoryOpen ? "" : "hidden"} absolute z-50 top-12 left-0 bg-white divide-y divide-gray-500 rounded-lg shadow-sm`}>
-                            {categoryData.map((category) => {
-                                if (!category.subCategories) {
-                                    return <div key={category.name} className="py-2 w-auto text-sm">
+                            className={`${folderOpen ? "" : "hidden"} absolute z-50 top-12 left-0 bg-white divide-y divide-gray-500 rounded-lg shadow-sm`}>
+                            {folderData.map((folder) => {
+                                if (!folder.subFolders) {
+                                    return <div key={folder.name} className="py-2 w-auto text-sm">
                                         <button
                                             className="px-4 py-2 text-gray-700 text-start hover:bg-gray-100 w-full hover:cursor-pointer"
                                             onClick={() => {
-                                                setSelectedCategory(category.name);
-                                                setCategoryOpen(false);
+                                                setSelectedFolder(folder.name);
+                                                setFolderOpen(false);
                                             }}>
-                                            {category.name}
+                                            {folder.name}
                                         </button>
                                     </div>
                                 } else {
-                                    return <div key={category.name}
+                                    return <div key={folder.name}
                                                 className="flex flex-col items-start py-2 w-auto text-sm">
                                         <button
                                             className="px-4 py-2 text-gray-700 text-start border-gray-200 hover:bg-gray-100 w-full hover:cursor-pointer"
                                             onClick={() => {
-                                                setSelectedCategory(category.name);
-                                                setCategoryOpen(false);
+                                                setSelectedFolder(folder.name);
+                                                setFolderOpen(false);
                                             }}>
-                                            {category.name}
+                                            {folder.name}
                                         </button>
-                                        {category.subCategories.map((subCategory: CategoryType) =>
+                                        {folder.subFolders.map((subFolder: FolderType) =>
                                             <button
-                                                key={subCategory.name}
+                                                key={subFolder.name}
                                                 className="px-4 py-2 text-gray-700 text-start hover:bg-gray-100 w-full hover:cursor-pointer"
                                                 onClick={() => {
-                                                    setSelectedCategory(`${category.name} > ${subCategory.name}`);
-                                                    setCategoryOpen(false);
+                                                    setSelectedFolder(`${folder.name} > ${subFolder.name}`);
+                                                    setFolderOpen(false);
                                                 }}>
-                                                {`${category.name} > ${subCategory.name}`}
+                                                {`${folder.name} > ${subFolder.name}`}
                                             </button>
                                         )}
                                     </div>;
@@ -212,21 +315,24 @@ function WritePage() {
                         placeholder: "내용을 작성해주세요.",
                         file_picker_types: "image",
                         images_upload_handler: async (blobInfo) => {
-                            setUploadCount((prev) => prev + 1);
-                            // const res = await uploadImage(blobInfo);
-                            // return res.data.url;
-                            console.log("Image Upload...... ", blobInfo);
-                            setUploadCount((prev) => prev - 1);
-                            return faker.image.url();
+                            setUploadCount(prev => prev + 1);
+                            const res = await uploadImage(blobInfo);
+                            setUploadCount(prev => prev - 1);
+                            return res.data.url;
                         }
                     }}
                     value={post.content}
                     onEditorChange={(content) => setPost({...post, content: content})}
                 />
-                <div className="flex justify-end items-center w-full mt-4">
-                    <FillButton text={"게시하기"} onClick={handleSubmit}/>
+                <div className="flex justify-between items-center w-full mt-4">
+                    {path.endsWith("/edit")
+                        && <FillButton text={"삭제하기"} onClick={() => handleDelete(id)} addStyle={"bg-red-400 hover:bg-red-700"}/>}
+                    {path.endsWith("/edit")
+                        ? <FillButton text={"수정하기"} onClick={handleEdit}/>
+                        : <FillButton text={"게시하기"} onClick={handleSubmit}/>}
                 </div>
             </div>
+            <LoadingLayout loading={loading}/>
         </BasicLayout>
     );
 }
