@@ -7,6 +7,13 @@ export interface PostRequest {
     urls: string[],
 }
 
+export interface PostListRequest {
+    sorts: string[],
+    page: number,
+    size: number,
+    isDescending: boolean,
+}
+
 export interface PostListResponse {
     content: PostResponse[];
     page: PageResponse;
