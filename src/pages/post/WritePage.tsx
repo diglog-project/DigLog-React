@@ -1,16 +1,19 @@
 import BasicLayout from "../../layout/BasicLayout.tsx";
 import {useEffect, useRef, useState} from "react";
-import {useBlocker, useNavigate} from "react-router-dom";
+import {useBlocker, useLocation, useNavigate, useParams} from "react-router-dom";
 import {Editor} from "@tinymce/tinymce-react";
 import {FillButton} from "../../components/common/FillButton.tsx";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store.tsx";
 import {faker} from "@faker-js/faker/locale/ko";
 import {MdOutlineArrowDropDown, MdOutlineClear} from "react-icons/md";
-import {createPost} from "../../common/apis/post.tsx";
+import {createPost, deletePost, getPost, updatePost} from "../../common/apis/post.tsx";
 import LoadingLayout from "../../layout/LoadingLayout.tsx";
 import {getImgUrls} from "../../common/util/html.tsx";
 import {uploadImage} from "../../common/apis/image.tsx";
+import {checkUUID} from "../../common/util/regex.tsx";
+import {TagResponse} from "../../common/types/post.tsx";
+import {sortByName} from "../../common/util/sort.tsx";
 
 interface WritePostType {
     inputTag: string;
@@ -29,6 +32,11 @@ function WritePage() {
     const loginState = useSelector((state: RootState) => state.loginSlice);
     const navigate = useNavigate();
     const folderRef = useRef<HTMLDivElement | null>(null);
+    const path = useLocation().pathname.substring(0, location.pathname.lastIndexOf("/"));
+    const {id} = useParams();
+
+    console.log(path);
+    console.log(id);
 
     const [loading, setLoading] = useState(false);
     const [post, setPost] = useState<WritePostType>({
@@ -87,6 +95,46 @@ function WritePage() {
             .finally(() => setLoading(false));
     }
 
+    const handleEdit = () => {
+        if (uploadCount > 0) {
+            alert("업로드 중인 이미지가 있습니다. 잠시만 기다려주세요.");
+            return;
+        }
+
+        if (!id) return;
+        setLoading(true);
+
+        const urls: string[] = getImgUrls(post.content);
+
+        updatePost({
+            id: id,
+            title: post.title,
+            content: post.content,
+            tagNames: post.tags,
+            urls: urls,
+        })
+            .then(() => {
+                alert("수정되었습니다.");
+                setExitPage(true);
+                navigate(`/blog/${loginState.username}username`);
+            })
+            .catch((error) => alert(error.response.data.message))
+            .finally(() => setLoading(false));
+    }
+
+    const handleDelete = (id: string | undefined) => {
+        if (!id || !confirm("정말 삭제하시겠습니까?")) {
+            return;
+        }
+
+        deletePost(id)
+            .then(() => {
+                alert("삭제되었습니다.");
+                navigate(`/blog/${loginState.username}`);
+            })
+            .catch((error) => alert(error.response.data.message));
+    }
+
     const handleClickOutside = (event: MouseEvent) => {
         if (folderRef.current && !folderRef.current.contains(event.target as Node)) {
             setFolderOpen(false);
@@ -138,11 +186,40 @@ function WritePage() {
     ];
 
     useEffect(() => {
-        if (!loginState.isLogin) {
-            alert("해당 페이지 이용에는 로그인이 필요합니다.");
-            navigate("/login");
+        if (!path.endsWith("edit")) {
+            return;
         }
+
+        if (!id || !checkUUID(id)) {
+            alert("올바르지 않은 url입니다.");
+            navigate(-1);
+            return;
+        }
+
+        getPost(id)
+            .then((res) => {
+                setPost({
+                    ...post,
+                    title: res.data.title,
+                    content: res.data.content,
+                    tags: sortByName(res.data.tags.map((tag: TagResponse) => tag.name)),
+                });
+            })
+            .catch((error) => alert(error.response.data.message));
+
+        // 폴더 불러오기 api
+        // if (loginState.isLogin) {
+        //     alert("해당 페이지 이용에는 로그인이 필요합니다.");
+        //     navigate("/login");
+        // }
     }, []);
+
+    useEffect(() => {
+        if (uploadCount > 0) {
+            setLoading(true);
+        }
+        setLoading(false)
+    }, [uploadCount]);
 
     return (
         <BasicLayout>
@@ -247,8 +324,12 @@ function WritePage() {
                     value={post.content}
                     onEditorChange={(content) => setPost({...post, content: content})}
                 />
-                <div className="flex justify-end items-center w-full mt-4">
-                    <FillButton text={"게시하기"} onClick={handleSubmit}/>
+                <div className="flex justify-between items-center w-full mt-4">
+                    {path.endsWith("/edit")
+                        && <FillButton text={"삭제하기"} onClick={() => handleDelete(id)} addStyle={"bg-red-400 hover:bg-red-700"}/>}
+                    {path.endsWith("/edit")
+                        ? <FillButton text={"수정하기"} onClick={handleEdit}/>
+                        : <FillButton text={"게시하기"} onClick={handleSubmit}/>}
                 </div>
             </div>
             <LoadingLayout loading={loading}/>

@@ -7,11 +7,16 @@ import {getPost} from "../../common/apis/post.tsx";
 import {useEffect, useState} from "react";
 import {PostResponse} from "../../common/types/post.tsx";
 import {checkUUID} from "../../common/util/regex.tsx";
+import {sortTagByName} from "../../common/util/sort.tsx";
+import {useSelector} from "react-redux";
+import {RootState} from "../../store.tsx";
+import {FillLink} from "../../components/common/FillButton.tsx";
 
 function PostPage() {
 
     const {id} = useParams();
     const navigate = useNavigate();
+    const loginState = useSelector((state: RootState) => state.loginSlice);
 
     const [post, setPost] = useState<PostResponse>({
         id: "",
@@ -31,10 +36,10 @@ function PostPage() {
 
         getPost(id)
             .then((res) => {
-                console.log(res.data);
                 setPost({
                     ...res.data,
                     id: id,
+                    tags: sortTagByName(res.data.tags),
                     createdAt: new Date(),
                 });
             })
@@ -47,12 +52,18 @@ function PostPage() {
         <BasicLayout>
             <div className="w-full">
                 <div className="flex flex-col gap-y-8">
-                    <div className="flex justify-center items-center gap-x-4">
-                        <Link to={`/blog/${post.username}`} className="text-xs">Home</Link>
-                        <div className="text-xs">{` > `}</div>
-                        <Link to={`/blog/${post.username}?folder=폴더`} className="text-xs">폴더</Link>
-                        <div>{` > `}</div>
-                        <div className="text-xs text-gray-600 max-w-96 md:max-w-192 break-words">{post.title}</div>
+                    <div className="flex justify-between items-center">
+                        {(loginState.username === post.username)
+                            && <div className="w-22"/>}
+                        <div className="flex-1 flex justify-center items-center gap-x-4">
+                            <Link to={`/blog/${post.username}`} className="text-xs">Home</Link>
+                            <div className="text-xs">{` > `}</div>
+                            <Link to={`/blog/${post.username}?folder=폴더`} className="text-xs">폴더</Link>
+                            <div>{` > `}</div>
+                            <div className="text-xs text-gray-600 max-w-96 md:max-w-192 break-words">{post.title}</div>
+                        </div>
+                        {(loginState.username === post.username)
+                            && <FillLink text={"수정하기"} to={`/post/edit/${id}`} addStyle={"text-sm"}/>}
                     </div>
                     <div className="flex flex-row w-full justify-center text-center items-center gap-4">
                         <Link to={`/blog/${post.username}`}
@@ -81,7 +92,8 @@ function PostPage() {
                      dangerouslySetInnerHTML={{__html: safeContent}}/>
             </div>
         </BasicLayout>
-    );
+    )
+        ;
 }
 
 export default PostPage;

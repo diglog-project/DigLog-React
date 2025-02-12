@@ -166,7 +166,7 @@ function SideBar({username, addTag, setSelectedFolder, bgColor}: {
                 {username === loginState.username && (
                     <div className="flex justify-between items-center gap-x-4 text-xs">
                         <OutlineLink text={"게시글 작성"} to={"/write"}/>
-                        <OutlineLink text={"블로그 설정"} to={"/write"}
+                        <OutlineLink text={"블로그 설정"} to={"/setting"}
                                      addStyle={"!border-neutral-500 !text-neutral-500 hover:bg-neutral-500 hover:!text-white"}/>
                     </div>
                 )}
