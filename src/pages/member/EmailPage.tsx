@@ -5,10 +5,13 @@ import LoginButton from "../../components/member/LoginButton.tsx";
 import {useNavigate} from "react-router-dom";
 import * as React from "react";
 import {checkEmail} from "../../common/util/regex.tsx";
+import {sendMail} from "../../common/apis/member.tsx";
+import LoadingLayout from "../../layout/LoadingLayout.tsx";
 
 function EmailPage() {
 
-    const [signupInfo, setSignupInfo] = useState({email: "", code: "", password: ""});
+    const [loading, setLoading] = useState(false);
+    const [email, setEmail] = useState("");
 
     const navigate = useNavigate();
 
@@ -21,12 +24,18 @@ function EmailPage() {
     }
 
     const handleVerifyEmail = () => {
-        if (!checkEmail(signupInfo.email)) {
-            alert("이메일 형식을 확인해주세요.");
+        if (!checkEmail(email)) {
+            alert("이메일 형식에 맞게 입력해주세요.");
             return;
         }
+        setLoading(true);
 
-        navigate("/signup/code", {state: {email: signupInfo.email}});
+        sendMail(email)
+            .then(() => {
+                navigate("/signup/code", {state: {email: email}});
+            })
+            .catch((error) => alert(error.response.data.message))
+            .finally(() => setLoading(false));
     }
 
     return (
@@ -37,11 +46,12 @@ function EmailPage() {
                     label={"이메일"}
                     type={"email"}
                     placeholder={"diglog@example.com"}
-                    value={signupInfo.email}
-                    setValue={(value) => setSignupInfo({...signupInfo, email: value})}
+                    value={email}
+                    setValue={(value) => setEmail(value)}
                     onKeyDown={handleEmailEnter}/>
-                <LoginButton text={"인증코드 전송"} onClick={handleVerifyEmail} bgColor={"bg-lime-400"}/>
+                <LoginButton text={"인증코드 전송"} onClick={handleVerifyEmail} disable={!checkEmail(email)} bgColor={"bg-lime-400"}/>
             </div>
+            <LoadingLayout loading={loading}/>
         </BasicLayout>
     );
 }

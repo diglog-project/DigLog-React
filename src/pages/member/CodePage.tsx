@@ -3,6 +3,7 @@ import BasicLayout from "../../layout/BasicLayout.tsx";
 import {useLocation, useNavigate} from "react-router-dom";
 import {formatTimer} from "../../common/util/date.tsx";
 import LoadingLayout from "../../layout/LoadingLayout.tsx";
+import {checkCode} from "../../common/apis/member.tsx";
 
 function CodePage() {
 
@@ -63,7 +64,12 @@ function CodePage() {
         if (code[5] !== "") {
             setLoading(true);
 
-            navigate("/signup", {state: {email: email, code: code.join("")}});
+            checkCode(email, code.join(""))
+                .then(() => {
+                    navigate("/signup", {state: {email: email, code: code.join("")}});
+                })
+                .catch((error) => alert(error.response.data.message))
+                .finally(() => setLoading(false));
         }
     }, [code]);
 

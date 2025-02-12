@@ -1,11 +1,13 @@
 import * as React from "react";
 
-function LoginTextField({label, type, placeholder, value, setValue, onKeyDown}: {
+function LoginTextField({label, type, placeholder, value, setValue, error, isError, onKeyDown}: {
     label?: string,
     type: string,
     placeholder: string,
     value: string,
     setValue: (value: string) => void,
+    error?: string,
+    isError?: boolean,
     onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void,
 }) {
     return (
@@ -19,6 +21,11 @@ function LoginTextField({label, type, placeholder, value, setValue, onKeyDown}: 
                    value={value}
                    onChange={(event => setValue(event.target.value))}
                    onKeyDown={onKeyDown}/>
+            {(error) && (
+                isError ?
+                    <p className="h-4 mt-2 text-sm text-red-600">{error}</p>
+                    : <div className="h-4 mt-2"/>
+            )}
         </div>
     );
 }

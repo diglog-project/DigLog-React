@@ -6,6 +6,7 @@ import {checkPassword} from "../../common/util/regex.tsx";
 import LoadingLayout from "../../layout/LoadingLayout.tsx";
 import * as React from "react";
 import LoginButton from "../../components/member/LoginButton.tsx";
+import {signup} from "../../common/apis/member.tsx";
 
 function SignupPage() {
 
@@ -25,17 +26,29 @@ function SignupPage() {
     }
 
     const handleSignup = () => {
-        setLoading(true);
-        console.log(email, code);
-
-        if (!checkPassword(passwordInfo.password) || passwordInfo.password !== passwordInfo.confirmPassword) {
-            setLoading(false);
+        if (!checkPassword(passwordInfo.password)) {
+            alert("비밀번호가 영문, 숫자 포함 8-16자리가 되도록 입력해주세요.");
+            return;
+        }
+        
+        if (passwordInfo.password !== passwordInfo.confirmPassword) {
+            alert("비밀번호 확인이 일치하지 않습니다.");
             return;
         }
 
-        alert("회원가입 되었습니다.");
+        setLoading(true);
 
-        navigate("/login");
+        signup(email, passwordInfo.password, code)
+            .then(() => {
+                alert("회원가입 되었습니다.");
+                navigate("/login");
+            })
+            .catch((error) => alert(error.response.data.message))
+            .finally(() => setLoading(false));
+    }
+
+    const disableSignupButton = () => {
+        return !checkPassword(passwordInfo.password) || (passwordInfo.password !== passwordInfo.confirmPassword);
     }
 
     return (
@@ -58,12 +71,11 @@ function SignupPage() {
                         setValue={(value) => setPasswordInfo({...passwordInfo, confirmPassword: value})}
                         onKeyDown={handlePasswordEnter}/>
                 </div>
-                <LoginButton text={"회원가입"} onClick={handleSignup} bgColor={"bg-lime-400"}/>
+                <LoginButton text={"회원가입"} onClick={handleSignup} disable={disableSignupButton()} bgColor={"bg-lime-400"}/>
             </div>
             <LoadingLayout loading={loading}/>
         </BasicLayout>
-    )
-        ;
+    );
 }
 
 export default SignupPage;
