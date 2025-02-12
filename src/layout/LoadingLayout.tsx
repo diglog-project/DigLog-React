@@ -3,7 +3,7 @@ function LoadingLayout({loading}: { loading: boolean }) {
     return (
         loading &&
         <div
-            className="fixed inset-0 flex items-center justify-center bg-gray-300 bg-opacity-50 z-1000 dark:bg-gray-100 dark:bg-opacity-50">
+            className="fixed inset-0 flex items-center justify-center bg-gray-300 opacity-50 z-1000 dark:bg-gray-100 dark:bg-opacity-50">
             <div role="status">
                 <svg aria-hidden="true"
                      className="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300"

@@ -6,6 +6,7 @@ import {ChangeEvent, useRef, useState} from "react";
 import {FillButton} from "../../components/common/FillButton.tsx";
 import {setUsername} from "../../common/slices/loginSlice.tsx";
 import {TextButton} from "../../components/common/TextButton.tsx";
+import {updateUsername} from "../../common/apis/member.tsx";
 
 function ProfileSettingPage() {
 
@@ -13,7 +14,7 @@ function ProfileSettingPage() {
     const dispatch = useDispatch();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const [input, setInput] = useState("");
+    const [input, setInput] = useState(loginState.username);
     const [image, setImage] = useState<string | null>(null);
     const [isUsernameEdit, setIsUsernameEdit] = useState(false);
     const [isImageEdit, setIsImageEdit] = useState(false);
@@ -27,11 +28,18 @@ function ProfileSettingPage() {
     }
 
     const handleUsernameSubmit = () => {
-        alert("변경되었습니다.");
-        dispatch(setUsername({
-            username: input,
-        }));
-        setIsUsernameEdit(false);
+
+        updateUsername(input)
+            .then(() => {
+                alert("변경되었습니다.");
+                dispatch(setUsername({
+                    username: input,
+                }));
+                setIsUsernameEdit(false);
+            })
+            .catch((error) => alert(error.response.data.message))
+            .finally(() => {
+            });
     }
 
     const handleImageEdit = () => {

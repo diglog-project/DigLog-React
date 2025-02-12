@@ -1,11 +1,11 @@
 import {createSlice} from "@reduxjs/toolkit";
 
 const initialState = {
-    isLogin: true,
-    accessToken: "token",
-    email: "diglog@example.com",
-    username: "diglog",
-    roles: ["ROLE_USER"],
+    isLogin: false,
+    accessToken: "",
+    email: "",
+    username: "",
+    roles: [],
 }
 
 const loginSlice = createSlice({
