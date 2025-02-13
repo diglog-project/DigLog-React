@@ -4,11 +4,12 @@ import {faker} from "@faker-js/faker/locale/ko";
 import {DragEndEvent} from "@dnd-kit/core";
 import {arrayMove} from "@dnd-kit/sortable";
 import {useNavigate} from "react-router-dom";
-import FolderSettingPage from "./FolderSettingPage.tsx";
+import OldFolderSettingPage from "./OldFolderSettingPage.tsx";
 import PostSettingPage from "./PostSettingPage.tsx";
 import ProfileSettingPage from "./ProfileSettingPage.tsx";
 import FolderMoveModal from "../../components/setting/FolderMoveModal.tsx";
 import FolderAddModal from "../../components/setting/FolderAddModal.tsx";
+import FolderSettingPage from "./FolderSettingPage.tsx";
 
 export interface FolderType {
     id: string;
@@ -23,7 +24,7 @@ function SettingPage() {
     const [showFolderModal, setShowFolderModal] = useState(false);
     const [showFolderAddModal, setShowFolderAddModal] = useState(false);
 
-    const tabList = ["프로필", "폴더", "게시글"];
+    const tabList = ["프로필", "폴더", "폴더2", "게시글"];
     const folderData: FolderType[] = [
         {
             id: "1",
@@ -48,7 +49,7 @@ function SettingPage() {
         },
     ];
 
-    const [selectedTab, setSelectedTab] = useState("프로필");
+    const [selectedTab, setSelectedTab] = useState("폴더2");
     const [folders, setFolders] = useState<FolderType[]>(folderData);
     const [selectedFolder, setSelectedFolder] = useState<FolderType | null>(null);
     const [isHover, setIsHover] = useState(false);
@@ -175,7 +176,7 @@ function SettingPage() {
                 </div>
                 {(selectedTab === "폴더") &&
                     <div className="border-l border-gray-200 w-full ps-8">
-                        <FolderSettingPage
+                        <OldFolderSettingPage
                             setSelectedFolder={setSelectedFolder}
                             folders={folders}
                             setShowModal={setShowFolderModal}
@@ -184,6 +185,10 @@ function SettingPage() {
                             isHover={isHover}
                             handleHover={handleHover}
                             submitFolderChange={submitFolderChange}/>
+                    </div>}
+                {(selectedTab === "폴더2") &&
+                    <div className="border-l border-gray-200 w-full ps-8">
+                        <FolderSettingPage/>
                     </div>}
                 {(selectedTab === "게시글") &&
                     <div className="border-l border-gray-200 w-full ps-8">
