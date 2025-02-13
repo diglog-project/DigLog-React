@@ -134,8 +134,10 @@ function FolderSettingPage() {
             return;
         }
 
-        // 이동할 폴더 분리
         const moveFolders: FolderResponse[] = [];
+        const anotherFolders: FolderResponse[] = [];
+
+        // 이동할 폴더 분리
         folders.forEach(folder => {
             if (folder.depth === moveFolder.depth && folder.parentOrder === moveFolder.parentOrder && folder.order === moveFolder.order) {
                 moveFolders.push({
@@ -149,39 +151,30 @@ function FolderSettingPage() {
                     ...folder,
                     parentOrder: targetFolder.order,
                 });
+            } else {
+                anotherFolders.push(folder);
             }
         });
-        setFolders(folders.filter(folder =>
-            !(folder.depth === moveFolder.depth && folder.parentOrder === moveFolder.parentOrder && folder.order === moveFolder.order) &&
-            !(folder.depth === moveFolder.depth + 1 && folder.parentOrder === moveFolder.order)));
 
         // 앞으로 이동하는 폴더 order--
-        setFolders(prevFolders =>
-            prevFolders.map(folder =>
-                folder.depth === moveFolder.depth && folder.parentOrder === moveFolder.parentOrder && folder.order > moveFolder.order
-                    ? {...folder, order: folder.order - 1} : folder)
-        );
-        setFolders(prevFolders =>
-            prevFolders.map(folder =>
-                folder.depth === moveFolder.depth + 1 && folder.parentOrder > moveFolder.order
-                    ? {...folder, parentOrder: folder.parentOrder - 1} : folder)
-        );
+        anotherFolders.forEach(folder => {
+            if (folder.depth === moveFolder.depth && folder.parentOrder === moveFolder.parentOrder && folder.order > moveFolder.order) {
+                folder.order--;
+            } else if (folder.depth === moveFolder.depth + 1 && folder.parentOrder > moveFolder.order) {
+                folder.order--;
+            }
+        });
 
         // 뒤로 이동하는 폴더 뒤의 order++
-        setFolders(prevFolders =>
-            prevFolders.map(folder =>
-                folder.depth === targetFolder.depth && folder.parentOrder === targetFolder.parentOrder && folder.order >= targetFolder.order
-                    ? {...folder, order: folder.order + 1} : folder)
-        );
-        setFolders(prevFolders =>
-            prevFolders.map(folder =>
-                folder.depth === targetFolder.depth + 1 && folder.parentOrder >= targetFolder.order
-                    ? {...folder, parentOrder: folder.parentOrder + 1} : folder)
-        );
+        anotherFolders.forEach(folder => {
+            if (folder.depth === targetFolder.depth && folder.parentOrder === targetFolder.parentOrder && folder.order >= targetFolder.order) {
+                folder.order++;
+            } else if (folder.depth === targetFolder.depth + 1 && folder.parentOrder >= targetFolder.order) {
+                folder.parentOrder++;
+            }
+        });
 
-        // 분리했던 폴더 추가
-        setFolders(prevFolders =>
-            sortFolders([...prevFolders, ...moveFolders]));
+        setFolders(sortFolders([...anotherFolders, ...moveFolders]));
     }
 
     const handleSubmit = () => {
@@ -195,17 +188,30 @@ function FolderSettingPage() {
                 <div key={folder.id}
                      className={`ml-${folder.depth * 8 - 8} ${folder.depth === 0 && "hidden"} flex justify-between items-center border h-12 px-4 my-4 text-sm`}>
                     depth: {folder.depth} parentOrder : {folder.parentOrder} order : {folder.order} {folder.title}
-                    {folder.depth <= 1 && <TextButton text={"추가"} onClick={() => addFolder(folder, faker.lorem.words())}
-                                                      addStyle={"text-xs"}/>}
-                    <TextButton text={"2, 1, 0 으로 이동"} onClick={() => moveFolder(folder, {
-                        id: "",
-                        title: "",
-                        depth: 2,
-                        parentOrder: 1,
-                        order: 0,
-                    })} addStyle={"text-sm"}/>
+                    <div className="flex justify-end items-center gap-x-2">
+                        {folder.depth <= 1 &&
+                            <TextButton text={"추가"} onClick={() => addFolder(folder, faker.lorem.words())}
+                                        addStyle={"text-xs"}/>}
+                        <TextButton text={"1, 1, 0 으로 이동"} onClick={() => moveFolder(folder, {
+                            id: "",
+                            title: "",
+                            depth: 1,
+                            parentOrder: 0,
+                            order: 1,
+                        })} addStyle={"text-xs"}/>
+                    </div>
                 </div>
             ))}
+            <button className="w-full border h-12 px-4 my-4 text-sm hover:cursor-pointer"
+                    onClick={() => addFolder({
+                        id: crypto.randomUUID(),
+                        title: "",
+                        depth: 0,
+                        parentOrder: -1,
+                        order: 0
+                    }, faker.lorem.words())}>
+                폴더 추가
+            </button>
             <div className="flex justify-end">
                 <FillButton text={"변경사항 저장"} onClick={handleSubmit} addStyle={"text-sm"}/>
             </div>
