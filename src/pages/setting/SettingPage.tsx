@@ -175,7 +175,7 @@ function SettingPage() {
                     </ul>
                 </div>
                 {(selectedTab === "폴더") &&
-                    <div className="border-l border-gray-200 w-full ps-8">
+                    <div className="min-w-160 border-l border-gray-200 w-full ps-8">
                         <OldFolderSettingPage
                             setSelectedFolder={setSelectedFolder}
                             folders={folders}
@@ -187,15 +187,15 @@ function SettingPage() {
                             submitFolderChange={submitFolderChange}/>
                     </div>}
                 {(selectedTab === "폴더2") &&
-                    <div className="border-l border-gray-200 w-full ps-8">
+                    <div className="min-w-160 border-l border-gray-200 w-full ps-8">
                         <FolderSettingPage/>
                     </div>}
                 {(selectedTab === "게시글") &&
-                    <div className="border-l border-gray-200 w-full ps-8">
+                    <div className="min-w-160 border-l border-gray-200 w-full ps-8">
                         <PostSettingPage/>
                     </div>}
                 {(selectedTab === "프로필") &&
-                    <div className="border-l border-gray-200 w-full ps-8">
+                    <div className="min-w-160 border-l border-gray-200 w-full ps-8">
                         <ProfileSettingPage/>
                     </div>}
             </div>

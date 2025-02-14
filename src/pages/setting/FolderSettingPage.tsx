@@ -111,6 +111,7 @@ function FolderSettingPage() {
             return;
         }
 
+        const id = crypto.randomUUID();
         const subFolders = folders.filter(folder =>
             folder.depth === parentFolder.depth + 1 && folder.parentOrder === parentFolder.order);
         const maxOrder = subFolders.reduce((max, folder) => {
@@ -118,13 +119,15 @@ function FolderSettingPage() {
         }, -1);
 
         const newFolder: FolderResponse = {
-            id: crypto.randomUUID(),
+            id: id,
             title: title,
             depth: parentFolder.depth + 1,
             order: maxOrder + 1,
             parentOrder: parentFolder.order,
         };
 
+        setEditFolderId(id);
+        setEditFolderTitle("");
         setFolders(sortFolders([...folders, newFolder]));
     }
 
@@ -187,6 +190,8 @@ function FolderSettingPage() {
         order: 0,
         parentOrder: -1,
     });
+    const [editFolderId, setEditFolderId] = useState("");
+    const [editFolderTitle, setEditFolderTitle] = useState("");
     const [targetFolder, setTargetFolder] = useState<FolderResponse>({
         id: crypto.randomUUID(),
         title: "DigLog의 블로그",
@@ -213,7 +218,12 @@ function FolderSettingPage() {
                 .reduce((max, f) => {
                     return f.order > max ? f.order : max;
                 }, -1);
-            moveTargetFolder = {...targetFolder, depth: targetFolder.depth + 1, parentOrder: targetFolder.order, order: maxOrder + 1};
+            moveTargetFolder = {
+                ...targetFolder,
+                depth: targetFolder.depth + 1,
+                parentOrder: targetFolder.order,
+                order: maxOrder + 1
+            };
         }
 
         moveFolder(selectedFolder, moveTargetFolder);
@@ -232,6 +242,28 @@ function FolderSettingPage() {
             return true;
         }
         return false;
+    }
+
+    const handleEdit = (editFolder: FolderResponse) => {
+        if (editFolder.title.trim() === "") {
+            alert("폴더 이름을 입력해주세요.");
+            return;
+        } else if (folders.findIndex(folder => folder.title === editFolderTitle.trim()) !== -1) {
+            alert("중복된 폴더 이름입니다.");
+            return;
+        }
+
+        setFolders(prevFolders =>
+            prevFolders.map(folder =>
+                folder.id === editFolder.id ? editFolder : folder));
+
+        setEditFolderId("");
+    }
+    const handleDelete = (deleteFolder: FolderResponse) => {
+        if (!confirm("삭제하시겠습니까?")) {
+            return;
+        }
+        setFolders(sortFolders(folders.filter(folder => folder !== deleteFolder)));
     }
 
     const handleSubmit = () => {
@@ -257,17 +289,42 @@ function FolderSettingPage() {
             <p className="font-semibold text-xl my-4">폴더 관리</p>
             {folders.map((folder: FolderResponse) => (
                 <div key={folder.id}
-                     className={`ml-${folder.depth * 8 - 8} ${folder.depth === 0 && "hidden"} flex justify-between items-center border h-12 px-4 my-4 text-sm`}>
-                    depth: {folder.depth} parentOrder : {folder.parentOrder} order : {folder.order} {folder.title}
-                    <div className="flex justify-end items-center gap-x-2">
-                        {folder.depth <= 1 &&
-                            <TextButton text={"추가"} onClick={() => addFolder(folder, faker.lorem.words())}
-                                        addStyle={"text-xs"}/>}
-                        <TextButton text={"이동"} onClick={() => {
-                            setOpenMoveModal(true);
-                            setSelectedFolder(folder);
-                        }} addStyle={"text-xs"}/>
-                    </div>
+                     className={`ml-${folder.depth * 8 - 8} ${folder.depth === 0 && "hidden"} flex justify-between items-center h-12 px-4 my-4 border border-gray-300 hover:border-gray-400 text-sm`}>
+                    {folder.id === editFolderId
+                        ? <div className="w-full flex justify-between items-center gap-x-4">
+                            <input
+                                className={"flex-1 font-bold border p-2"}
+                                value={editFolderTitle}
+                                onChange={(e) => setEditFolderTitle(e.target.value)}
+                                placeholder="폴더 이름"/>
+                            <div className="flex items-center gap-x-2">
+                                <FillButton text={"취소"}
+                                            onClick={() => setEditFolderId("")}
+                                            addStyle={"!bg-gray-400 hover:brightness-110"}/>
+                                <FillButton text={"수정"}
+                                            onClick={() => handleEdit({...folder, title: editFolderTitle})}/>
+                            </div>
+                        </div>
+                        : <div className="w-full flex justify-between items-center ">
+                            <p>{folder.title}</p>
+                            <div className="flex justify-end items-center">
+                                {folder.depth <= 1 &&
+                                    <TextButton text={"추가"}
+                                                onClick={() => addFolder(folder, `폴더_${crypto.randomUUID().substring(0, 4)}`)}
+                                                addStyle={"text-xs hover:text-lime-600"}/>}
+                                <TextButton text={"수정"} onClick={() => {
+                                    setEditFolderId(folder.id);
+                                    setEditFolderTitle(folder.title);
+                                }} addStyle={"text-xs hover:text-lime-600"}/>
+                                <TextButton text={"삭제"} onClick={() => {
+                                    handleDelete(folder);
+                                }} addStyle={"text-xs hover:text-lime-600"}/>
+                                <TextButton text={"이동"} onClick={() => {
+                                    setOpenMoveModal(true);
+                                    setSelectedFolder(folder);
+                                }} addStyle={"text-xs hover:text-lime-600"}/>
+                            </div>
+                        </div>}
                 </div>
             ))}
             <button className="w-full border h-12 px-4 my-4 text-sm hover:cursor-pointer"
@@ -277,7 +334,7 @@ function FolderSettingPage() {
                         depth: 0,
                         parentOrder: -1,
                         order: 0
-                    }, faker.lorem.words())}>
+                    }, `폴더_${crypto.randomUUID().substring(0, 4)}`)}>
                 폴더 추가
             </button>
             <div className="flex justify-end">
@@ -321,7 +378,8 @@ function FolderSettingPage() {
                             <FillButton text={"취소"} onClick={() => {
                                 setOpenMoveModal(false);
                             }}/>
-                            <FillButton text={"이동"} onClick={handleMoveFolder} addStyle={(handleDisabled(folderMoveType) ? "opacity-40 hover:!cursor-auto" : "")}/>
+                            <FillButton text={"이동"} onClick={handleMoveFolder}
+                                        addStyle={(handleDisabled(folderMoveType) ? "opacity-40 hover:!cursor-auto" : "")}/>
                         </div>
                     </div>
                 </ModalLayout>
