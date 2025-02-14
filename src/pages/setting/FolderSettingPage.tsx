@@ -1,8 +1,10 @@
 import {faker} from "@faker-js/faker/locale/ko";
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {FolderResponse} from "../../common/types/blog.tsx";
 import {FillButton} from "../../components/common/FillButton.tsx";
 import {TextButton} from "../../components/common/TextButton.tsx";
+import ModalLayout from "../../layout/ModalLayout.tsx";
+import CategorySelectBox from "../../components/blog/CategorySelectBox.tsx";
 
 function FolderSettingPage() {
 
@@ -177,9 +179,78 @@ function FolderSettingPage() {
         setFolders(sortFolders([...anotherFolders, ...moveFolders]));
     }
 
+    const [openMoveModal, setOpenMoveModal] = useState(false);
+    const [selectedFolder, setSelectedFolder] = useState<FolderResponse>({
+        id: crypto.randomUUID(),
+        title: "DigLog의 블로그",
+        depth: 0,
+        order: 0,
+        parentOrder: -1,
+    });
+    const [targetFolder, setTargetFolder] = useState<FolderResponse>({
+        id: crypto.randomUUID(),
+        title: "DigLog의 블로그",
+        depth: 0,
+        order: 0,
+        parentOrder: -1,
+    });
+    const [folderMoveType, setFolderMoveType] = useState(0);
+    const folderMoveTypes = ["폴더 위로 옮깁니다.", "폴더 아래로 옮깁니다.", "폴더 내부로 옮깁니다."];
+
+    const handleMoveFolder = () => {
+        if (handleDisabled(folderMoveType)) {
+            alert("활성화된 동작 중에서 선택해주세요.");
+            return;
+        }
+
+        let moveTargetFolder;
+        if (folderMoveType === 0) {
+            moveTargetFolder = targetFolder;
+        } else if (folderMoveType === 1) {
+            moveTargetFolder = {...targetFolder, order: targetFolder.order + 1};
+        } else {
+            const maxOrder = folders.filter(folder => folder.depth === targetFolder.depth + 1 && folder.parentOrder === targetFolder.order)
+                .reduce((max, f) => {
+                    return f.order > max ? f.order : max;
+                }, -1);
+            moveTargetFolder = {...targetFolder, depth: targetFolder.depth + 1, parentOrder: targetFolder.order, order: maxOrder + 1};
+        }
+
+        moveFolder(selectedFolder, moveTargetFolder);
+        setOpenMoveModal(false);
+    }
+
+    const handleDisabled = (moveType: number) => {
+        if (!targetFolder) {
+            return true;
+        } else if (targetFolder.depth === 0 && moveType !== 2) {
+            return true;
+        } else if (targetFolder.depth == 2 && moveType == 2) {
+            return true;
+        } else if (moveType === 2 && selectedFolder.depth === 1 && targetFolder.depth !== 0 &&
+            folders.findIndex(folder => folder.depth === 2 && folder.parentOrder === selectedFolder.order) !== -1) {
+            return true;
+        }
+        return false;
+    }
+
     const handleSubmit = () => {
         alert("변경사항이 적용되었습니다.");
     }
+
+    const modalRef = useRef<HTMLDivElement | null>(null);
+    const handleClickOutside = (event: MouseEvent) => {
+        if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+            setOpenMoveModal(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     return (
         <div>
@@ -192,13 +263,10 @@ function FolderSettingPage() {
                         {folder.depth <= 1 &&
                             <TextButton text={"추가"} onClick={() => addFolder(folder, faker.lorem.words())}
                                         addStyle={"text-xs"}/>}
-                        <TextButton text={"1, 1, 0 으로 이동"} onClick={() => moveFolder(folder, {
-                            id: "",
-                            title: "",
-                            depth: 1,
-                            parentOrder: 0,
-                            order: 1,
-                        })} addStyle={"text-xs"}/>
+                        <TextButton text={"이동"} onClick={() => {
+                            setOpenMoveModal(true);
+                            setSelectedFolder(folder);
+                        }} addStyle={"text-xs"}/>
                     </div>
                 </div>
             ))}
@@ -215,6 +283,49 @@ function FolderSettingPage() {
             <div className="flex justify-end">
                 <FillButton text={"변경사항 저장"} onClick={handleSubmit} addStyle={"text-sm"}/>
             </div>
+            {openMoveModal && (
+                <ModalLayout addStyle={"!w-128"} customRef={modalRef}>
+                    <div className="w-full h-full">
+                        <div className="flex flex-col justify-center items-center gap-y-8">
+                            <p><span className="font-bold">{selectedFolder.title}</span> 폴더를</p>
+                            <CategorySelectBox
+                                folders={folders}
+                                targetFolder={targetFolder}
+                                setTargetFolder={setTargetFolder}
+                                center={true}
+                            />
+                            <fieldset>
+                                <legend></legend>
+                                <ul className="flex flex-col justify-center items-center gap-y-2 mb-4">
+                                    {folderMoveTypes.map((moveType, index) =>
+                                        <li key={index}
+                                            className="w-48 flex justify-start items-center gap-x-4">
+                                            <input
+                                                key={`folder-radio-${index}`}
+                                                className="size-4"
+                                                id={`folderMoveType${index}`}
+                                                type="radio"
+                                                value={index}
+                                                checked={folderMoveType === index}
+                                                onChange={() => setFolderMoveType(index)}
+                                                disabled={handleDisabled(index)}/>
+                                            <label key={`folder-radio-label-${index}`}
+                                                   className={`${handleDisabled(index) && "text-gray-400"}`}
+                                                   htmlFor={`folderMoveType${index}`}>{moveType}</label>
+                                        </li>
+                                    )}
+                                </ul>
+                            </fieldset>
+                        </div>
+                        <div className="flex justify-center items-center gap-x-4">
+                            <FillButton text={"취소"} onClick={() => {
+                                setOpenMoveModal(false);
+                            }}/>
+                            <FillButton text={"이동"} onClick={handleMoveFolder} addStyle={(handleDisabled(folderMoveType) ? "opacity-40 hover:!cursor-auto" : "")}/>
+                        </div>
+                    </div>
+                </ModalLayout>
+            )}
         </div>
     );
 }
