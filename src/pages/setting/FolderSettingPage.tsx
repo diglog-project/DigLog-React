@@ -2,9 +2,12 @@ import {faker} from "@faker-js/faker/locale/ko";
 import {useEffect, useRef, useState} from "react";
 import {FolderResponse} from "../../common/types/blog.tsx";
 import {FillButton} from "../../components/common/FillButton.tsx";
-import {TextButton} from "../../components/common/TextButton.tsx";
 import ModalLayout from "../../layout/ModalLayout.tsx";
 import CategorySelectBox from "../../components/blog/CategorySelectBox.tsx";
+import {SortableContext, verticalListSortingStrategy} from "@dnd-kit/sortable";
+import {DndContext, DragEndEvent} from "@dnd-kit/core";
+import FolderCard from "../../components/setting/FolderCard.tsx";
+import {FolderRequest, testApi} from "../../common/apis/post.tsx";
 
 function FolderSettingPage() {
 
@@ -144,14 +147,16 @@ function FolderSettingPage() {
 
         // 이동할 폴더 분리
         folders.forEach(folder => {
-            if (folder.depth === moveFolder.depth && folder.parentOrder === moveFolder.parentOrder && folder.order === moveFolder.order) {
+            if (folder.depth === 0) {
+                moveFolders.push(folder);
+            } else if (folder.depth === moveFolder.depth && folder.parentOrder === moveFolder.parentOrder && folder.order === moveFolder.order) {
                 moveFolders.push({
                     ...folder,
                     depth: targetFolder.depth,
                     order: targetFolder.order,
                     parentOrder: targetFolder.parentOrder,
                 });
-            } else if (folder.depth === moveFolder.depth + 1 && folder.parentOrder === moveFolder.order) {
+            } else if (folder.depth > moveFolder.depth && folder.parentOrder === moveFolder.order) {
                 moveFolders.push({
                     ...folder,
                     parentOrder: targetFolder.order,
@@ -161,25 +166,67 @@ function FolderSettingPage() {
             }
         });
 
-        // 앞으로 이동하는 폴더 order--
-        anotherFolders.forEach(folder => {
-            if (folder.depth === moveFolder.depth && folder.parentOrder === moveFolder.parentOrder && folder.order > moveFolder.order) {
-                folder.order--;
-            } else if (folder.depth === moveFolder.depth + 1 && folder.parentOrder > moveFolder.order) {
-                folder.order--;
-            }
-        });
-
-        // 뒤로 이동하는 폴더 뒤의 order++
-        anotherFolders.forEach(folder => {
-            if (folder.depth === targetFolder.depth && folder.parentOrder === targetFolder.parentOrder && folder.order >= targetFolder.order) {
-                folder.order++;
-            } else if (folder.depth === targetFolder.depth + 1 && folder.parentOrder >= targetFolder.order) {
-                folder.parentOrder++;
-            }
-        });
-
         setFolders(sortFolders([...anotherFolders, ...moveFolders]));
+
+        // anotherFolders.forEach((folder) => {
+        //     if (moveFolder.depth === 2 && targetFolder.depth === 2) {
+        //         if (folder.depth === 2 && moveFolder.parentOrder === targetFolder.parentOrder && folder.parentOrder === moveFolder.parentOrder) {
+        //             if (folder.order > moveFolder.order && folder.order <= targetFolder.order) {
+        //                 resultFolders.push({...folder, order: --folder.order});
+        //             } else if (folder.order < moveFolder.order && folder.order >= targetFolder.order) {
+        //                 resultFolders.push({...folder, order: ++folder.order});
+        //             } else {
+        //                 resultFolders.push(folder);
+        //             }
+        //         } else if (folder.depth === 2 && moveFolder.parentOrder !== targetFolder.parentOrder) {
+        //             if (folder.parentOrder === moveFolder.parentOrder && folder.order > moveFolder.order) {
+        //                 resultFolders.push({...folder, order: --folder.order});
+        //             } else if (folder.parentOrder === targetFolder.parentOrder && folder.order >= targetFolder.order) {
+        //                 resultFolders.push({...folder, order: ++folder.order});
+        //             } else {
+        //                 resultFolders.push(folder);
+        //             }
+        //         } else {
+        //             resultFolders.push(folder);
+        //         }
+        //     } else if (moveFolder.depth === 2 && targetFolder.depth === 1) {
+        //         if (folder.depth === 2 && folder.parentOrder >= targetFolder.order) {
+        //             resultFolders.push({...folder, parentOrder: ++folder.parentOrder});
+        //         } else if (folder.depth === 2 && folder.parentOrder === moveFolder.parentOrder && folder.order > moveFolder.order) {
+        //             resultFolders.push({...folder, order: --folder.order});
+        //         } else if (folder.depth === 1 && folder.order >= targetFolder.order) {
+        //             resultFolders.push({...folder, order: ++folder.order});
+        //         } else {
+        //             resultFolders.push(folder);
+        //         }
+        //     } else if (moveFolder.depth === 1 && targetFolder.depth === 2) {
+        //         if (folder.depth === 1 && folder.order > moveFolder.order) {
+        //             resultFolders.push({...folder, order: --folder.order});
+        //         } else if (folder.depth === 2 && folder.parentOrder === targetFolder.parentOrder && folder.order >= targetFolder.order) {
+        //             resultFolders.push({...folder, order: ++folder.order});x
+        //         } else if (folder.depth === 2 && folder.parentOrder > moveFolder.order) {
+        //             resultFolders.push({...folder, parentOrder: --folder.parentOrder});
+        //         } else {
+        //             resultFolders.push(folder);
+        //         }
+        //     } else if (moveFolder.depth === 1 && targetFolder.depth === 1) {
+        //         if (folder.depth === 1 && folder.order > moveFolder.order && folder.order <= targetFolder.order) {
+        //             resultFolders.push({...folder, order: --folder.order});
+        //         } else if (folder.depth === 1 && folder.order < moveFolder.order && folder.order >= targetFolder.order) {
+        //             resultFolders.push({...folder, order: ++folder.order});
+        //         } else if (folder.depth === 2 && folder.parentOrder > moveFolder.order && folder.parentOrder <= targetFolder.order) {
+        //             resultFolders.push({...folder, parentOrder: --folder.parentOrder});
+        //         } else if (folder.depth === 2 && folder.parentOrder < moveFolder.order && folder.parentOrder >= targetFolder.order) {
+        //             resultFolders.push({...folder, parentOrder: ++folder.parentOrder});
+        //         } else {
+        //             resultFolders.push(folder);
+        //         }
+        //     } else {
+        //         resultFolders.push(folder);
+        //     }
+        // });
+        //
+        // setFolders(sortFolders([...resultFolders, ...moveFolders]));
     }
 
     const [openMoveModal, setOpenMoveModal] = useState(false);
@@ -230,6 +277,21 @@ function FolderSettingPage() {
         setOpenMoveModal(false);
     }
 
+    const handleOnDragEnd = ({active, over}: DragEndEvent) => {
+        if (!over || active.id === over.id) {
+            return;
+        }
+
+        const activeFolder = folders.find(folder => folder.id === active.id);
+        const overFolder = folders.find(folder => folder.id === over.id);
+
+        if (!activeFolder || !overFolder) {
+            return;
+        }
+
+        moveFolder(activeFolder, overFolder);
+    }
+
     const handleDisabled = (moveType: number) => {
         if (!targetFolder) {
             return true;
@@ -260,13 +322,26 @@ function FolderSettingPage() {
         setEditFolderId("");
     }
     const handleDelete = (deleteFolder: FolderResponse) => {
+        if (deleteFolder.depth === 1) {
+            const findIndex = folders.findIndex(folder =>
+                folder.depth === 2 && folder.parentOrder === deleteFolder.order);
+            if (findIndex !== -1) {
+                alert("하위 폴더를 삭제한 후에 삭제할 수 있습니다.");
+                return;
+            }
+        }
+
         if (!confirm("삭제하시겠습니까?")) {
             return;
         }
+
         setFolders(sortFolders(folders.filter(folder => folder !== deleteFolder)));
     }
 
     const handleSubmit = () => {
+        if (!confirm("변경사항을 적용하시겠습니까?")) {
+            return;
+        }
         alert("변경사항이 적용되었습니다.");
     }
 
@@ -287,46 +362,24 @@ function FolderSettingPage() {
     return (
         <div>
             <p className="font-semibold text-xl my-4">폴더 관리</p>
-            {folders.map((folder: FolderResponse) => (
-                <div key={folder.id}
-                     className={`ml-${folder.depth * 8 - 8} ${folder.depth === 0 && "hidden"} flex justify-between items-center h-12 px-4 my-4 border border-gray-300 hover:border-gray-400 text-sm`}>
-                    {folder.id === editFolderId
-                        ? <div className="w-full flex justify-between items-center gap-x-4">
-                            <input
-                                className={"flex-1 font-bold border p-2"}
-                                value={editFolderTitle}
-                                onChange={(e) => setEditFolderTitle(e.target.value)}
-                                placeholder="폴더 이름"/>
-                            <div className="flex items-center gap-x-2">
-                                <FillButton text={"취소"}
-                                            onClick={() => setEditFolderId("")}
-                                            addStyle={"!bg-gray-400 hover:brightness-110"}/>
-                                <FillButton text={"수정"}
-                                            onClick={() => handleEdit({...folder, title: editFolderTitle})}/>
-                            </div>
-                        </div>
-                        : <div className="w-full flex justify-between items-center ">
-                            <p>{folder.title}</p>
-                            <div className="flex justify-end items-center">
-                                {folder.depth <= 1 &&
-                                    <TextButton text={"추가"}
-                                                onClick={() => addFolder(folder, `폴더_${crypto.randomUUID().substring(0, 4)}`)}
-                                                addStyle={"text-xs hover:text-lime-600"}/>}
-                                <TextButton text={"수정"} onClick={() => {
-                                    setEditFolderId(folder.id);
-                                    setEditFolderTitle(folder.title);
-                                }} addStyle={"text-xs hover:text-lime-600"}/>
-                                <TextButton text={"삭제"} onClick={() => {
-                                    handleDelete(folder);
-                                }} addStyle={"text-xs hover:text-lime-600"}/>
-                                <TextButton text={"이동"} onClick={() => {
-                                    setOpenMoveModal(true);
-                                    setSelectedFolder(folder);
-                                }} addStyle={"text-xs hover:text-lime-600"}/>
-                            </div>
-                        </div>}
-                </div>
-            ))}
+            <DndContext onDragEnd={handleOnDragEnd}>
+                <SortableContext items={folders} strategy={verticalListSortingStrategy}>
+                    {folders.map((folder: FolderResponse) => (
+                        <FolderCard
+                            key={folder.id}
+                            folder={folder}
+                            editFolderId={editFolderId}
+                            editFolderTitle={editFolderTitle}
+                            setEditFolderId={setEditFolderId}
+                            setEditFolderTitle={setEditFolderTitle}
+                            handleEdit={handleEdit}
+                            addFolder={addFolder}
+                            handleDelete={handleDelete}
+                            setOpenMoveModal={setOpenMoveModal}
+                            setSelectedFolder={setSelectedFolder}/>
+                    ))}
+                </SortableContext>
+            </DndContext>
             <button className="w-full border h-12 px-4 my-4 text-sm hover:cursor-pointer"
                     onClick={() => addFolder({
                         id: crypto.randomUUID(),
@@ -339,6 +392,58 @@ function FolderSettingPage() {
             </button>
             <div className="flex justify-end">
                 <FillButton text={"변경사항 저장"} onClick={handleSubmit} addStyle={"text-sm"}/>
+                <FillButton text={"테스트 전송"} onClick={() => {
+
+                    const folderRequestList: FolderRequest[] = [
+                        {
+                            id: crypto.randomUUID(),
+                            name: faker.lorem.words(),
+                            subFolders: [
+                                {
+                                    id: crypto.randomUUID(),
+                                    name: faker.lorem.words(),
+                                    subFolders: [],
+                                },
+                                {
+                                    id: crypto.randomUUID(),
+                                    name: faker.lorem.words(),
+                                    subFolders: [],
+                                },
+                            ],
+                        },
+                        {
+                            id: crypto.randomUUID(),
+                            name: faker.lorem.words(),
+                            subFolders: [
+                                {
+                                    id: crypto.randomUUID(),
+                                    name: faker.lorem.words(),
+                                    subFolders: [],
+                                },
+                                {
+                                    id: crypto.randomUUID(),
+                                    name: faker.lorem.words(),
+                                    subFolders: [],
+                                },
+                            ],
+                        },
+                        {
+                            id: crypto.randomUUID(),
+                            name: faker.lorem.words(),
+                            subFolders: [
+                                {
+                                    id: crypto.randomUUID(),
+                                    name: faker.lorem.words(),
+                                    subFolders: [],
+                                },
+                            ],
+                        },
+                    ]
+
+                    testApi(folderRequestList)
+                        .then((res) => console.log(res.data))
+                        .catch((error) => console.log(error));
+                }}/>
             </div>
             {openMoveModal && (
                 <ModalLayout addStyle={"!w-128"} customRef={modalRef}>
@@ -351,28 +456,25 @@ function FolderSettingPage() {
                                 setTargetFolder={setTargetFolder}
                                 center={true}
                             />
-                            <fieldset>
-                                <legend></legend>
-                                <ul className="flex flex-col justify-center items-center gap-y-2 mb-4">
-                                    {folderMoveTypes.map((moveType, index) =>
-                                        <li key={index}
-                                            className="w-48 flex justify-start items-center gap-x-4">
-                                            <input
-                                                key={`folder-radio-${index}`}
-                                                className="size-4"
-                                                id={`folderMoveType${index}`}
-                                                type="radio"
-                                                value={index}
-                                                checked={folderMoveType === index}
-                                                onChange={() => setFolderMoveType(index)}
-                                                disabled={handleDisabled(index)}/>
-                                            <label key={`folder-radio-label-${index}`}
-                                                   className={`${handleDisabled(index) && "text-gray-400"}`}
-                                                   htmlFor={`folderMoveType${index}`}>{moveType}</label>
-                                        </li>
-                                    )}
-                                </ul>
-                            </fieldset>
+                            <ul className="flex flex-col justify-center items-center gap-y-2 mb-4">
+                                {folderMoveTypes.map((moveType, index) =>
+                                    <li key={index}
+                                        className="w-48 flex justify-start items-center gap-x-4">
+                                        <input
+                                            key={`folder-radio-${index}`}
+                                            className="size-4"
+                                            id={`folderMoveType${index}`}
+                                            type="radio"
+                                            value={index}
+                                            checked={folderMoveType === index}
+                                            onChange={() => setFolderMoveType(index)}
+                                            disabled={handleDisabled(index)}/>
+                                        <label key={`folder-radio-label-${index}`}
+                                               className={`${handleDisabled(index) && "text-gray-400"}`}
+                                               htmlFor={`folderMoveType${index}`}>{moveType}</label>
+                                    </li>
+                                )}
+                            </ul>
                         </div>
                         <div className="flex justify-center items-center gap-x-4">
                             <FillButton text={"취소"} onClick={() => {

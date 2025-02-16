@@ -3,7 +3,7 @@ import {restrictToVerticalAxis} from "@dnd-kit/modifiers";
 import {SortableContext} from "@dnd-kit/sortable";
 import {FillButton} from "../../components/common/FillButton.tsx";
 import {FolderType} from "./SettingPage.tsx";
-import FolderCard from "../../components/setting/FolderCard.tsx";
+import OldFolderCard from "../../components/setting/OldFolderCard.tsx";
 import {OutlineButton} from "../../components/common/OutlineButton.tsx";
 
 function OldFolderSettingPage({
@@ -35,7 +35,7 @@ function OldFolderSettingPage({
                     <SortableContext items={folders}>
                         {folders.map((folder) => (
                             <div key={folder.id}>
-                                <FolderCard
+                                <OldFolderCard
                                     setSelectedFolder={setSelectedFolder}
                                     folder={folder}
                                     setShowModal={setShowModal}
