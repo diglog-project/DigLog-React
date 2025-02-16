@@ -14,17 +14,13 @@ import {uploadImage} from "../../common/apis/image.tsx";
 import {checkUUID} from "../../common/util/regex.tsx";
 import {TagResponse} from "../../common/types/post.tsx";
 import {sortByName} from "../../common/util/sort.tsx";
+import {FolderType} from "../../common/types/blog.tsx";
 
 interface WritePostType {
     inputTag: string;
     tags: string[];
     title: string;
     content: string;
-}
-
-interface FolderType {
-    name: string;
-    subFolders?: FolderType[];
 }
 
 function WritePage() {
@@ -166,21 +162,45 @@ function WritePage() {
 
     const folderData: FolderType[] = [
         {
-            name: faker.lorem.words(),
+            id: crypto.randomUUID(),
+            title: faker.lorem.words(),
             subFolders: [
-                {name: faker.lorem.words()},
-                {name: faker.lorem.words()}
+                {
+                    id: crypto.randomUUID(),
+                    title: faker.lorem.words(),
+                    subFolders: [],
+                },
+                {
+                    id: crypto.randomUUID(),
+                    title: faker.lorem.words(),
+                    subFolders: [],
+                },
             ]
         },
         {
-            name: faker.lorem.words(),
+            id: crypto.randomUUID(),
+            title: faker.lorem.words(),
+            subFolders: [],
         },
         {
-            name: faker.lorem.words(),
+            id: crypto.randomUUID(),
+            title: faker.lorem.words(),
             subFolders: [
-                {name: faker.lorem.words()},
-                {name: faker.lorem.words()},
-                {name: faker.lorem.words()}
+                {
+                    id: crypto.randomUUID(),
+                    title: faker.lorem.words(),
+                    subFolders: [],
+                },
+                {
+                    id: crypto.randomUUID(),
+                    title: faker.lorem.words(),
+                    subFolders: [],
+                },
+                {
+                    id: crypto.randomUUID(),
+                    title: faker.lorem.words(),
+                    subFolders: [],
+                },
             ]
         },
     ];
@@ -237,36 +257,36 @@ function WritePage() {
                             className={`${folderOpen ? "" : "hidden"} absolute z-50 top-12 left-0 bg-white divide-y divide-gray-500 rounded-lg shadow-sm`}>
                             {folderData.map((folder) => {
                                 if (!folder.subFolders) {
-                                    return <div key={folder.name} className="py-2 w-auto text-sm">
+                                    return <div key={folder.title} className="py-2 w-auto text-sm">
                                         <button
                                             className="px-4 py-2 text-gray-700 text-start hover:bg-gray-100 w-full hover:cursor-pointer"
                                             onClick={() => {
-                                                setSelectedFolder(folder.name);
+                                                setSelectedFolder(folder.title);
                                                 setFolderOpen(false);
                                             }}>
-                                            {folder.name}
+                                            {folder.title}
                                         </button>
                                     </div>
                                 } else {
-                                    return <div key={folder.name}
+                                    return <div key={folder.title}
                                                 className="flex flex-col items-start py-2 w-auto text-sm">
                                         <button
                                             className="px-4 py-2 text-gray-700 text-start border-gray-200 hover:bg-gray-100 w-full hover:cursor-pointer"
                                             onClick={() => {
-                                                setSelectedFolder(folder.name);
+                                                setSelectedFolder(folder.title);
                                                 setFolderOpen(false);
                                             }}>
-                                            {folder.name}
+                                            {folder.title}
                                         </button>
                                         {folder.subFolders.map((subFolder: FolderType) =>
                                             <button
-                                                key={subFolder.name}
+                                                key={subFolder.title}
                                                 className="px-4 py-2 text-gray-700 text-start hover:bg-gray-100 w-full hover:cursor-pointer"
                                                 onClick={() => {
-                                                    setSelectedFolder(`${folder.name} > ${subFolder.name}`);
+                                                    setSelectedFolder(`${folder.title} > ${subFolder.title}`);
                                                     setFolderOpen(false);
                                                 }}>
-                                                {`${folder.name} > ${subFolder.name}`}
+                                                {`${folder.title} > ${subFolder.title}`}
                                             </button>
                                         )}
                                     </div>;
@@ -326,7 +346,9 @@ function WritePage() {
                 />
                 <div className="flex justify-between items-center w-full mt-4">
                     {path.endsWith("/edit")
-                        && <FillButton text={"삭제하기"} onClick={() => handleDelete(id)} addStyle={"bg-red-400 hover:bg-red-700"}/>}
+                        ? <FillButton text={"삭제하기"} onClick={() => handleDelete(id)}
+                                      addStyle={"bg-red-400 hover:bg-red-700"}/>
+                        : <div></div>}
                     {path.endsWith("/edit")
                         ? <FillButton text={"수정하기"} onClick={handleEdit}/>
                         : <FillButton text={"게시하기"} onClick={handleSubmit}/>}

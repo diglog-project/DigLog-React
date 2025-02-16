@@ -1,10 +1,10 @@
-import {FolderType} from "../../pages/setting/SettingPage.tsx";
 import {FillButton} from "../common/FillButton.tsx";
 import {useState} from "react";
 import {TextButton} from "../common/TextButton.tsx";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store.tsx";
 import ModalLayout from "../../layout/ModalLayout.tsx";
+import {FolderType} from "../../common/types/blog.tsx";
 
 function FolderMoveModal({selectedFolder, folders, handleFolderMove, setShowModal}: {
     selectedFolder: FolderType | null,
@@ -27,7 +27,7 @@ function FolderMoveModal({selectedFolder, folders, handleFolderMove, setShowModa
         <ModalLayout>
             <div className="flex flex-col gap-y-4">
                 <p className="font-bold mb-4">
-                    "{selectedFolder?.name}" 폴더를 이동할 곳을 골라주세요.
+                    "{selectedFolder?.title}" 폴더를 이동할 곳을 골라주세요.
                 </p>
                 <button
                     className={`${"top" === selectedFolderId && "bg-lime-300"} border border-gray-400 p-2 text-start hover:bg-lime-300 hover:cursor-pointer`}
@@ -38,7 +38,7 @@ function FolderMoveModal({selectedFolder, folders, handleFolderMove, setShowModa
                     <button key={folder.id}
                             className={`${folder.id === selectedFolderId && "bg-lime-300"} ml-8 border border-gray-400 p-2 text-start hover:bg-lime-300 hover:cursor-pointer`}
                             onClick={() => setSelectedFolderId(folder.id)}>
-                        {folder.name}
+                        {folder.title}
                     </button>
                 ))}
                 <div className="flex justify-between items-center">

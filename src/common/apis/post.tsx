@@ -16,3 +16,9 @@ export const getPost = async (id: string) =>
 
 export const getPosts = async (postListRequest: PostListRequest) =>
     await axiosApi.get(`/post${postListRequestToParameter(postListRequest)}`);
+
+export interface FolderRequest {
+    id: string;
+    name: string;
+    subFolders: FolderRequest[];
+}
