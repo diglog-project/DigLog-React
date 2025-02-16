@@ -2,9 +2,10 @@ import {FolderType} from "../../common/types/blog.tsx";
 import {MdOutlineArrowDropDown} from "react-icons/md";
 import {useEffect, useRef, useState} from "react";
 
-function CategorySelectBox({folders, depth, targetFolder, setTargetFolder, center}: {
+function CategorySelectBox({folders, depth, selectedFolder, targetFolder, setTargetFolder, center}: {
     folders: FolderType[],
     depth: number,
+    selectedFolder: FolderType,
     targetFolder: FolderType,
     setTargetFolder: (folder: FolderType) => void,
     center?: boolean,
@@ -43,20 +44,23 @@ function CategorySelectBox({folders, depth, targetFolder, setTargetFolder, cente
                     <CategorySelectCard
                         folder={folder}
                         depth={depth}
+                        selectedFolder={selectedFolder}
                         setTargetFolder={setTargetFolder}
-                        setFolderOpen={setFolderOpen}/>)}
+                        setFolderOpen={setFolderOpen}/>
+                )}
             </div>
         </div>
     );
 }
 
-function CategorySelectCard({folder, depth, setTargetFolder, setFolderOpen}: {
+function CategorySelectCard({folder, depth, selectedFolder, setTargetFolder, setFolderOpen}: {
     folder: FolderType,
     depth: number,
+    selectedFolder: FolderType,
     setTargetFolder: (folder: FolderType) => void,
     setFolderOpen: (open: boolean) => void,
 }) {
-    return (
+    return folder.id !== selectedFolder.id ? (
         <div key={folder.title} className={`text-sm`}>
             <button
                 className={`px-4 py-2 text-gray-700 w-full text-start hover:bg-gray-100 hover:cursor-pointer`}
@@ -70,11 +74,12 @@ function CategorySelectCard({folder, depth, setTargetFolder, setFolderOpen}: {
                 folder.subFolders.map((subFolder =>
                     <CategorySelectCard
                         folder={subFolder}
+                        selectedFolder={selectedFolder}
                         depth={depth + 1}
                         setTargetFolder={setTargetFolder}
                         setFolderOpen={setFolderOpen}/>))}
         </div>
-    );
+    ) : <></>;
 }
 
 export default CategorySelectBox;

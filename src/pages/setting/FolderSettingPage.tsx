@@ -144,27 +144,20 @@ function FolderSettingPage() {
                 return {...folder, subFolders: getAddFolderList(folder.subFolders, id, title)};
             }
             return folder;
-        })
-    }
-
-    const moveFolder = (moveFolder: FolderType, targetFolder: FolderType) => {
-
-        setFolders(prevFolders => {
-            return prevFolders;
         });
     }
 
     const [openMoveModal, setOpenMoveModal] = useState(false);
     const [selectedFolder, setSelectedFolder] = useState<FolderType>({
         id: crypto.randomUUID(),
-        title: "DigLog의 블로그",
+        title: "",
         subFolders: [],
     });
     const [editFolderId, setEditFolderId] = useState("");
     const [editFolderTitle, setEditFolderTitle] = useState("");
     const [targetFolder, setTargetFolder] = useState<FolderType>({
         id: crypto.randomUUID(),
-        title: "DigLog의 블로그",
+        title: "--------------",
         subFolders: [],
     });
     const [folderMoveType, setFolderMoveType] = useState(0);
@@ -176,26 +169,43 @@ function FolderSettingPage() {
             return;
         }
 
-        // let moveTargetFolder;
-        // if (folderMoveType === 0) {
-        //     moveTargetFolder = targetFolder;
-        // } else if (folderMoveType === 1) {
-        //     moveTargetFolder = {...targetFolder, order: targetFolder.order + 1};
-        // } else {
-        //     const maxOrder = folders.filter(folder => folder.depth === targetFolder.depth + 1 && folder.parentOrder === targetFolder.order)
-        //         .reduce((max, f) => {
-        //             return f.order > max ? f.order : max;
-        //         }, -1);
-        //     moveTargetFolder = {
-        //         ...targetFolder,
-        //         depth: targetFolder.depth + 1,
-        //         parentOrder: targetFolder.order,
-        //         order: maxOrder + 1
-        //     };
-        // }
+        if (folderMoveType === 2) {
+            setFolders(prevFolders => {
+                const deleteFolderList = getDeleteFolderList(prevFolders, selectedFolder.id);
+                return getAddFolderModalList(deleteFolderList);
+            });
+        } else {
+            setFolders(prevFolders => {
+                const deleteFolderList = getDeleteFolderList(prevFolders, selectedFolder.id);
+                return getModalMoveFolderList(deleteFolderList);
+            });
+        }
 
-        // moveFolder(selectedFolder, moveTargetFolder);
         setOpenMoveModal(false);
+    }
+    const getModalMoveFolderList = (folders: FolderType[]) => {
+        const targetIndex = folders.findIndex((folder) => folder.id === targetFolder.id);
+
+        if (targetIndex !== -1) {
+            const moveIndex = (folderMoveType === 0) ? targetIndex : targetIndex + 1;
+            return folders.slice(0, moveIndex).concat(selectedFolder, folders.slice(moveIndex));
+        }
+        return folders.map((folder: FolderType): FolderType => {
+            if (folder.subFolders.length > 0) {
+                return {...folder, subFolders: getModalMoveFolderList(folder.subFolders)};
+            }
+            return folder;
+        });
+    }
+    const getAddFolderModalList = (folders: FolderType[]) => {
+        return folders.map((folder: FolderType): FolderType => {
+            if (folder.id === targetFolder.id) {
+                return {...folder, subFolders: [...folder.subFolders, selectedFolder]};
+            } else if (folder.subFolders.length > 0) {
+                return {...folder, subFolders: getAddFolderModalList(folder.subFolders)};
+            }
+            return folder;
+        });
     }
 
     const handleOnDragEnd = ({active, over}: DragEndEvent) => {
@@ -203,35 +213,31 @@ function FolderSettingPage() {
             return;
         }
 
-        setFolders(prevFolders => dndMoveFolder(prevFolders, active.id, over.id));
+        setFolders(prevFolders => getMoveFolderList(prevFolders, active.id as string, over.id as string));
     }
-    const dndMoveFolder = (folders: FolderType[], activeId: string, overId: string) => {
+    const getMoveFolderList = (folders: FolderType[], activeId: string, overId: string) => {
         const activeIndex = folders.findIndex(folder => folder.id === activeId);
         const overIndex = folders.findIndex(folder => folder.id === overId);
 
         if (activeIndex !== -1 && overIndex !== -1) {
             return arrayMove(folders, activeIndex, overIndex);
         }
-
         return folders.map((folder: FolderType): FolderType => {
             if (folder.subFolders.length > 0) {
-                return {...folder, subFolders: dndMoveFolder(folder.subFolders, activeId, overId)};
+                return {...folder, subFolders: getMoveFolderList(folder.subFolders, activeId, overId)};
             }
             return folder;
         });
     }
 
     const handleDisabled = (moveType: number) => {
-        // if (!targetFolder) {
-        //     return true;
-        // } else if (targetFolder.depth === 0 && moveType !== 2) {
-        //     return true;
-        // } else if (targetFolder.depth == 2 && moveType == 2) {
-        //     return true;
-        // } else if (moveType === 2 && selectedFolder.depth === 1 && targetFolder.depth !== 0 &&
-        //     folders.findIndex(folder => folder.depth === 2 && folder.parentOrder === selectedFolder.order) !== -1) {
-        //     return true;
-        // }
+        if (!targetFolder) {
+            return true;
+        }
+        if (moveType !== 2) {
+            return false;
+        }
+
         return false;
     }
 
@@ -332,6 +338,7 @@ function FolderSettingPage() {
                             <CategorySelectBox
                                 folders={folders}
                                 depth={0}
+                                selectedFolder={selectedFolder}
                                 targetFolder={targetFolder}
                                 setTargetFolder={setTargetFolder}
                                 center={true}
