@@ -6,6 +6,7 @@ import ModalLayout from "../../layout/ModalLayout.tsx";
 import CategorySelectBox from "../../components/blog/CategorySelectBox.tsx";
 import {DragEndEvent} from "@dnd-kit/core";
 import FolderCardList from "../../components/setting/FolderCardList.tsx";
+import {arrayMove} from "@dnd-kit/sortable";
 
 function FolderSettingPage() {
 
@@ -111,27 +112,6 @@ function FolderSettingPage() {
             orderIndex: 13,
             parentFolderId: idList[11],
         },
-        {
-            folderId: idList[14],
-            title: faker.lorem.words(),
-            depth: 1,
-            orderIndex: 14,
-            parentFolderId: idList[6],
-        },
-        {
-            folderId: idList[15],
-            title: faker.lorem.words(),
-            depth: 2,
-            orderIndex: 15,
-            parentFolderId: idList[14],
-        },
-        {
-            folderId: idList[16],
-            title: faker.lorem.words(),
-            depth: 2,
-            orderIndex: 16,
-            parentFolderId: idList[14],
-        },
     ];
 
     const [tempId, setTempId] = useState(0);
@@ -144,15 +124,27 @@ function FolderSettingPage() {
 
     const addFolder = (parentFolder: FolderType | null, title: string) => {
         if (parentFolder === null) {
-            setFolders([...folders, {id: getTempId(), title: title, subFolders: []}]);
+            const tempId = getTempId();
+            setFolders([...folders, {id: tempId, title: title, subFolders: []}]);
+            setEditFolderTitle(title);
+            setEditFolderId(tempId);
             return;
         }
 
-        setFolders(prevFolders =>
-            prevFolders.map(folder => folder.id === parentFolder.id
-                ? {...folder, subFolders: [...folder.subFolders, {id: getTempId(), title: title, subFolders: []}]}
-                : folder)
-        );
+        setFolders(prevFolders => getAddFolderList(prevFolders, parentFolder.id, title));
+    }
+    const getAddFolderList = (folders: FolderType[], id: string, title: string) => {
+        return folders.map((folder: FolderType): FolderType => {
+            if (folder.id === id) {
+                const tempId = getTempId();
+                setEditFolderTitle(title);
+                setEditFolderId(tempId);
+                return {...folder, subFolders: [...folder.subFolders, {id: tempId, title: title, subFolders: []}]};
+            } else if (folder.subFolders.length > 0) {
+                return {...folder, subFolders: getAddFolderList(folder.subFolders, id, title)};
+            }
+            return folder;
+        })
     }
 
     const moveFolder = (moveFolder: FolderType, targetFolder: FolderType) => {
@@ -211,14 +203,22 @@ function FolderSettingPage() {
             return;
         }
 
-        const activeFolder = folders.find(folder => folder.id === active.id);
-        const overFolder = folders.find(folder => folder.id === over.id);
+        setFolders(prevFolders => dndMoveFolder(prevFolders, active.id, over.id));
+    }
+    const dndMoveFolder = (folders: FolderType[], activeId: string, overId: string) => {
+        const activeIndex = folders.findIndex(folder => folder.id === activeId);
+        const overIndex = folders.findIndex(folder => folder.id === overId);
 
-        if (!activeFolder || !overFolder) {
-            return;
+        if (activeIndex !== -1 && overIndex !== -1) {
+            return arrayMove(folders, activeIndex, overIndex);
         }
 
-        moveFolder(activeFolder, overFolder);
+        return folders.map((folder: FolderType): FolderType => {
+            if (folder.subFolders.length > 0) {
+                return {...folder, subFolders: dndMoveFolder(folder.subFolders, activeId, overId)};
+            }
+            return folder;
+        });
     }
 
     const handleDisabled = (moveType: number) => {
@@ -244,27 +244,40 @@ function FolderSettingPage() {
             return;
         }
 
-        // setFolders(prevFolders =>
-        //     prevFolders.map(folder =>
-        //         folder.id === editFolder.id ? editFolder : folder));
-
+        setFolders(prevFolders => getEditFolderList(prevFolders, editFolder.id, editFolder.title));
         setEditFolderId("");
     }
+    const getEditFolderList = (folders: FolderType[], id: string, title: string) => {
+        return folders.map((folder: FolderType): FolderType => {
+            if (folder.id === id) {
+                return {...folder, title: title};
+            } else if (folder.subFolders.length > 0) {
+                return {...folder, subFolders: getEditFolderList(folder.subFolders, id, title)};
+            }
+            return folder;
+        })
+    }
+
+
     const handleDelete = (deleteFolder: FolderType) => {
-        // if (deleteFolder.depth === 1) {
-        //     const findIndex = folders.findIndex(folder =>
-        //         folder.depth === 2 && folder.parentOrder === deleteFolder.order);
-        //     if (findIndex !== -1) {
-        //         alert("하위 폴더를 삭제한 후에 삭제할 수 있습니다.");
-        //         return;
-        //     }
-        // }
-        //
-        // if (!confirm("삭제하시겠습니까?")) {
-        //     return;
-        // }
-        //
-        // setFolders(sortFolders(folders.filter(folder => folder !== deleteFolder)));
+        if (deleteFolder.subFolders.length > 0) {
+            alert("하위 폴더를 모두 제거한 후에 제거할 수 있습니다.");
+            return;
+        }
+
+        setFolders(prevFolders => getDeleteFolderList(prevFolders, deleteFolder.id));
+    }
+    const getDeleteFolderList = (folders: FolderType[], id: string) => {
+        if (folders.findIndex(folder => folder.id === id) !== -1) {
+            return folders.filter(folder => folder.id !== id);
+        }
+
+        return folders.map((folder: FolderType): FolderType => {
+            if (folder.subFolders.length > 0) {
+                return {...folder, subFolders: getDeleteFolderList(folder.subFolders, id)};
+            }
+            return folder;
+        })
     }
 
     const handleSubmit = () => {
@@ -318,6 +331,7 @@ function FolderSettingPage() {
                             <p><span className="font-bold">{selectedFolder.title}</span> 폴더를</p>
                             <CategorySelectBox
                                 folders={folders}
+                                depth={0}
                                 targetFolder={targetFolder}
                                 setTargetFolder={setTargetFolder}
                                 center={true}

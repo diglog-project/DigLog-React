@@ -2,8 +2,9 @@ import {FolderType} from "../../common/types/blog.tsx";
 import {MdOutlineArrowDropDown} from "react-icons/md";
 import {useEffect, useRef, useState} from "react";
 
-function CategorySelectBox({folders, targetFolder, setTargetFolder, center}: {
+function CategorySelectBox({folders, depth, targetFolder, setTargetFolder, center}: {
     folders: FolderType[],
+    depth: number,
     targetFolder: FolderType,
     setTargetFolder: (folder: FolderType) => void,
     center?: boolean,
@@ -39,17 +40,39 @@ function CategorySelectBox({folders, targetFolder, setTargetFolder, center}: {
             <div
                 className={`${folderOpen ? "" : "hidden"} absolute z-50 w-full top-12 left-0 bg-white divide-y divide-gray-300 rounded-lg shadow-sm`}>
                 {folders.map((folder) =>
-                    <div key={folder.title} className="text-sm">
-                        <button
-                            className={`pl-${0 * 4} px-4 py-2 text-gray-700 w-full text-start hover:bg-gray-100 hover:cursor-pointer`}
-                            onClick={() => {
-                                setTargetFolder(folder);
-                                setFolderOpen(false);
-                            }}>
-                            {folder.title}
-                        </button>
-                    </div>)}
+                    <CategorySelectCard
+                        folder={folder}
+                        depth={depth}
+                        setTargetFolder={setTargetFolder}
+                        setFolderOpen={setFolderOpen}/>)}
             </div>
+        </div>
+    );
+}
+
+function CategorySelectCard({folder, depth, setTargetFolder, setFolderOpen}: {
+    folder: FolderType,
+    depth: number,
+    setTargetFolder: (folder: FolderType) => void,
+    setFolderOpen: (open: boolean) => void,
+}) {
+    return (
+        <div key={folder.title} className={`text-sm`}>
+            <button
+                className={`px-4 py-2 text-gray-700 w-full text-start hover:bg-gray-100 hover:cursor-pointer`}
+                onClick={() => {
+                    setTargetFolder(folder);
+                    setFolderOpen(false);
+                }}>
+                <p className={`ml-${depth * 4}`}>{folder.title}</p>
+            </button>
+            {folder.subFolders.length > 0 &&
+                folder.subFolders.map((subFolder =>
+                    <CategorySelectCard
+                        folder={subFolder}
+                        depth={depth + 1}
+                        setTargetFolder={setTargetFolder}
+                        setFolderOpen={setFolderOpen}/>))}
         </div>
     );
 }
