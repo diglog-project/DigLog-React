@@ -1,6 +1,6 @@
 import {faker} from "@faker-js/faker/locale/ko";
 import {useEffect, useRef, useState} from "react";
-import {FolderResponse, FolderType, toFolderTypeList} from "../../common/types/blog.tsx";
+import {FolderResponse, FolderType, toFolderRequestList, toFolderTypeList} from "../../common/types/blog.tsx";
 import {FillButton} from "../../components/common/FillButton.tsx";
 import ModalLayout from "../../layout/ModalLayout.tsx";
 import CategorySelectBox from "../../components/blog/CategorySelectBox.tsx";
@@ -332,6 +332,9 @@ function FolderSettingPage() {
         if (!confirm("변경사항을 저장하시겠습니까?")) {
             return;
         }
+
+        console.log(toFolderRequestList(folders));
+
         alert("변경사항이 저장되었습니다.");
     }
 
@@ -369,7 +372,7 @@ function FolderSettingPage() {
                 handleDelete={handleDelete}
                 setOpenMoveModal={setOpenMoveModal}
                 setSelectedFolder={setSelectedFolder}/>
-            <button className="w-full border h-12 px-4 my-4 text-sm hover:cursor-pointer"
+            <button className="w-full border border-gray-400 h-12 px-4 my-4 text-sm hover:cursor-pointer"
                     onClick={() => addFolder(null, `폴더_${crypto.randomUUID().substring(0, 4)}`)}>
                 폴더 추가
             </button>

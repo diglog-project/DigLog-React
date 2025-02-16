@@ -326,7 +326,9 @@ function WritePage() {
                 />
                 <div className="flex justify-between items-center w-full mt-4">
                     {path.endsWith("/edit")
-                        && <FillButton text={"삭제하기"} onClick={() => handleDelete(id)} addStyle={"bg-red-400 hover:bg-red-700"}/>}
+                        ? <FillButton text={"삭제하기"} onClick={() => handleDelete(id)}
+                                      addStyle={"bg-red-400 hover:bg-red-700"}/>
+                        : <div></div>}
                     {path.endsWith("/edit")
                         ? <FillButton text={"수정하기"} onClick={handleEdit}/>
                         : <FillButton text={"게시하기"} onClick={handleSubmit}/>}

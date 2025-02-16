@@ -49,7 +49,26 @@ const toFolderType = (folderResponse: FolderResponse) => {
 }
 
 export const toFolderRequestList = (folderTypeList: FolderType[]) => {
-    const result: FolderType[] = [];
+    const result: FolderRequest[] = [];
+
+    const getFolderRequestList = (folderTypeList: FolderType[], depth: number = 0, parentIndex: number = -1) => {
+        folderTypeList.forEach(folder => {
+            const id = (!folder.id.startsWith("temp") ? folder.id : null);
+            result.push({
+                id: id,
+                title: folder.title,
+                depth: depth,
+                orderIndex: result.length,
+                parentOrderIndex: parentIndex,
+            });
+
+            if (folder.subFolders.length > 0) {
+                getFolderRequestList(folder.subFolders, depth + 1, result.length - 1);
+            }
+        });
+    }
+
+    getFolderRequestList(folderTypeList);
 
     return result;
 }

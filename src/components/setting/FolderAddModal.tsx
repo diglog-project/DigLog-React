@@ -1,9 +1,9 @@
 import ModalLayout from "../../layout/ModalLayout.tsx";
 import {useState} from "react";
 import {FillButton} from "../common/FillButton.tsx";
-import {FolderType} from "../../pages/setting/SettingPage.tsx";
 import {TextButton} from "../common/TextButton.tsx";
 import {MdOutlineArrowDropDown} from "react-icons/md";
+import {FolderType} from "../../common/types/blog.tsx";
 
 function FolderAddModal({folders, setShowFolderAddModal}: {
     folders: FolderType[],
@@ -38,36 +38,36 @@ function FolderAddModal({folders, setShowFolderAddModal}: {
                     </div>
                     {folders.map((folder) => {
                         if (!folder.subFolders) {
-                            return <div key={folder.name} className="py-2 w-auto text-sm">
+                            return <div key={folder.title} className="py-2 w-auto text-sm">
                                 <button
                                     className="px-4 py-2 text-gray-700 text-start hover:bg-gray-100 w-full hover:cursor-pointer"
                                     onClick={() => {
-                                        setSelectedFolder(folder.name);
+                                        setSelectedFolder(folder.title);
                                         setFolderOpen(false);
                                     }}>
-                                    {folder.name}
+                                    {folder.title}
                                 </button>
                             </div>
                         } else {
-                            return <div key={folder.name}
+                            return <div key={folder.title}
                                         className="flex flex-col items-start py-2 w-auto text-sm">
                                 <button
                                     className="px-4 py-2 text-gray-700 text-start border-gray-200 hover:bg-gray-100 w-full hover:cursor-pointer"
                                     onClick={() => {
-                                        setSelectedFolder(folder.name);
+                                        setSelectedFolder(folder.title);
                                         setFolderOpen(false);
                                     }}>
-                                    {folder.name}
+                                    {folder.title}
                                 </button>
                                 {folder.subFolders.map((subFolder: FolderType) =>
                                     <button
-                                        key={subFolder.name}
+                                        key={subFolder.title}
                                         className="px-4 py-2 text-gray-700 text-start hover:bg-gray-100 w-full hover:cursor-pointer"
                                         onClick={() => {
-                                            setSelectedFolder(`${folder.name} > ${subFolder.name}`);
+                                            setSelectedFolder(`${folder.title} > ${subFolder.title}`);
                                             setFolderOpen(false);
                                         }}>
-                                        {`${folder.name} > ${subFolder.name}`}
+                                        {`${folder.title} > ${subFolder.title}`}
                                     </button>
                                 )}
                             </div>;
