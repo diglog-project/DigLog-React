@@ -42,6 +42,7 @@ function CategorySelectBox({folders, depth, selectedFolder, targetFolder, setTar
                 className={`${folderOpen ? "" : "hidden"} absolute z-50 w-full top-12 left-0 bg-white divide-y divide-gray-300 rounded-lg shadow-sm`}>
                 {folders.map((folder) =>
                     <CategorySelectCard
+                        key={folder.id}
                         folder={folder}
                         depth={depth}
                         selectedFolder={selectedFolder}
@@ -73,6 +74,7 @@ function CategorySelectCard({folder, depth, selectedFolder, setTargetFolder, set
             {folder.subFolders.length > 0 &&
                 folder.subFolders.map((subFolder =>
                     <CategorySelectCard
+                        key={subFolder.id}
                         folder={subFolder}
                         selectedFolder={selectedFolder}
                         depth={depth + 1}

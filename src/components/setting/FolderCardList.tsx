@@ -141,6 +141,7 @@ function FolderCard({
             {folder.subFolders.length > 0 &&
                 <div className="pl-6 w-full">
                     <FolderCardList
+                        key={`${folder.id}_sub`}
                         folders={folder.subFolders}
                         depth={depth + 1}
                         editFolderId={editFolderId}

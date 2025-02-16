@@ -157,7 +157,7 @@ function FolderSettingPage() {
     const [editFolderTitle, setEditFolderTitle] = useState("");
     const [targetFolder, setTargetFolder] = useState<FolderType>({
         id: crypto.randomUUID(),
-        title: "--------------",
+        title: "",
         subFolders: [],
     });
     const [folderMoveType, setFolderMoveType] = useState(0);
@@ -231,15 +231,57 @@ function FolderSettingPage() {
     }
 
     const handleDisabled = (moveType: number) => {
-        if (!targetFolder) {
+        if (targetFolder.title === "") {
             return true;
         }
-        if (moveType !== 2) {
-            return false;
+
+        const maxDepth = 2;
+
+        const selectedFolderMaxDepth = getMaxFolderDepth(folders, selectedFolder.id) || 1;
+        const selectedFolderDepth = getFolderDepth(folders, selectedFolder.id) || 1;
+        const targetFolderDepth = getFolderDepth(folders, targetFolder.id) || 1;
+        if (moveType === 2) {
+            return selectedFolderMaxDepth + targetFolderDepth > maxDepth;
+        } else {
+            return selectedFolderMaxDepth - selectedFolderDepth + targetFolderDepth > maxDepth;
+        }
+    }
+    // 하위 폴더의 최대 깊이
+    const getMaxFolderDepth = (folders: FolderType[], folderId: string, currentDepth: number = 1): number | null => {
+        for (const folder of folders) {
+            if (folder.id === folderId) {
+                return calculateMaxDepth(folder.subFolders);
+            }
+
+            const depth = getMaxFolderDepth(folder.subFolders, folder.id, currentDepth + 1);
+            if (depth !== null) {
+                return depth;
+            }
         }
 
-        return false;
+        return null;
     }
+    const calculateMaxDepth = (folders: FolderType[]): number => {
+        if (folders.length === 0) return 0;
+
+        const depths = folders.map(folder => 1 + calculateMaxDepth(folder.subFolders));
+        return Math.max(...depths); // 최대 깊이 반환
+    };
+    // 폴더의 현재 깊이
+    const getFolderDepth = (folders: FolderType[], targetId: string, currentDepth: number = 1): number | null => {
+        for (const folder of folders) {
+            if (folder.id === targetId) {
+                return currentDepth;
+            }
+
+            const depth = getFolderDepth(folder.subFolders, targetId, currentDepth + 1);
+            if (depth !== null) {
+                return depth;
+            }
+        }
+
+        return null;
+    };
 
     const handleEdit = (editFolder: FolderType) => {
         if (editFolder.title.trim() === "") {
@@ -287,10 +329,10 @@ function FolderSettingPage() {
     }
 
     const handleSubmit = () => {
-        if (!confirm("변경사항을 적용하시겠습니까?")) {
+        if (!confirm("변경사항을 저장하시겠습니까?")) {
             return;
         }
-        alert("변경사항이 적용되었습니다.");
+        alert("변경사항이 저장되었습니다.");
     }
 
     const modalRef = useRef<HTMLDivElement | null>(null);
@@ -306,6 +348,10 @@ function FolderSettingPage() {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
+
+    useEffect(() => {
+        setTargetFolder({...targetFolder, title: ""});
+    }, [openMoveModal]);
 
     return (
         <div>
