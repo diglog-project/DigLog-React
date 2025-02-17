@@ -5,10 +5,11 @@ import {CSS} from "@dnd-kit/utilities";
 import {FillButton} from "../common/FillButton.tsx";
 import {MdOutlineMenu} from "react-icons/md";
 import {TextButton} from "../common/TextButton.tsx";
+import {restrictToVerticalAxis} from "@dnd-kit/modifiers";
 
 function FolderCardList({
                             folders,
-                            depth,
+                            depth = 0,
                             editFolderId,
                             editFolderTitle,
                             setEditFolderId,
@@ -21,7 +22,7 @@ function FolderCardList({
                             setOpenMoveModal
                         }: {
     folders: FolderType[],
-    depth: number,
+    depth?: number,
     editFolderId: string,
     editFolderTitle: string,
     setEditFolderId: (editFolderId: string) => void,
@@ -33,8 +34,9 @@ function FolderCardList({
     setOpenMoveModal: (openMoveModal: boolean) => void,
     setSelectedFolder: (selectedFolder: FolderType) => void,
 }) {
+
     return (
-        <DndContext onDragEnd={handleOnDragEnd}>
+        <DndContext onDragEnd={handleOnDragEnd} modifiers={[restrictToVerticalAxis]}>
             <SortableContext items={folders} strategy={verticalListSortingStrategy}>
                 {folders.map((folder: FolderType) => (
                     <FolderCard
@@ -109,7 +111,9 @@ function FolderCard({
                                         onClick={() => setEditFolderId("")}
                                         addStyle={"!bg-gray-400 hover:brightness-110"}/>
                             <FillButton text={"수정"}
-                                        onClick={() => handleEdit({...folder, title: editFolderTitle})}/>
+                                        onClick={() => handleEdit({...folder, title: editFolderTitle})}
+                                        addStyle={`${folder.title === editFolderTitle && "opacity-50 hover:!cursor-auto"}`}
+                                        disabled={folder.title === editFolderTitle}/>
                         </div>
                     </div>
                     : <div className="w-full flex justify-between items-center ">

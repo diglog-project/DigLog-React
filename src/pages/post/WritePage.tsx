@@ -1,12 +1,12 @@
 import BasicLayout from "../../layout/BasicLayout.tsx";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import {useBlocker, useLocation, useNavigate, useParams} from "react-router-dom";
 import {Editor} from "@tinymce/tinymce-react";
 import {FillButton} from "../../components/common/FillButton.tsx";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store.tsx";
 import {faker} from "@faker-js/faker/locale/ko";
-import {MdOutlineArrowDropDown, MdOutlineClear} from "react-icons/md";
+import {MdOutlineClear} from "react-icons/md";
 import {createPost, deletePost, getPost, updatePost} from "../../common/apis/post.tsx";
 import LoadingLayout from "../../layout/LoadingLayout.tsx";
 import {getImgUrls} from "../../common/util/html.tsx";
@@ -15,6 +15,7 @@ import {checkUUID} from "../../common/util/regex.tsx";
 import {TagResponse} from "../../common/types/post.tsx";
 import {sortByName} from "../../common/util/sort.tsx";
 import {FolderType} from "../../common/types/blog.tsx";
+import FolderSelectBox from "../../components/folder/FolderSelectBox.tsx";
 
 interface WritePostType {
     inputTag: string;
@@ -27,7 +28,6 @@ function WritePage() {
 
     const loginState = useSelector((state: RootState) => state.loginSlice);
     const navigate = useNavigate();
-    const folderRef = useRef<HTMLDivElement | null>(null);
     const path = useLocation().pathname.substring(0, location.pathname.lastIndexOf("/"));
     const {id} = useParams();
 
@@ -43,13 +43,9 @@ function WritePage() {
     });
     const [showTag, setShowTag] = useState(false);
 
-    const [folderOpen, setFolderOpen] = useState(false);
-    const [selectedFolder, setSelectedFolder] = useState("폴더 선택");
+    const [targetFolder, setTargetFolder] = useState<FolderType>({id: crypto.randomUUID(), title: "", subFolders: []});
     const [uploadCount, setUploadCount] = useState(0);
     const [exitPage, setExitPage] = useState(false);
-    const handleFolderOpen = () => {
-        setFolderOpen(prev => !prev);
-    }
 
     const removeTag = (tag: string | null) => {
         setPost({...post, tags: post.tags.filter(prevTag => prevTag !== tag)});
@@ -131,12 +127,6 @@ function WritePage() {
             .catch((error) => alert(error.response.data.message));
     }
 
-    const handleClickOutside = (event: MouseEvent) => {
-        if (folderRef.current && !folderRef.current.contains(event.target as Node)) {
-            setFolderOpen(false);
-        }
-    };
-
     // 뒤로가기 방지
     useBlocker(() => {
             return (!!post.title || !!post.content) &&
@@ -151,12 +141,10 @@ function WritePage() {
             event.preventDefault();
         };
 
-        document.addEventListener('mousedown', handleClickOutside);
         window.addEventListener('beforeunload', handleBeforeUnload);
 
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
-            document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
 
@@ -168,7 +156,13 @@ function WritePage() {
                 {
                     id: crypto.randomUUID(),
                     title: faker.lorem.words(),
-                    subFolders: [],
+                    subFolders: [
+                        {
+                            id: crypto.randomUUID(),
+                            title: faker.lorem.words(),
+                            subFolders: [],
+                        },
+                    ],
                 },
                 {
                     id: crypto.randomUUID(),
@@ -180,7 +174,13 @@ function WritePage() {
         {
             id: crypto.randomUUID(),
             title: faker.lorem.words(),
-            subFolders: [],
+            subFolders: [
+                {
+                    id: crypto.randomUUID(),
+                    title: faker.lorem.words(),
+                    subFolders: [],
+                },
+            ],
         },
         {
             id: crypto.randomUUID(),
@@ -245,54 +245,10 @@ function WritePage() {
         <BasicLayout>
             <div className="flex flex-col w-full">
                 <div className="flex justify-start items-center">
-                    <div ref={folderRef}
-                         className="w-full relative flex justify-start text-gray-700 items-center text-sm font-normal">
-                        <button
-                            className="w-auto flex justify-between items-center gap-x-2 px-3 py-2 border border-gray-200 hover:bg-gray-50 hover:cursor-pointer"
-                            onClick={handleFolderOpen}>
-                            {selectedFolder}
-                            <MdOutlineArrowDropDown/>
-                        </button>
-                        <div
-                            className={`${folderOpen ? "" : "hidden"} absolute z-50 top-12 left-0 bg-white divide-y divide-gray-500 rounded-lg shadow-sm`}>
-                            {folderData.map((folder) => {
-                                if (!folder.subFolders) {
-                                    return <div key={folder.title} className="py-2 w-auto text-sm">
-                                        <button
-                                            className="px-4 py-2 text-gray-700 text-start hover:bg-gray-100 w-full hover:cursor-pointer"
-                                            onClick={() => {
-                                                setSelectedFolder(folder.title);
-                                                setFolderOpen(false);
-                                            }}>
-                                            {folder.title}
-                                        </button>
-                                    </div>
-                                } else {
-                                    return <div key={folder.title}
-                                                className="flex flex-col items-start py-2 w-auto text-sm">
-                                        <button
-                                            className="px-4 py-2 text-gray-700 text-start border-gray-200 hover:bg-gray-100 w-full hover:cursor-pointer"
-                                            onClick={() => {
-                                                setSelectedFolder(folder.title);
-                                                setFolderOpen(false);
-                                            }}>
-                                            {folder.title}
-                                        </button>
-                                        {folder.subFolders.map((subFolder: FolderType) =>
-                                            <button
-                                                key={subFolder.title}
-                                                className="px-4 py-2 text-gray-700 text-start hover:bg-gray-100 w-full hover:cursor-pointer"
-                                                onClick={() => {
-                                                    setSelectedFolder(`${folder.title} > ${subFolder.title}`);
-                                                    setFolderOpen(false);
-                                                }}>
-                                                {`${folder.title} > ${subFolder.title}`}
-                                            </button>
-                                        )}
-                                    </div>;
-                                }
-                            })}
-                        </div>
+                    <div className="w-108">
+                        <FolderSelectBox folders={folderData}
+                                         targetFolder={targetFolder}
+                                         setTargetFolder={setTargetFolder}/>
                     </div>
                 </div>
                 <div className="w-full flex justify-between items-center my-6">
