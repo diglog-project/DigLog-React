@@ -15,7 +15,7 @@ const root = createBrowserRouter([
         element: <Suspense fallback={Loading}><Login/></Suspense>
     },
     {
-        path: '/setting',
+        path: '/setting/:section',
         element: <Suspense fallback={Loading}><Setting/></Suspense>
     },
     {

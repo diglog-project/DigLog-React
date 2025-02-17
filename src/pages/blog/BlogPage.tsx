@@ -7,6 +7,7 @@ import {MdMenu, MdOutlineExitToApp} from "react-icons/md";
 import PaginationButton from "../../components/common/PaginationButton.tsx";
 import {FolderType} from "../../common/types/blog.tsx";
 import BlogSideBar from "../../components/blog/BlogSideBar.tsx";
+import IconButton from "../../components/common/IconButton.tsx";
 
 function BlogPage() {
 
@@ -84,7 +85,6 @@ function BlogPage() {
     const [selectedFolder, setSelectedFolder] = useState<FolderType | null>(null);
     const [selectedTagList, setSelectedTagList] = useState<string[]>([]);
 
-    const mainRef = useRef<HTMLDivElement | null>(null);
     const sideBarRef = useRef<HTMLDivElement | null>(null);
 
     const handleMenuOpen = () => {
@@ -101,10 +101,6 @@ function BlogPage() {
     }
 
     useEffect(() => {
-        if (sideBarRef.current && mainRef.current) {
-            sideBarRef.current.style.height = `${mainRef.current.offsetHeight + 220}px`;
-        }
-
         setFolders(folderData);
     }, []);
 
@@ -125,28 +121,28 @@ function BlogPage() {
 
     useEffect(() => {
         if (isOpen) {
-            document.body.classList.remove('overflow-x-hidden');
+            document.body.style.overflow = 'hidden';
         } else {
-            document.body.classList.add('overflow-x-hidden');
+            document.body.style.overflow = 'auto';
         }
 
         return () => {
-            document.body.classList.remove('overflow-x-hidden');
+            document.body.style.overflow = 'auto';
         };
     }, [isOpen]);
 
     return (
         <BasicLayout>
-            <div ref={mainRef}
-                 className={`${(isOpen) ? "opacity-50 backdrop-blur-sm z-10" : "z-10"} flex flex-col`}>
+            <div className={`${(isOpen) ? "opacity-50 backdrop-blur-sm z-10 overflow-y-hidden" : "z-10"} flex flex-col`}>
                 <div className="flex justify-between items-center text-2xl font-jalnan px-4 pb-4">
                     <div>{username}의 블로그</div>
-                    <button onClick={handleMenuOpen} className="lg:hidden hover:cursor-pointer">
-                        <MdMenu className="size-8"/>
-                    </button>
+                    <IconButton
+                        icon={<MdMenu className="size-8"/>}
+                        onClick={handleMenuOpen}
+                        addStyle="lg:hidden"/>
                 </div>
                 <div className="grid lg:grid-cols-3">
-                    <div className="lg:col-span-2 flex flex-col gap-y-4 p-4 md:border-r border-r-gray-200">
+                    <div className="lg:col-span-2 flex flex-col gap-y-4 p-4 lg:border-r border-r-gray-200">
                         {[Array.from({length: 3}).map(() => (
                             <PostCard
                                 key={faker.number.int().toString()}
@@ -188,7 +184,8 @@ function BlogPage() {
                     username={username}
                     addTag={addTag}
                     setSelectedFolder={setSelectedFolder}
-                    bgColor={"bg-gray-50"}/>
+                    bgColor={"bg-gray-50"}
+                    side={true}/>
             </div>
         </BasicLayout>
     );

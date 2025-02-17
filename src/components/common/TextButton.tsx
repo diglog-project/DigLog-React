@@ -4,7 +4,7 @@ const className = " flex justify-center items-center bg-transparent py-2 px-4 ho
 
 export function TextButton({text, onClick, addStyle}: { text: string, onClick?: () => void, addStyle?: string }) {
     return (
-        <button onClick={onClick} className={(addStyle) ? addStyle + className : className}>
+        <button onClick={onClick} className={`${addStyle} ${className}`}>
             {text}
         </button>
     );
@@ -13,7 +13,7 @@ export function TextButton({text, onClick, addStyle}: { text: string, onClick?: 
 export function TextLink({text, to, addStyle}: { text: string, to: string, addStyle?: string }) {
 
     return (
-        <Link to={to} className={(addStyle) ? addStyle + className : className}>
+        <Link to={to} className={`${addStyle} ${className}`}>
             {text}
         </Link>
     );

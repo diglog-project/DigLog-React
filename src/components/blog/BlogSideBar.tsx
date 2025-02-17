@@ -5,18 +5,19 @@ import {faker} from "@faker-js/faker/locale/ko";
 import {OutlineLink} from "../common/OutlineButton.tsx";
 import BlogTagCard from "./BlogTagCard.tsx";
 
-function BlogSideBar({folders, username, addTag, setSelectedFolder, bgColor}: {
+function BlogSideBar({folders, username, addTag, setSelectedFolder, bgColor, side}: {
     folders: FolderType[],
     username: string | undefined,
     addTag: (tagName: string) => void,
     setSelectedFolder: (folder: FolderType) => void,
-    bgColor?: string
+    bgColor?: string,
+    side?: boolean,
 }) {
 
     const loginState = useSelector((state: RootState) => state.loginSlice);
 
     return (
-        <div className={bgColor}>
+        <div className={`${bgColor} ${side && "h-screen overflow-y-scroll"}`}>
             <div className="flex flex-col justify-start items-center py-4 gap-4 z-200">
                 <img className="border border-gray-300 h-32 w-32 rounded-full"
                      src={faker.image.avatar()} alt="username"/>
@@ -26,7 +27,7 @@ function BlogSideBar({folders, username, addTag, setSelectedFolder, bgColor}: {
                 {username === loginState.username && (
                     <div className="flex justify-between items-center gap-x-4 text-xs">
                         <OutlineLink text={"게시글 작성"} to={"/write"}/>
-                        <OutlineLink text={"블로그 설정"} to={"/setting"}
+                        <OutlineLink text={"블로그 설정"} to={"/setting/folder"}
                                      addStyle={"!border-neutral-500 !text-neutral-500 hover:bg-neutral-500 hover:!text-white"}/>
                     </div>
                 )}
@@ -39,7 +40,7 @@ function BlogSideBar({folders, username, addTag, setSelectedFolder, bgColor}: {
             </div>
             <div className="flex flex-col justify-center items-center gap-4 py-8">
                 <div className="font-bold text-lime-700 text-center">태그</div>
-                <div className="flex flex-wrap justify-center gap-x-2 gap-y-4 p-2">
+                <div className="w-72 flex flex-wrap justify-center gap-x-2 gap-y-4 p-2">
                     {[Array.from({length: 24}).map(() => (
                         <BlogTagCard key={faker.number.int().toString()}
                                      tag={{

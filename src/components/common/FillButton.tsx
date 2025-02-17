@@ -11,7 +11,7 @@ export function FillButton({text, onClick, addStyle, disabled}: {
     return (
         <button
             onClick={onClick}
-            className={(addStyle) ? addStyle + className : className}
+            className={`${addStyle} ${className}`}
             disabled={disabled}>
             {text}
         </button>
@@ -20,7 +20,7 @@ export function FillButton({text, onClick, addStyle, disabled}: {
 
 export function FillLink({text, to, addStyle}: { text: string, to: string, addStyle?: string }) {
     return (
-        <Link to={to} className={(addStyle) ? addStyle + className : className}>
+        <Link to={to} className={`${addStyle} ${className}`}>
             {text}
         </Link>
     );
@@ -35,7 +35,7 @@ export function LoadMoreButton({onClick, addStyle, disabled}: {
         <FillButton
             text={"더 불러오기"}
             onClick={onClick}
-            addStyle={addStyle + " !bg-gray-400 hover:brightness-105"}
+            addStyle={`${addStyle} "!bg-gray-400 hover:brightness-105"`}
             disabled={disabled}/>
     );
 }
