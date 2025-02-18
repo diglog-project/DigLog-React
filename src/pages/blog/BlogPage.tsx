@@ -104,6 +104,8 @@ function BlogPage() {
     }
 
     useEffect(() => {
+        // todo: 내 게시글 불러오기 api
+        console.log(page, setPageInfo.toString());
         setFolders(folderData);
     }, []);
 

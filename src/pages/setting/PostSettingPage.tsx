@@ -24,7 +24,6 @@ function PostSettingPage() {
             isDescending: true,
         })
             .then((res) => {
-                console.log(res);
                 setPosts([...res.data.content]);
                 setPageInfo(res.data.page);
             })
