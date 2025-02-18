@@ -8,11 +8,14 @@ import PaginationButton from "../../components/common/PaginationButton.tsx";
 import {FolderType} from "../../common/types/blog.tsx";
 import BlogSideBar from "../../components/blog/BlogSideBar.tsx";
 import IconButton from "../../components/common/IconButton.tsx";
+import {PageResponse} from "../../common/types/common.tsx";
 
 function BlogPage() {
 
     const {username} = useParams();
 
+    const [page, setPage] = useState(0);
+    const [pageInfo, setPageInfo] = useState<PageResponse>({number: 0, size: 5, totalElements: 53, totalPages: 11});
     const folderData: FolderType[] = [
         {
             id: crypto.randomUUID(),
@@ -133,7 +136,8 @@ function BlogPage() {
 
     return (
         <BasicLayout>
-            <div className={`${(isOpen) ? "opacity-50 backdrop-blur-sm z-10 overflow-y-hidden" : "z-10"} flex flex-col`}>
+            <div
+                className={`${(isOpen) ? "opacity-50 backdrop-blur-sm z-10 overflow-y-hidden" : "z-10"} flex flex-col`}>
                 <div className="flex justify-between items-center text-2xl font-jalnan px-4 pb-4">
                     <div>{username}의 블로그</div>
                     <IconButton
@@ -160,8 +164,7 @@ function BlogPage() {
                                 createdAt={new Date()}/>
                         ))]}
                         <PaginationButton
-                            pageInfo={{size: 5, number: 0, totalPages: 25, totalElements: 120}} setPage={() => {
-                        }}/>
+                            pageInfo={pageInfo} setPage={setPage}/>
                     </div>
                     <div className="col-span-1 hidden lg:block flex-col">
                         <BlogSideBar

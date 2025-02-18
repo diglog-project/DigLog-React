@@ -1,6 +1,7 @@
 import {FolderType} from "../../common/types/blog.tsx";
 import {MdOutlineArrowDropDown} from "react-icons/md";
 import {useEffect, useRef, useState} from "react";
+import {getFolderTitle} from "../../common/util/string.tsx";
 
 function FolderSelectBox({folders, depth = 0, selectedFolder, targetFolder, setTargetFolder, center}: {
     folders: FolderType[],
@@ -72,7 +73,7 @@ function FolderSelectCard({folder, depth, selectedFolder, setTargetFolder, setFo
                 }}>
                 <div className={`flex items-center gap-x-1 ${depth === 0 && "font-bold text-black"}`}>
                     <div className={`w-${depth * 4}`}/>
-                    - {folder.title}
+                    {getFolderTitle(folder.title, depth)}
                 </div>
             </button>
             {folder.subFolders.length > 0 &&

@@ -4,6 +4,7 @@ import {RootState} from "../../store.tsx";
 import {faker} from "@faker-js/faker/locale/ko";
 import {OutlineLink} from "../common/OutlineButton.tsx";
 import BlogTagCard from "./BlogTagCard.tsx";
+import {getFolderTitle} from "../../common/util/string.tsx";
 
 function BlogSideBar({folders, username, addTag, setSelectedFolder, bgColor, side}: {
     folders: FolderType[],
@@ -72,7 +73,7 @@ function BlogFolderList({depth = 0, folders, setSelectedFolder}: {
                         ${depth > 0 && `text-gray-500`}`}
                         onClick={() => setSelectedFolder(folder)}>
                         {depth === 2 && <div className="w-8"/>}
-                        - {folder.title}
+                        {getFolderTitle(folder.title, depth)}
                     </button>
                     {depth === 0 && <hr className="text-gray-400"/>}
                     <BlogFolderList
