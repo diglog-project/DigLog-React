@@ -98,9 +98,9 @@ function Header() {
                                           className="w-full block px-4 py-2 text-gray-700 hover:bg-gray-100">
                                         내 블로그
                                     </Link>
-                                    <Link to={`/setting`}
+                                    <Link to={`/setting/profile`}
                                           className="w-full block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                                        설정
+                                        프로필 설정
                                     </Link>
                                 </div>
                                 <div className="py-1">

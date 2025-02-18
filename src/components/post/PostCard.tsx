@@ -4,6 +4,7 @@ import DOMPurify from "dompurify";
 import {MdImage} from "react-icons/md";
 import {dateToKorean} from "../../common/util/date.tsx";
 import {Link} from "react-router-dom";
+import {FaRegComment, FaRegHeart} from "react-icons/fa6";
 
 function PostCard(post: PostResponse) {
 
@@ -22,13 +23,25 @@ function PostCard(post: PostResponse) {
                     </div>}
             </Link>
             <div className="flex flex-col gap-y-2 my-4">
-                <div className="flex items-center gap-4">
-                    <Link to={`/blog/${post.username}`}
-                          className="text-sm font-semibold text-lime-700 hover:text-lime-400">
-                        {post.username}
-                    </Link>
-                    <div className="text-sm text-gray-500 font-semibold">
-                        {dateToKorean(post.createdAt)}
+                <div className="flex justify-between items-center">
+                    <div className="flex justify-center items-center gap-x-4">
+                        <Link to={`/blog/${post.username}`}
+                              className="text-sm font-semibold text-lime-700 hover:text-lime-400">
+                            {post.username}
+                        </Link>
+                        <div className="text-sm text-gray-500 font-semibold">
+                            {dateToKorean(post.createdAt)}
+                        </div>
+                    </div>
+                    <div className="flex justify-end items-center gap-x-3 text-sm text-gray-400">
+                        <div className="flex items-center gap-x-1.5">
+                            <FaRegHeart className="size-3"/>
+                            <p className="text-gray-900">20</p>
+                        </div>
+                        <div className="flex items-center gap-x-1">
+                            <FaRegComment className="size-3"/>
+                            <p className="text-gray-900">10</p>
+                        </div>
                     </div>
                 </div>
                 <Link to={`/post/${post.id}`}>

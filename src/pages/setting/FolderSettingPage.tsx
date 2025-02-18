@@ -3,10 +3,10 @@ import {useEffect, useRef, useState} from "react";
 import {FolderResponse, FolderType, toFolderRequestList, toFolderTypeList} from "../../common/types/blog.tsx";
 import {FillButton} from "../../components/common/FillButton.tsx";
 import ModalLayout from "../../layout/ModalLayout.tsx";
-import CategorySelectBox from "../../components/blog/CategorySelectBox.tsx";
 import {DragEndEvent} from "@dnd-kit/core";
-import FolderCardList from "../../components/setting/FolderCardList.tsx";
+import FolderCardList from "../../components/folder/FolderCardList.tsx";
 import {arrayMove} from "@dnd-kit/sortable";
+import FolderSelectBox from "../../components/folder/FolderSelectBox.tsx";
 
 function FolderSettingPage() {
 
@@ -361,7 +361,6 @@ function FolderSettingPage() {
             <p className="font-semibold text-xl my-4">폴더 관리</p>
             <FolderCardList
                 folders={folders}
-                depth={0}
                 editFolderId={editFolderId}
                 editFolderTitle={editFolderTitle}
                 setEditFolderId={setEditFolderId}
@@ -384,9 +383,8 @@ function FolderSettingPage() {
                     <div className="w-full h-full">
                         <div className="flex flex-col justify-center items-center gap-y-8">
                             <p><span className="font-bold">{selectedFolder.title}</span> 폴더를</p>
-                            <CategorySelectBox
+                            <FolderSelectBox
                                 folders={folders}
-                                depth={0}
                                 selectedFolder={selectedFolder}
                                 targetFolder={targetFolder}
                                 setTargetFolder={setTargetFolder}

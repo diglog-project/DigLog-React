@@ -14,27 +14,30 @@ function CodePage() {
     const [loading, setLoading] = useState(false);
 
     const inputRefs = useRef<HTMLInputElement[]>([]);
-    const [code, setCode] = useState<string[]>(Array(6).fill(""));
+    const [code, setCode] = useState<string>("");
 
     const [timer, setTimer] = useState(600);
 
     const handleChange = (index: number, value: string) => {
-        if (/[^0-9]/g.test(value)) {
-            return;
+        let newCode = code;
+        for (const digit of value.split("")) {
+            if (/[^0-9]/g.test(digit)) {
+                return;
+            }
+
+            newCode += digit;
         }
 
-        const newCode = [...code];
-
-        newCode[index] = value.replace(/[^0-9]/g, "");
-        setCode(newCode);
+        setCode(newCode.substring(0, 6));
 
         if (value && index < inputRefs.current.length - 1) {
-            inputRefs.current[index + 1].focus();
+            inputRefs.current[index + Math.min(value.length, 5)].focus();
         }
     };
 
     const handleBackspace = (event: React.KeyboardEvent<HTMLInputElement>, index: number) => {
-        if (event.key === "Backspace" && !event.currentTarget.value && index > 0) {
+        if (event.key === "Backspace" && index > 0) {
+            setCode(code.substring(0, index - 1));
             inputRefs.current[index - 1].focus();
         }
     };
@@ -61,14 +64,19 @@ function CodePage() {
     }, [timer]);
 
     useEffect(() => {
-        if (code[5] !== "") {
+        if (code.length >= 6) {
             setLoading(true);
 
-            checkCode(email, code.join(""))
+            checkCode(email, code)
                 .then(() => {
-                    navigate("/signup", {state: {email: email, code: code.join("")}});
+                    navigate("/signup", {state: {email: email, code: code}});
                 })
-                .catch((error) => alert(error.response.data.message))
+                .catch((error) => {
+                    alert(error.response.data.message);
+                    if (inputRefs.current) {
+                        inputRefs.current[5].focus();
+                    }
+                })
                 .finally(() => setLoading(false));
         }
     }, [code]);
@@ -82,7 +90,7 @@ function CodePage() {
                     <p>인증코드 6자리를 입력해주세요.</p>
                 </div>
                 <div className="flex items-center justify-center gap-2 my-4">
-                    {code.map((digit, index) => (
+                    {Array.from({length: 6}).map((_, index) => (
                         <React.Fragment key={index}>
                             <input
                                 ref={(el) => {
@@ -90,10 +98,10 @@ function CodePage() {
                                         inputRefs.current[index] = el;
                                     }
                                 }}
-                                type=" text"
-                                maxLength={1}
+                                type="text"
+                                maxLength={6}
                                 className="w-12 h-16 rounded-lg font-bold text-lg appearance-none border border-gray-200 text-center focus:outline-1"
-                                value={digit}
+                                value={code[index] ?? ""}
                                 onChange={(e) => handleChange(index, e.target.value)}
                                 onKeyDown={(e) => {
                                     handleBackspace(e, index)

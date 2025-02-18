@@ -11,6 +11,6 @@ export const getImgUrls = (content: string) => {
 }
 
 export const removeHtmlTags = (content: string) => {
-    const regex = /(<([^>]+)>)/gi;
+    const regex = /(<([^>]+)>|&nbsp;)/gi;
     return content.replace(regex, "");
 }

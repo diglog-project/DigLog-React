@@ -1,40 +1,34 @@
 import BasicLayout from "../../layout/BasicLayout.tsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import PostSettingPage from "./PostSettingPage.tsx";
 import ProfileSettingPage from "./ProfileSettingPage.tsx";
 import FolderSettingPage from "./FolderSettingPage.tsx";
+import {useNavigate, useParams} from "react-router-dom";
+import SettingSideBar from "../../components/setting/SettingSideBar.tsx";
 
 function SettingPage() {
 
-    const tabList = ["프로필", "폴더", "게시글"];
+    const {section} = useParams();
+    const navigate = useNavigate();
+    const [selectedSection, setSelectedSection] = useState<string>(section || "profile");
 
-    const [selectedTab, setSelectedTab] = useState("프로필");
+    useEffect(() => {
+        navigate(`/setting/${selectedSection}`);
+    }, [selectedSection]);
 
     return (
         <BasicLayout>
             <div className="flex w-full gap-x-4">
-                <div
-                    className="w-52 h-full flex flex-col justify-start items-start">
-                    <ul className="w-full flex flex-col gap-y-1.5 flex-wrap">
-                        {tabList.map((tab) =>
-                            <li key={tab}>
-                                <button
-                                    onClick={() => setSelectedTab(tab)}
-                                    className="text-left w-full p-2 my-1 hover:bg-gray-200 hover:cursor-pointer">
-                                    {tab}
-                                </button>
-                            </li>)}
-                    </ul>
-                </div>
-                {(selectedTab === "프로필") &&
+                <SettingSideBar setSelectedSection={setSelectedSection}/>
+                {(selectedSection === "profile") &&
                     <div className="min-w-160 border-l border-gray-200 w-full ps-8">
                         <ProfileSettingPage/>
                     </div>}
-                {(selectedTab === "폴더") &&
+                {(selectedSection === "folder") &&
                     <div className="min-w-160 border-l border-gray-200 w-full ps-8">
                         <FolderSettingPage/>
                     </div>}
-                {(selectedTab === "게시글") &&
+                {(selectedSection === "post") &&
                     <div className="min-w-160 border-l border-gray-200 w-full ps-8">
                         <PostSettingPage/>
                     </div>}

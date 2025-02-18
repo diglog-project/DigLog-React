@@ -1,11 +1,12 @@
 import {FolderType} from "../../common/types/blog.tsx";
 import {MdOutlineArrowDropDown} from "react-icons/md";
 import {useEffect, useRef, useState} from "react";
+import {getFolderTitle} from "../../common/util/string.tsx";
 
-function CategorySelectBox({folders, depth, selectedFolder, targetFolder, setTargetFolder, center}: {
+function FolderSelectBox({folders, depth = 0, selectedFolder, targetFolder, setTargetFolder, center}: {
     folders: FolderType[],
-    depth: number,
-    selectedFolder: FolderType,
+    depth?: number,
+    selectedFolder?: FolderType,
     targetFolder: FolderType,
     setTargetFolder: (folder: FolderType) => void,
     center?: boolean,
@@ -35,13 +36,13 @@ function CategorySelectBox({folders, depth, selectedFolder, targetFolder, setTar
             <button
                 className="w-full flex justify-between items-center gap-x-2 px-4 py-2 border border-gray-200 hover:bg-gray-50 hover:cursor-pointer"
                 onClick={handleFolderOpen}>
-                {targetFolder.title}
+                {targetFolder.title === "" ? "폴더 선택" : targetFolder.title}
                 <MdOutlineArrowDropDown/>
             </button>
             <div
-                className={`${folderOpen ? "" : "hidden"} absolute z-50 w-full top-12 left-0 bg-white divide-y divide-gray-300 rounded-lg shadow-sm`}>
+                className={`${folderOpen ? "" : "hidden"} h-72 min-h-16 overflow-y-scroll absolute z-50 w-full top-12 left-0 bg-white divide-y divide-gray-300 rounded-lg shadow-sm`}>
                 {folders.map((folder) =>
-                    <CategorySelectCard
+                    <FolderSelectCard
                         key={folder.id}
                         folder={folder}
                         depth={depth}
@@ -54,14 +55,15 @@ function CategorySelectBox({folders, depth, selectedFolder, targetFolder, setTar
     );
 }
 
-function CategorySelectCard({folder, depth, selectedFolder, setTargetFolder, setFolderOpen}: {
+function FolderSelectCard({folder, depth, selectedFolder, setTargetFolder, setFolderOpen}: {
     folder: FolderType,
     depth: number,
-    selectedFolder: FolderType,
+    selectedFolder?: FolderType,
     setTargetFolder: (folder: FolderType) => void,
     setFolderOpen: (open: boolean) => void,
 }) {
-    return folder.id !== selectedFolder.id ? (
+
+    return !selectedFolder || folder.id !== selectedFolder.id ? (
         <div key={folder.title} className={`text-sm`}>
             <button
                 className={`px-4 py-2 text-gray-700 w-full text-start hover:bg-gray-100 hover:cursor-pointer`}
@@ -69,11 +71,14 @@ function CategorySelectCard({folder, depth, selectedFolder, setTargetFolder, set
                     setTargetFolder(folder);
                     setFolderOpen(false);
                 }}>
-                <p className={`ml-${depth * 4}`}>{folder.title}</p>
+                <div className={`flex items-center gap-x-1 ${depth === 0 && "font-bold text-black"}`}>
+                    <div className={`w-${depth * 4}`}/>
+                    {getFolderTitle(folder.title, depth)}
+                </div>
             </button>
             {folder.subFolders.length > 0 &&
                 folder.subFolders.map((subFolder =>
-                    <CategorySelectCard
+                    <FolderSelectCard
                         key={subFolder.id}
                         folder={subFolder}
                         selectedFolder={selectedFolder}
@@ -84,4 +89,4 @@ function CategorySelectCard({folder, depth, selectedFolder, setTargetFolder, set
     ) : <></>;
 }
 
-export default CategorySelectBox;
+export default FolderSelectBox;
