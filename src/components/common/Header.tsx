@@ -80,7 +80,7 @@ function Header() {
                     ? <div ref={dashboardRef}>
                         <div
                             className="relative flex justify-around items-center w-full">
-                            <img className="w-10 h-10 rounded-full hover:cursor-pointer"
+                            <img className="size-10 rounded-full hover:cursor-pointer"
                                  onClick={handleDropDown}
                                  src={faker.image.avatar()} alt="user_image"/>
                             <div

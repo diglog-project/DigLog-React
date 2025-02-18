@@ -4,10 +4,13 @@ import DOMPurify from "dompurify";
 import {fullDateToKorean} from "../../common/util/date.tsx";
 import TagCard from "../../components/post/TagCard.tsx";
 import {getPost} from "../../common/apis/post.tsx";
-import {useEffect, useState} from "react";
+import {ChangeEvent, useEffect, useState} from "react";
 import {PostResponse} from "../../common/types/post.tsx";
 import {checkUUID} from "../../common/util/regex.tsx";
 import {sortTagByName} from "../../common/util/sort.tsx";
+import CommentCard from "../../components/post/CommentCard.tsx";
+import CommentTextField from "../../components/post/CommentTextField.tsx";
+import {LoadMoreButton} from "../../components/common/FillButton.tsx";
 
 function PostPage() {
 
@@ -22,6 +25,19 @@ function PostPage() {
         tags: [],
         createdAt: new Date(),
     });
+    const [commentInput, setCommentInput] = useState("");
+
+    const handleCommentInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
+        setCommentInput(e.target.value);
+    }
+    const handleCommentSubmit = (commentId: string | undefined) => {
+        confirm("댓글을 등록하시겠습니까?");
+        alert("등록되었습니다.");
+        console.log(commentId);
+    }
+    const handleLoadMoreCommit = () => {
+
+    }
 
     useEffect(() => {
         if (id === null || id === undefined || !checkUUID(id)) {
@@ -46,7 +62,7 @@ function PostPage() {
 
     return (
         <BasicLayout>
-            <div className="w-full">
+            <div className="w-full flex flex-col">
                 <div className="flex flex-col gap-y-8">
                     <div className="flex justify-between items-center">
                         <div className="flex-1 flex justify-center items-center gap-x-4">
@@ -75,13 +91,21 @@ function PostPage() {
                                 navigate(`/search?word=${tag.name}&option=태그`)
                             }}/>)}
                     </div>
-                    <div className="flex justify-between items-center">
-
-                        <div></div>
-                    </div>
                 </div>
                 <div className="py-8"
                      dangerouslySetInnerHTML={{__html: safeContent}}/>
+                <div className="w-full max-w-4xl mx-auto p-8 rounded-2xl flex flex-col gap-y-0 my-8">
+                    <p>댓글</p>
+                    <CommentTextField
+                        value={commentInput}
+                        onChange={handleCommentInput}
+                        handleSubmit={handleCommentSubmit}/>
+                    {Array.from({length: 10}).map((_, i) =>
+                        <CommentCard key={i}/>)}
+                    <LoadMoreButton
+                        onClick={handleLoadMoreCommit}
+                        addStyle={"!bg-gray-400"}/>
+                </div>
             </div>
         </BasicLayout>
     )
