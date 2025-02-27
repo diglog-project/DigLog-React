@@ -1,14 +1,21 @@
 import {faker} from "@faker-js/faker/locale/ko";
 import {dateToKorean} from "../../common/util/date.tsx";
-import {MdOutlineAddComment, MdOutlineComment} from "react-icons/md";
+import {MdOutlineAddComment, MdOutlineComment, MdOutlinePerson} from "react-icons/md";
 import {ChangeEvent, useState} from "react";
 import CommentTextField from "./CommentTextField.tsx";
+import {CommentType} from "../../common/types/comment.tsx";
+import {LoadMoreButton} from "../common/FillButton.tsx";
 
-function CommentCard({depth = 0}: { depth?: number }) {
+function CommentCard({comment, handleLoadMoreSubComment, pageSize, depth = 0}: {
+    comment: CommentType,
+    handleLoadMoreSubComment: (page: number, parentId: string) => void,
+    pageSize: number,
+    depth?: number,
+}) {
 
-    const [openComment, setOpenComment] = useState(depth !== 0);
     const [commentInput, setCommentInput] = useState("");
     const [showTextField, setShowTextField] = useState(false);
+    const [page, setPage] = useState(0);
 
     const handleCommentInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
         setCommentInput(e.currentTarget.value);
@@ -28,26 +35,31 @@ function CommentCard({depth = 0}: { depth?: number }) {
             <div className="flex-1 flex flex-col justify-center mt-4 text-sm">
                 <div className="flex flex-col gap-y-2 border rounded-2xl border-gray-300 px-4 pt-4 pb-2">
                     <div className="flex items-center gap-x-2">
-                        <img className="size-6 rounded-full hover:cursor-pointer"
-                             src={faker.image.avatar()} alt="user_image"/>
+                        {comment.member.profileUrl
+                            ? <img className="size-6 rounded-full hover:cursor-pointer"
+                                   src={comment.member.profileUrl} alt="user_image"/>
+                            : <MdOutlinePerson className="size-5 text-gray-600"/>}
                         <p className="font-bold">
-                            {faker.animal.cow()}
+                            {comment.member.username}
                         </p>
                         <p className="text-gray-400 text-sm">
-                            {dateToKorean(faker.date.anytime())}
+                            {dateToKorean(comment.createdAt)}
                         </p>
                     </div>
                     <p className="mt-4 text-gray-900">
-                        {faker.lorem.paragraph()}
+                        {comment.content}
                     </p>
                     <div className="flex justify-between items-center">
                         {depth === 0 &&
-                        <button
-                            className="w-fit py-2 flex justify-center items-center gap-x-2 text-gray-600 hover:cursor-pointer rounded-md hover:brightness-120"
-                            onClick={() => setOpenComment(prev => !prev)}>
-                            <MdOutlineComment className="text-gray-600 size-4"/>
-                            {!openComment ? "답글 (10)" : "답글 닫기"}
-                        </button>}
+                            <button
+                                className="w-fit py-2 flex justify-center items-center gap-x-2 text-gray-600 hover:cursor-pointer rounded-md hover:brightness-120"
+                                onClick={() => {
+                                    handleLoadMoreSubComment(page, comment.id);
+                                    setPage(page + 1);
+                                }}>
+                                <MdOutlineComment className="text-gray-600 size-4"/>
+                                답글 ({comment.replyCount})
+                            </button>}
                         <div/>
                         <button
                             className="w-fit py-2 flex justify-center items-center gap-x-2 text-gray-600 hover:cursor-pointer rounded-md hover:brightness-120"
@@ -57,7 +69,7 @@ function CommentCard({depth = 0}: { depth?: number }) {
                         </button>
                     </div>
                 </div>
-                <div className="ml-8">
+                <div>
                     {showTextField &&
                         <CommentTextField
                             value={commentInput}
@@ -66,14 +78,25 @@ function CommentCard({depth = 0}: { depth?: number }) {
                             commentId={faker.number.int().toString()}
                             handleShowTextField={handleShowTextField}/>}
                 </div>
-                {openComment &&
+                {comment.subComments &&
                     <div>
-                        {Array.from({length: 2}).map(() =>
+                        {comment.subComments.map((comment) =>
                             (depth <= 2)
-                                ? <CommentCard key={faker.animal.cow()} depth={depth + 1}/>
+                                ? <CommentCard
+                                    key={faker.animal.cow()}
+                                    comment={comment}
+                                    handleLoadMoreSubComment={handleLoadMoreSubComment}
+                                    pageSize={pageSize}
+                                    depth={depth + 1}/>
                                 : null)}
-                    </div>
-                }
+                        {page !== 0 && (page) * 10 < comment.replyCount &&
+                            <LoadMoreButton
+                                addStyle="mt-2 ml-8 w-[calc(100%-36px)] !bg-gray-400"
+                                onClick={() => {
+                                    handleLoadMoreSubComment(page, comment.id);
+                                    setPage(page + 1);
+                                }}/>}
+                    </div>}
             </div>
         </div>
     );

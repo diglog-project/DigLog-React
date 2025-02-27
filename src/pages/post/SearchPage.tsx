@@ -179,7 +179,7 @@ function SearchResults({selectedTab}: { selectedTab: string }) {
                 {(Array.from({length: 5}).map(() => (
                     <Link key={faker.animal.dog()} to={`/blog/${faker.animal.dog()}`}
                           className="flex justify-start items-center px-4 py-6 gap-8 divide-y divide-gray-200 hover:bg-gray-100 shadow-gray-400 duration-300 ease-out">
-                        <img className="border border-gray-300 h-32 w-32 rounded-full"
+                        <img className="border border-gray-300 size-32 rounded-full"
                              src={faker.image.avatar()} alt="username"/>
                         <div className="flex flex-col gap-y-1 justify-center items-start">
                             <div className="text-2xl font-black">{faker.animal.dog()}</div>

@@ -83,15 +83,15 @@ function ProfileSettingPage() {
                     <div className={`${isImageEdit ? "w-32" : "w-0"}`}/>
                     <div className="relative group">
                         {isImageEdit && image
-                            ? <img className="border border-gray-300 h-32 w-32 rounded-full group-hover:brightness-50"
+                            ? <img className="border border-gray-300 size-32 rounded-full group-hover:brightness-50"
                                    src={image} alt="Edit Profile Image"/>
                             : (loginState.profileUrl
                                 ?
-                                <img className="border border-gray-300 h-32 w-32 rounded-full group-hover:brightness-50"
+                                <img className="border border-gray-300 size-32 rounded-full group-hover:brightness-50"
                                      src={loginState.profileUrl} alt="Profile Image"/>
                                 : <MdOutlinePerson
-                                    className="border border-gray-300 h-32 w-32 rounded-full group-hover:brightness-50 text-gray-400"/>)}
-                        <div className="absolute h-32 w-32 inset-0 flex justify-center items-center">
+                                    className="border border-gray-300 size-32 rounded-full group-hover:brightness-50 text-gray-400"/>)}
+                        <div className="absolute size-32 inset-0 flex justify-center items-center">
                             <input
                                 type="file"
                                 accept="image/*"
