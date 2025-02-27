@@ -1,21 +1,23 @@
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store.tsx";
-import {faker} from "@faker-js/faker/locale/ko";
-import {MdOutlineEdit} from "react-icons/md";
+import {MdOutlineEdit, MdOutlinePerson} from "react-icons/md";
 import {ChangeEvent, useRef, useState} from "react";
 import {FillButton} from "../../components/common/FillButton.tsx";
 import {setUsername} from "../../common/slices/loginSlice.tsx";
 import {TextButton} from "../../components/common/TextButton.tsx";
-import {updateUsername} from "../../common/apis/member.tsx";
+import {updateProfileImage, updateUsername} from "../../common/apis/member.tsx";
+import {useNavigate} from "react-router-dom";
 
 function ProfileSettingPage() {
 
+    const navigate = useNavigate();
     const loginState = useSelector((state: RootState) => state.loginSlice);
     const dispatch = useDispatch();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [input, setInput] = useState(loginState.username);
     const [image, setImage] = useState<string | null>(null);
+    const [file, setFile] = useState<File | null>(null);
     const [isUsernameEdit, setIsUsernameEdit] = useState(false);
     const [isImageEdit, setIsImageEdit] = useState(false);
 
@@ -49,6 +51,7 @@ function ProfileSettingPage() {
 
     const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
+            setFile(event.target.files[0]);
             setImage(URL.createObjectURL(event.target.files[0]));
         }
     }
@@ -58,8 +61,17 @@ function ProfileSettingPage() {
     }
 
     const handleImageSubmit = () => {
-        alert("변경되었습니다.");
-        setIsImageEdit(false);
+        if (!file) {
+            alert("업데이트할 이미지를 선택해주세요.");
+            return;
+        }
+
+        updateProfileImage(file)
+            .then(() => {
+                alert("변경되었습니다.");
+                navigate(0);
+            })
+            .catch((error) => alert(error.response.data.message));
     }
 
     return (
@@ -73,8 +85,12 @@ function ProfileSettingPage() {
                         {isImageEdit && image
                             ? <img className="border border-gray-300 h-32 w-32 rounded-full group-hover:brightness-50"
                                    src={image} alt="Edit Profile Image"/>
-                            : <img className="border border-gray-300 h-32 w-32 rounded-full group-hover:brightness-50"
-                                   src={faker.image.avatar()} alt="Profile Image"/>}
+                            : (loginState.profileUrl
+                                ?
+                                <img className="border border-gray-300 h-32 w-32 rounded-full group-hover:brightness-50"
+                                     src={loginState.profileUrl} alt="Profile Image"/>
+                                : <MdOutlinePerson
+                                    className="border border-gray-300 h-32 w-32 rounded-full group-hover:brightness-50 text-gray-400"/>)}
                         <div className="absolute h-32 w-32 inset-0 flex justify-center items-center">
                             <input
                                 type="file"

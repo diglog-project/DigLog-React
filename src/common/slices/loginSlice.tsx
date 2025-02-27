@@ -5,6 +5,7 @@ const initialState = {
     accessToken: "",
     email: "",
     username: "",
+    profileUrl: "",
     roles: [],
 }
 
@@ -18,6 +19,7 @@ const loginSlice = createSlice({
                 accessToken: action.payload.accessToken,
                 email: action.payload.email,
                 username: action.payload.username,
+                profileUrl: action.payload.profileUrl,
                 roles: action.payload.roles,
             };
         },

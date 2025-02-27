@@ -39,3 +39,10 @@ export const updateUsername = async (username: string) =>
     await axiosApi.post("/member/username", {
         username: username,
     });
+
+export const updateProfileImage = async (image: File) => {
+    const formData = new FormData();
+    formData.append("file", image);
+
+    return await axiosApi.post("/member/image", formData);
+}
