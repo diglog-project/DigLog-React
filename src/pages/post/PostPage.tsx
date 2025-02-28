@@ -10,14 +10,17 @@ import {checkUUID} from "../../common/util/regex.tsx";
 import {sortTagByName} from "../../common/util/sort.tsx";
 import CommentCard from "../../components/post/CommentCard.tsx";
 import CommentTextField from "../../components/post/CommentTextField.tsx";
-import {LoadMoreButton} from "../../components/common/FillButton.tsx";
+import {FillLink, LoadMoreButton} from "../../components/common/FillButton.tsx";
 import {getComments, saveComment, updateComment} from "../../common/apis/comment.tsx";
 import {CommentResponse, CommentType} from "../../common/types/comment.tsx";
+import {useSelector} from "react-redux";
+import {RootState} from "../../store.tsx";
 
 function PostPage() {
 
     const {id} = useParams();
     const navigate = useNavigate();
+    const loginState = useSelector((state: RootState) => state.loginSlice);
 
     const pageSize = 10;
 
@@ -217,10 +220,20 @@ function PostPage() {
                      dangerouslySetInnerHTML={{__html: safeContent}}/>
                 <div className="w-full max-w-4xl mx-auto p-8 rounded-2xl flex flex-col gap-y-0 my-8">
                     <p>댓글</p>
-                    <CommentTextField
-                        value={commentInput}
-                        onChange={handleCommentInput}
-                        handleSubmit={handleCommentSubmit}/>
+
+                    {loginState.isLogin
+                        ? <CommentTextField
+                            value={commentInput}
+                            onChange={handleCommentInput}
+                            handleSubmit={handleCommentSubmit}/>
+                        : <div className="flex flex-col items-end gap-y-2">
+                            <textarea className="w-full border border-gray-400 bg-gray-100 opacity-50"
+                                      disabled={true}
+                                      rows={5}
+                                      minLength={5}/>
+                            <FillLink text={"로그인"} to={"/login"} addStyle={"w-fit"}/>
+                        </div>
+                    }
                     {comments.map((comment, i) =>
                         <CommentCard
                             key={i}
@@ -233,6 +246,7 @@ function PostPage() {
                             onClick={handleLoadMoreComment}
                             addStyle={"!bg-gray-400"}/>}
                 </div>
+
             </div>
         </BasicLayout>
     )
