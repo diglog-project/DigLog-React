@@ -11,11 +11,15 @@ import {sortTagByName} from "../../common/util/sort.tsx";
 import CommentCard from "../../components/post/CommentCard.tsx";
 import CommentTextField from "../../components/post/CommentTextField.tsx";
 import {LoadMoreButton} from "../../components/common/FillButton.tsx";
+import {getComments, saveComment, updateComment} from "../../common/apis/comment.tsx";
+import {CommentResponse, CommentType} from "../../common/types/comment.tsx";
 
 function PostPage() {
 
     const {id} = useParams();
     const navigate = useNavigate();
+
+    const pageSize = 10;
 
     const [post, setPost] = useState<PostResponse>({
         id: "",
@@ -26,17 +30,104 @@ function PostPage() {
         createdAt: new Date(),
     });
     const [commentInput, setCommentInput] = useState("");
+    const [comments, setComments] = useState<CommentType[]>([]);
+    const [pageInfo, setPageInfo] = useState({number: 0, totalPages: 0});
+    const [trigger, setTrigger] = useState(false);
 
     const handleCommentInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
         setCommentInput(e.target.value);
     }
-    const handleCommentSubmit = (commentId: string | undefined) => {
-        confirm("댓글을 등록하시겠습니까?");
-        alert("등록되었습니다.");
-        console.log(commentId);
-    }
-    const handleLoadMoreCommit = () => {
+    const handleCommentSubmit = (parentCommentId: string | null, content: string, taggedUsername: string | null, originalComment: CommentType | null) => {
+        if (originalComment) {
+            handleUpdateComment(content, taggedUsername, originalComment);
+            return;
+        }
 
+        if (!confirm("댓글을 등록하시겠습니까?")) {
+            return;
+        }
+
+        if (parentCommentId !== null) {
+            parentCommentId = findParentCommentId(comments, parentCommentId);
+        }
+
+        const commentRequest = {
+            content: content,
+            postId: post.id,
+            parentCommentId: parentCommentId,
+            taggedUsername: taggedUsername,
+        };
+
+        saveComment(commentRequest)
+            .then(() => {
+                alert("등록되었습니다.");
+                navigate(0);
+            })
+            .catch((error) => alert(error.response.data.message));
+    }
+    const findParentCommentId = (comments: CommentType[], parentCommentId: string) => {
+        for (const comment of comments) {
+            if (comment.id === parentCommentId) {
+                return comment.id;
+            }
+
+            if (comment.subComments && comment.subComments.length > 0) {
+                const foundId = findParentCommentId(comment.subComments, parentCommentId);
+                if (foundId) {
+                    return comment.id;
+                }
+            }
+        }
+        return null;
+    }
+    const handleUpdateComment = (content: string, taggedUsername: string | null, originalComment: CommentType | null) => {
+        if (!confirm("댓글을 수정하시겠습니까?")) {
+            return;
+        }
+
+        if (!originalComment) {
+            alert("업데이트 할 댓글이 존재하지 않습니다.");
+            return;
+        }
+
+        const commentUpdateRequest = {
+            id: originalComment.id,
+            content: content,
+            taggedUsername: taggedUsername,
+        };
+
+        updateComment(commentUpdateRequest)
+            .then(() => {
+                alert("수정되었습니다.");
+                navigate(0);
+            })
+            .catch((error) => alert(error.response.data.message));
+    }
+
+    const handleLoadMoreComment = () => {
+        setPageInfo({...pageInfo, number: pageInfo.number + 1});
+        setTrigger(prev => !prev);
+    }
+    const handleLoadMoreSubComment = (page: number, parentId: string) => {
+        getComments({
+            postId: post.id,
+            parentCommentId: parentId,
+            page: page,
+            size: pageSize,
+        })
+            .then((res) => {
+                setComments(prevComments =>
+                    prevComments.map(comment => {
+                        if (comment.id === parentId) {
+                            return {
+                                ...comment,
+                                subComments: [...comment.subComments, ...res.data.content]
+                            }
+                        }
+                        return comment;
+                    }));
+            })
+            .catch((error) => alert(error.response.data.message));
     }
 
     useEffect(() => {
@@ -54,9 +145,39 @@ function PostPage() {
                     tags: sortTagByName(res.data.tags),
                     createdAt: new Date(),
                 });
+                setTrigger(prev => !prev);
             })
             .catch((error) => alert(error.response.data.message));
     }, []);
+
+    useEffect(() => {
+        if (post.id === "") return;
+
+        getComments({
+            postId: post.id,
+            parentCommentId: null,
+            page: pageInfo.number,
+            size: pageSize,
+        })
+            .then((res) => {
+                setComments(prev => [...prev, ...getCommentType(res.data.content)]);
+                setPageInfo({number: pageInfo.number, totalPages: res.data.page.totalPages});
+            })
+            .catch((error) => alert(error.response.data.message));
+    }, [trigger]);
+
+    const getCommentType = (content: CommentResponse[]): CommentType[] => {
+        return content.map(res => ({
+            id: res.id,
+            member: res.member,
+            content: res.content,
+            taggedUsername: res.taggedUsername,
+            replyCount: res.replyCount,
+            createdAt: res.createdAt,
+            deleted: res.deleted,
+            subComments: [],
+        }));
+    }
 
     const safeContent = DOMPurify.sanitize(post.content);
 
@@ -92,7 +213,7 @@ function PostPage() {
                             }}/>)}
                     </div>
                 </div>
-                <div className="py-8"
+                <div className="w-4xl mx-auto p-8 break-words"
                      dangerouslySetInnerHTML={{__html: safeContent}}/>
                 <div className="w-full max-w-4xl mx-auto p-8 rounded-2xl flex flex-col gap-y-0 my-8">
                     <p>댓글</p>
@@ -100,11 +221,17 @@ function PostPage() {
                         value={commentInput}
                         onChange={handleCommentInput}
                         handleSubmit={handleCommentSubmit}/>
-                    {Array.from({length: 10}).map((_, i) =>
-                        <CommentCard key={i}/>)}
-                    <LoadMoreButton
-                        onClick={handleLoadMoreCommit}
-                        addStyle={"!bg-gray-400"}/>
+                    {comments.map((comment, i) =>
+                        <CommentCard
+                            key={i}
+                            comment={comment}
+                            handleLoadMoreSubComment={handleLoadMoreSubComment}
+                            handleCommentSubmit={handleCommentSubmit}
+                            pageSize={pageSize}/>)}
+                    {pageInfo.number + 1 < pageInfo.totalPages &&
+                        <LoadMoreButton
+                            onClick={handleLoadMoreComment}
+                            addStyle={"!bg-gray-400"}/>}
                 </div>
             </div>
         </BasicLayout>
