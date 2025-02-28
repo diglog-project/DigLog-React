@@ -1,4 +1,3 @@
-import {faker} from "@faker-js/faker/locale/ko";
 import {dateToKorean} from "../../common/util/date.tsx";
 import {MdOutlineAddComment, MdOutlineComment, MdOutlinePerson} from "react-icons/md";
 import {ChangeEvent, useState} from "react";
@@ -9,7 +8,7 @@ import {LoadMoreButton} from "../common/FillButton.tsx";
 function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pageSize, depth = 0}: {
     comment: CommentType,
     handleLoadMoreSubComment: (page: number, parentId: string) => void,
-    handleCommentSubmit: (commentId: string | null, content: string) => void,
+    handleCommentSubmit: (commentId: string | null, content: string, taggedUsername: string | null) => void,
     pageSize: number,
     depth?: number,
 }) {
@@ -25,9 +24,11 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
         setShowTextField(prev => !prev);
     }
     const handleOpenTextField = () => {
-        setCommentInput(`@${comment.member.username}`);
+        setCommentInput("");
         setShowTextField(true);
     }
+
+    const taggedUsername = depth > 0 ? comment.member.username : null;
 
     return (
         <div className={`flex ${depth === 0 && "pb-4"}`}>
@@ -47,6 +48,10 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
                         </p>
                     </div>
                     <p className="mt-4 text-gray-900">
+                        {comment.taggedUsername &&
+                            <span className="text-lime-700 mr-2">
+                            @{comment.taggedUsername}
+                        </span>}
                         {comment.content}
                     </p>
                     <div className="flex justify-between items-center">
@@ -74,8 +79,9 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
                         <CommentTextField
                             value={commentInput}
                             onChange={handleCommentInput}
-                            handleSubmit={() => handleCommentSubmit(comment.id, commentInput)}
-                            commentId={faker.number.int().toString()}
+                            handleSubmit={handleCommentSubmit}
+                            commentId={comment.id}
+                            taggedUsername={taggedUsername}
                             handleShowTextField={handleShowTextField}/>}
                 </div>
                 {comment.subComments &&
@@ -83,7 +89,7 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
                         {comment.subComments.map((comment) =>
                             (depth <= 2)
                                 ? <CommentCard
-                                    key={faker.animal.cow()}
+                                    key={comment.id}
                                     comment={comment}
                                     handleLoadMoreSubComment={handleLoadMoreSubComment}
                                     handleCommentSubmit={handleCommentSubmit}

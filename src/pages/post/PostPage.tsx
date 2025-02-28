@@ -37,7 +37,7 @@ function PostPage() {
     const handleCommentInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
         setCommentInput(e.target.value);
     }
-    const handleCommentSubmit = (parentCommentId: string | null, content: string) => {
+    const handleCommentSubmit = (parentCommentId: string | null, content: string, taggedUsername: string | null) => {
         if (!confirm("댓글을 등록하시겠습니까?")) {
             return;
         }
@@ -50,7 +50,7 @@ function PostPage() {
             content: content,
             postId: post.id,
             parentCommentId: parentCommentId,
-            taggedUsername: null,
+            taggedUsername: taggedUsername,
         };
 
         saveComment(commentRequest)
