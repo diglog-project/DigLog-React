@@ -107,7 +107,7 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
                                 답글 ({comment.replyCount})
                             </button>}
                         <div/>
-                        {!showEditTextField &&
+                        {loginState.isLogin && !showEditTextField &&
                             <div className="flex items-center gap-x-4 text-gray-600">
                                 {comment.member.username === loginState.username &&
                                     <div className="flex items-center">
