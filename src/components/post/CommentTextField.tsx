@@ -1,24 +1,26 @@
 import {ChangeEventHandler, useState} from 'react';
 import {FillButton} from "../common/FillButton.tsx";
 import {TextButton} from "../common/TextButton.tsx";
+import {CommentType} from "../../common/types/comment.tsx";
 
 interface CommentTextFieldProps {
     value: string,
     onChange: ChangeEventHandler<HTMLTextAreaElement>,
     commentId?: string,
     taggedUsername?: string | null,
-    handleSubmit: (commentId: string | null, content: string, taggedUsername: string | null) => void,
+    originalComment?: CommentType | null,
+    handleSubmit: (commentId: string | null, content: string, taggedUsername: string | null, originalComment: CommentType | null) => void,
     handleShowTextField?: () => void,
 }
 
 function CommentTextField(props: CommentTextFieldProps) {
 
-    const {value, onChange, commentId, taggedUsername, handleSubmit, handleShowTextField} = props;
+    const {value, onChange, commentId, taggedUsername, originalComment, handleSubmit, handleShowTextField} = props;
 
     const [username, setUsername] = useState<string | null>(taggedUsername || null);
 
     return (
-        <div className="my-2 flex flex-col justify-center gap-y-2">
+        <div className="w-full my-2 flex flex-col justify-center gap-y-2">
             <textarea
                 value={value}
                 onChange={onChange}
@@ -32,12 +34,13 @@ function CommentTextField(props: CommentTextFieldProps) {
                                 addStyle="w-fit !bg-gray-400 text-xs"/>}
                 <div/>
                 <div className="flex">
-                    {commentId && <TextButton text={"취소"} onClick={() => {
+                    {(commentId || originalComment) && <TextButton text={"취소"} onClick={() => {
                         if (handleShowTextField) {
                             handleShowTextField();
                         }
                     }}/>}
-                    <FillButton text={"등록"} onClick={() => handleSubmit(commentId || null, value, username || null)}/>
+                    <FillButton text={(!originalComment) ? "등록" : "수정"}
+                                onClick={() => handleSubmit(commentId || null, value, username || null, originalComment || null)}/>
                 </div>
             </div>
         </div>

@@ -44,3 +44,9 @@ export interface CommentRequest {
     parentCommentId: string | null,
     taggedUsername: string | null,
 }
+
+export interface CommentUpdateRequest {
+    id: string,
+    content: string,
+    taggedUsername: string | null,
+}

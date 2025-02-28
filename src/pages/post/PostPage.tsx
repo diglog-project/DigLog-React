@@ -11,7 +11,7 @@ import {sortTagByName} from "../../common/util/sort.tsx";
 import CommentCard from "../../components/post/CommentCard.tsx";
 import CommentTextField from "../../components/post/CommentTextField.tsx";
 import {LoadMoreButton} from "../../components/common/FillButton.tsx";
-import {getComments, saveComment} from "../../common/apis/comment.tsx";
+import {getComments, saveComment, updateComment} from "../../common/apis/comment.tsx";
 import {CommentResponse, CommentType} from "../../common/types/comment.tsx";
 
 function PostPage() {
@@ -37,7 +37,12 @@ function PostPage() {
     const handleCommentInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
         setCommentInput(e.target.value);
     }
-    const handleCommentSubmit = (parentCommentId: string | null, content: string, taggedUsername: string | null) => {
+    const handleCommentSubmit = (parentCommentId: string | null, content: string, taggedUsername: string | null, originalComment: CommentType | null) => {
+        if (originalComment) {
+            handleUpdateComment(content, taggedUsername, originalComment);
+            return;
+        }
+
         if (!confirm("댓글을 등록하시겠습니까?")) {
             return;
         }
@@ -75,7 +80,29 @@ function PostPage() {
         }
         return null;
     }
+    const handleUpdateComment = (content: string, taggedUsername: string | null, originalComment: CommentType | null) => {
+        if (!confirm("댓글을 수정하시겠습니까?")) {
+            return;
+        }
 
+        if (!originalComment) {
+            alert("업데이트 할 댓글이 존재하지 않습니다.");
+            return;
+        }
+
+        const commentUpdateRequest = {
+            id: originalComment.id,
+            content: content,
+            taggedUsername: taggedUsername,
+        };
+
+        updateComment(commentUpdateRequest)
+            .then(() => {
+                alert("수정되었습니다.");
+                navigate(0);
+            })
+            .catch((error) => alert(error.response.data.message));
+    }
 
     const handleLoadMoreComment = () => {
         setPageInfo({...pageInfo, number: pageInfo.number + 1});
