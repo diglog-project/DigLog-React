@@ -1,5 +1,5 @@
 import {PostListRequest} from "../types/post.tsx";
-import {CommentRequest} from "../types/comment.tsx";
+import {CommentListRequest} from "../types/comment.tsx";
 
 export const postListRequestToParameter = (postListRequest: PostListRequest) => {
     const sorts = postListRequest.sorts.map(sort => `sorts=${sort}`).join("&");
@@ -7,11 +7,11 @@ export const postListRequestToParameter = (postListRequest: PostListRequest) => 
     return `?${sorts}&page=${postListRequest.page}&size=${postListRequest.size}&isDescending=${postListRequest.isDescending}`;
 }
 
-export const commentRequestToParameter = (commentRequest: CommentRequest) => {
-    let query = `?postId=${commentRequest.postId}&page=${commentRequest.page}&size=${commentRequest.size}`;
+export const commentListRequestToParameter = (commentListRequest: CommentListRequest) => {
+    let query = `?postId=${commentListRequest.postId}&page=${commentListRequest.page}&size=${commentListRequest.size}`;
 
-    if (commentRequest.parentCommentId) {
-        query += `&parentCommentId=${commentRequest.parentCommentId}`;
+    if (commentListRequest.parentCommentId) {
+        query += `&parentCommentId=${commentListRequest.parentCommentId}`;
     }
 
     return query;

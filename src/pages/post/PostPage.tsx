@@ -11,7 +11,7 @@ import {sortTagByName} from "../../common/util/sort.tsx";
 import CommentCard from "../../components/post/CommentCard.tsx";
 import CommentTextField from "../../components/post/CommentTextField.tsx";
 import {LoadMoreButton} from "../../components/common/FillButton.tsx";
-import {getComments} from "../../common/apis/comment.tsx";
+import {getComments, saveComment} from "../../common/apis/comment.tsx";
 import {CommentResponse, CommentType} from "../../common/types/comment.tsx";
 
 function PostPage() {
@@ -37,11 +37,46 @@ function PostPage() {
     const handleCommentInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
         setCommentInput(e.target.value);
     }
-    const handleCommentSubmit = (commentId: string | undefined) => {
-        confirm("댓글을 등록하시겠습니까?");
-        alert("등록되었습니다.");
-        console.log(commentId);
+    const handleCommentSubmit = (parentCommentId: string | null, content: string) => {
+        if (!confirm("댓글을 등록하시겠습니까?")) {
+            return;
+        }
+
+        if (parentCommentId !== null) {
+            parentCommentId = findParentCommentId(comments, parentCommentId);
+        }
+
+        const commentRequest = {
+            content: content,
+            postId: post.id,
+            parentCommentId: parentCommentId,
+            taggedUsername: null,
+        };
+
+        saveComment(commentRequest)
+            .then(() => {
+                alert("등록되었습니다.");
+                navigate(0);
+            })
+            .catch((error) => alert(error.response.data.message));
     }
+    const findParentCommentId = (comments: CommentType[], parentCommentId: string) => {
+        for (const comment of comments) {
+            if (comment.id === parentCommentId) {
+                return comment.id;
+            }
+
+            if (comment.subComments && comment.subComments.length > 0) {
+                const foundId = findParentCommentId(comment.subComments, parentCommentId);
+                if (foundId) {
+                    return comment.id;
+                }
+            }
+        }
+        return null;
+    }
+
+
     const handleLoadMoreComment = () => {
         setPageInfo({...pageInfo, number: pageInfo.number + 1});
         setTrigger(prev => !prev);
@@ -98,7 +133,6 @@ function PostPage() {
             size: pageSize,
         })
             .then((res) => {
-                console.log(res);
                 setComments(prev => [...prev, ...getCommentType(res.data.content)]);
                 setPageInfo({number: pageInfo.number, totalPages: res.data.page.totalPages});
             })
@@ -165,6 +199,7 @@ function PostPage() {
                             key={i}
                             comment={comment}
                             handleLoadMoreSubComment={handleLoadMoreSubComment}
+                            handleCommentSubmit={handleCommentSubmit}
                             pageSize={pageSize}/>)}
                     {pageInfo.number + 1 < pageInfo.totalPages &&
                         <LoadMoreButton

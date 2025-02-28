@@ -31,9 +31,6 @@ function WritePage() {
     const path = useLocation().pathname.substring(0, location.pathname.lastIndexOf("/"));
     const {id} = useParams();
 
-    console.log(path);
-    console.log(id);
-
     const [loading, setLoading] = useState(false);
     const [post, setPost] = useState<WritePostType>({
         inputTag: "",

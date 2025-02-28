@@ -11,7 +11,7 @@ export interface CommentType {
     subComments: CommentType[],
 }
 
-export interface CommentRequest {
+export interface CommentListRequest {
     postId: string,
     parentCommentId: string | null,
     page: number,
@@ -36,4 +36,11 @@ export interface CommentResponse {
 export interface CommentMember {
     username: string,
     profileUrl: string | null,
+}
+
+export interface CommentRequest {
+    content: string,
+    postId: string,
+    parentCommentId: string | null,
+    taggedUsername: string | null,
 }

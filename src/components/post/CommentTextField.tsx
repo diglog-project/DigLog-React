@@ -6,7 +6,7 @@ interface CommentTextFieldProps {
     value: string,
     onChange: ChangeEventHandler<HTMLTextAreaElement>,
     commentId?: string,
-    handleSubmit: (commentId: string | undefined) => void,
+    handleSubmit: (commentId: string | null, content: string) => void,
     handleShowTextField?: () => void,
 }
 
@@ -28,7 +28,7 @@ function CommentTextField(props: CommentTextFieldProps) {
                         handleShowTextField();
                     }
                 }}/>}
-                <FillButton text={"등록"} onClick={() => handleSubmit(commentId)}/>
+                <FillButton text={"등록"} onClick={() => handleSubmit(commentId || null, value)}/>
             </div>
         </div>
     );

@@ -6,9 +6,10 @@ import CommentTextField from "./CommentTextField.tsx";
 import {CommentType} from "../../common/types/comment.tsx";
 import {LoadMoreButton} from "../common/FillButton.tsx";
 
-function CommentCard({comment, handleLoadMoreSubComment, pageSize, depth = 0}: {
+function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pageSize, depth = 0}: {
     comment: CommentType,
     handleLoadMoreSubComment: (page: number, parentId: string) => void,
+    handleCommentSubmit: (commentId: string | null, content: string) => void,
     pageSize: number,
     depth?: number,
 }) {
@@ -23,10 +24,9 @@ function CommentCard({comment, handleLoadMoreSubComment, pageSize, depth = 0}: {
     const handleShowTextField = () => {
         setShowTextField(prev => !prev);
     }
-    const handleSubmit = (commentId: string | undefined) => {
-        confirm("댓글을 등록하시겠습니까?");
-        alert("등록되었습니다.");
-        console.log(commentId);
+    const handleOpenTextField = () => {
+        setCommentInput(`@${comment.member.username}`);
+        setShowTextField(true);
     }
 
     return (
@@ -63,7 +63,7 @@ function CommentCard({comment, handleLoadMoreSubComment, pageSize, depth = 0}: {
                         <div/>
                         <button
                             className="w-fit py-2 flex justify-center items-center gap-x-2 text-gray-600 hover:cursor-pointer rounded-md hover:brightness-120"
-                            onClick={() => setShowTextField(true)}>
+                            onClick={handleOpenTextField}>
                             <MdOutlineAddComment className="text-gray-600 size-4"/>
                             댓글 작성하기
                         </button>
@@ -74,7 +74,7 @@ function CommentCard({comment, handleLoadMoreSubComment, pageSize, depth = 0}: {
                         <CommentTextField
                             value={commentInput}
                             onChange={handleCommentInput}
-                            handleSubmit={handleSubmit}
+                            handleSubmit={() => handleCommentSubmit(comment.id, commentInput)}
                             commentId={faker.number.int().toString()}
                             handleShowTextField={handleShowTextField}/>}
                 </div>
@@ -86,6 +86,7 @@ function CommentCard({comment, handleLoadMoreSubComment, pageSize, depth = 0}: {
                                     key={faker.animal.cow()}
                                     comment={comment}
                                     handleLoadMoreSubComment={handleLoadMoreSubComment}
+                                    handleCommentSubmit={handleCommentSubmit}
                                     pageSize={pageSize}
                                     depth={depth + 1}/>
                                 : null)}
