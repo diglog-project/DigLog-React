@@ -7,6 +7,8 @@ import {LoadMoreButton} from "../common/FillButton.tsx";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store.tsx";
 import {TextButton} from "../common/TextButton.tsx";
+import {deleteComment} from "../../common/apis/comment.tsx";
+import {useNavigate} from "react-router-dom";
 
 function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pageSize, depth = 0}: {
     comment: CommentType,
@@ -16,6 +18,7 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
     depth?: number,
 }) {
 
+    const navigate = useNavigate();
     const loginState = useSelector((state: RootState) => state.loginSlice);
 
     const [commentInput, setCommentInput] = useState("");
@@ -41,6 +44,19 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
     }
     const handleEditCommentInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
         setEditCommentInput(e.currentTarget.value);
+    }
+
+    const handleDeleteComment = () => {
+        if (!confirm("댓글을 삭제하시겠습니까?")) {
+            return;
+        }
+
+        deleteComment(comment.id)
+            .then(() => {
+                alert("삭제되었습니다.");
+                navigate(0);
+            })
+            .catch((error) => alert(error.response.data.message));
     }
 
     const taggedUsername = depth > 0 ? comment.member.username : null;
@@ -92,14 +108,17 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
                             </button>}
                         <div/>
                         {!showEditTextField &&
-                            <div className="flex items-center gap-x-4">
+                            <div className="flex items-center gap-x-4 text-gray-600">
                                 {comment.member.username === loginState.username &&
-                                    <TextButton text={"수정"} onClick={handleShowEdit}/>
+                                    <div className="flex items-center">
+                                        <TextButton text={"수정"} onClick={handleShowEdit}/>
+                                        <TextButton text={"삭제"} onClick={handleDeleteComment}/>
+                                    </div>
                                 }
                                 <button
-                                    className="w-fit py-2 flex justify-center items-center gap-x-2 text-gray-600 hover:cursor-pointer rounded-md hover:brightness-120"
+                                    className="w-fit py-2 flex justify-center items-center gap-x-2 hover:cursor-pointer rounded-md hover:brightness-120"
                                     onClick={handleOpenTextField}>
-                                    <MdOutlineAddComment className="text-gray-600 size-4"/>
+                                    <MdOutlineAddComment className="size-4"/>
                                     댓글 작성하기
                                 </button>
                             </div>

@@ -11,3 +11,6 @@ export const saveComment = async (commentRequest: CommentRequest) =>
 export const updateComment = async (commentUpdateRequest: CommentUpdateRequest) => {
     await axiosApi.patch("/comment", commentUpdateRequest);
 }
+
+export const deleteComment = async (id: string) =>
+    await axiosApi.patch(`/comment/delete/${id}`);
