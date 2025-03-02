@@ -1,4 +1,4 @@
-import {PostListRequest} from "../types/post.tsx";
+import {PostListRequest, PostSearchRequest} from "../types/post.tsx";
 import {CommentListRequest} from "../types/comment.tsx";
 import {PostListMemberRequest} from "../types/blog.tsx";
 
@@ -19,11 +19,17 @@ export const commentListRequestToParameter = (commentListRequest: CommentListReq
 }
 
 export const postListMemberRequestToParameter = (postListMemberRequest: PostListMemberRequest) => {
-    let query =`?username=${postListMemberRequest.username}&page=${postListMemberRequest.page}&size=${postListMemberRequest.size}`;
+    let query = `?username=${postListMemberRequest.username}&page=${postListMemberRequest.page}&size=${postListMemberRequest.size}`;
 
     if (postListMemberRequest.folderId) {
         query += `&folderId=${postListMemberRequest.folderId}`;
     }
 
     return query;
+}
+
+export const postListSearchRequestToParameter = (postSearchRequest: PostSearchRequest) => {
+    const sorts = postSearchRequest.sorts.map(sort => `sorts=${sort}`).join("&");
+
+    return `?${sorts}&keyword=${postSearchRequest.keyword}&option=${postSearchRequest.option}&page=${postSearchRequest.page}&size=${postSearchRequest.size}&isDescending=${postSearchRequest.isDescending}`;
 }

@@ -2,10 +2,13 @@ import BasicLayout from "../../layout/BasicLayout.tsx";
 import {MdArrowDropDown, MdOutlineClear, MdOutlineSearch} from "react-icons/md";
 import {Ref, useEffect, useRef, useState} from "react";
 import * as React from "react";
-// import PostCard from "../../components/post/PostCard.tsx";
+import PostCard from "../../components/post/PostCard.tsx";
 import {faker} from "@faker-js/faker/locale/ko";
 import {Link, useSearchParams} from "react-router-dom";
 import {LoadMoreButton} from "../../components/common/FillButton.tsx";
+import {PostResponse} from "../../common/types/post.tsx";
+import {PageResponse} from "../../common/types/common.tsx";
+import {searchPost} from "../../common/apis/post.tsx";
 
 function SearchPage() {
 
@@ -15,11 +18,21 @@ function SearchPage() {
     const [openOption, setOpenOption] = useState(false);
     const [openSort, setOpenSort] = useState(false);
 
-    const [searchParams, setSearchParams] = useSearchParams({"word": "", "option": "전체", "sort": "최신순", "tab": "게시글"});
+    const [posts, setPosts] = useState<PostResponse[]>([]);
+    const [trigger, setTrigger] = useState(false);
+    const [page, setPage] = useState(0);
+    const [pageInfo, setPageInfo] = useState<PageResponse>({number: 0, size: 120, totalPages: 0, totalElements: 0});
+
+    const [searchParams, setSearchParams] = useSearchParams({"word": "", "option": "ALL", "sort": "createdAt", "tab": "post"});
     const [searchWord, setSearchWord] = useState<string>(searchParams.get("word") || "");
-    const [option, setOption] = useState<string>(searchParams.get("option") || "전체");
-    const [sort, setSort] = useState<string>(searchParams.get("sort") || "최신순");
-    const [selectedTab, setSelectedTab] = useState<string>(searchParams.get("tab") || "게시글");
+    const [option, setOption] = useState<string>(searchParams.get("option") || "ALL");
+    const [sort, setSort] = useState<string>(searchParams.get("sort") || "createdAt");
+    const [selectedTab, setSelectedTab] = useState<string>(searchParams.get("tab") || "post");
+
+    const handlePage = () => {
+        setPage(prev => prev + 1);
+        setTrigger(prev => !prev);
+    }
 
     const handleOpenOption = () => {
         setOpenOption(cur => !cur);
@@ -42,6 +55,7 @@ function SearchPage() {
             return;
         }
         handleSearchWord();
+        setTrigger(prev => !prev);
     }
 
     const handleSearchWord = () => {
@@ -73,6 +87,26 @@ function SearchPage() {
         };
     }, []);
 
+    useEffect(() => {
+        if (searchWord === "") {
+            return;
+        }
+
+        searchPost({
+            keyword: searchWord,
+            option: "ALL",
+            sorts: ["createdAt"],
+            page: page,
+            size: pageInfo.size,
+            isDescending: true,
+        })
+            .then(res => {
+                setPosts(prev => [...prev, ...res.data.content]);
+                setPageInfo(res.data.page);
+            })
+            .catch(error => alert(error.response.data.message));
+    }, [trigger]);
+
     return (
         <BasicLayout>
             <div className="w-full flex flex-col gap-y-8">
@@ -98,7 +132,8 @@ function SearchPage() {
                 </div>
                 <div className="w-full max-w-4xl mx-auto flex flex-col gap-y-2">
                     <div className="flex justify-between items-center">
-                        <div className="text-lg"><span className="font-bold">99</span>개의 검색결과</div>
+                        <div className="text-lg"><span className="font-bold">{pageInfo.totalElements}</span>개의 검색결과
+                        </div>
                         <div className="flex items-center justify-end">
                             <SearchMenu
                                 type={"option"}
@@ -117,7 +152,11 @@ function SearchPage() {
                         </div>
                     </div>
                     <SearchTab selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>
-                    <SearchResults selectedTab={selectedTab}/>
+                    <SearchResults
+                        posts={posts}
+                        pageInfo={pageInfo}
+                        handlePage={handlePage}
+                        selectedTab={selectedTab}/>
                 </div>
             </div>
         </BasicLayout>
@@ -148,29 +187,25 @@ function SearchTab({selectedTab, setSelectedTab}: {
     );
 }
 
-function SearchResults({selectedTab}: { selectedTab: string }) {
+function SearchResults({posts, pageInfo, handlePage, selectedTab}: {
+    posts: PostResponse[],
+    pageInfo: PageResponse,
+    handlePage: () => void,
+    selectedTab: string
+}) {
 
     if (selectedTab === "게시글") {
         return (
             <div className="my-2">
-                {/*{(Array.from({length: 5}).map(() => (*/}
-                {/*    <PostCard*/}
-                {/*        key={faker.number.int().toString()}*/}
-                {/*        id={faker.number.int().toString()}*/}
-                {/*        title={faker.lorem.sentence()}*/}
-                {/*        content={`${faker.lorem.paragraphs()}<img src=${faker.image.url({*/}
-                {/*            width: 320,*/}
-                {/*            height: 320*/}
-                {/*        })}/>`}*/}
-                {/*        username={faker.animal.cat()}*/}
-                {/*        tags={[{*/}
-                {/*            id: faker.number.int().toString(),*/}
-                {/*            name: faker.word.sample()*/}
-                {/*        }, {id: faker.number.int().toString(), name: faker.word.sample()}]}*/}
-                {/*        createdAt={new Date()}/>*/}
-                {/*)))}*/}
-                <LoadMoreButton onClick={() => {
-                }} addStyle={"w-full"}/>
+                {posts.map((post) => (
+                    <PostCard
+                        key={post.id}
+                        post={post}/>
+                ))}
+                {pageInfo.number + 1 < pageInfo.totalPages &&
+                    <LoadMoreButton
+                        onClick={handlePage}
+                        addStyle={"w-full"}/>}
             </div>
         );
     } else if (selectedTab === "블로그") {
@@ -210,10 +245,10 @@ function SearchMenu({type, open, handleOpen, value, setValue, customRef}: {
     let searchMenuList: string[] = [];
     if (type === "option") {
         title = "검색 조건";
-        searchMenuList = ["전체", "제목", "내용", "태그", "작성자"];
+        searchMenuList = ["전체", "제목", "태그"];
     } else if (type === "sort") {
         title = "정렬 조건";
-        searchMenuList = ["최신순", "오래된순", "조회순"];
+        searchMenuList = ["최신순", "오래된순"];
     }
 
     return (

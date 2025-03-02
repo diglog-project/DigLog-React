@@ -1,6 +1,6 @@
 import axiosApi from "./AxiosApi.tsx";
-import {PostListRequest, PostRequest, PostUpdateRequest} from "../types/post.tsx";
-import {postListRequestToParameter} from "../util/url.tsx";
+import {PostListRequest, PostRequest, PostSearchRequest, PostUpdateRequest} from "../types/post.tsx";
+import {postListRequestToParameter, postListSearchRequestToParameter} from "../util/url.tsx";
 
 export const createPost = async (postRequest: PostRequest) =>
     await axiosApi.post("/post", postRequest);
@@ -17,8 +17,5 @@ export const getPost = async (id: string) =>
 export const getPosts = async (postListRequest: PostListRequest) =>
     await axiosApi.get(`/post${postListRequestToParameter(postListRequest)}`);
 
-export interface FolderRequest {
-    id: string;
-    name: string;
-    subFolders: FolderRequest[];
-}
+export const searchPost = async (postSearchRequest: PostSearchRequest) =>
+    await axiosApi.get(`/post/search${postListSearchRequestToParameter(postSearchRequest)}`);

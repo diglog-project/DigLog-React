@@ -22,6 +22,15 @@ export interface PostListRequest {
     isDescending: boolean,
 }
 
+export interface PostSearchRequest {
+    keyword: string,
+    option: string,
+    sorts: string[],
+    page: number,
+    size: number,
+    isDescending: boolean,
+}
+
 export interface PostListResponse {
     content: PostResponse[];
     page: PageResponse;
