@@ -41,12 +41,7 @@ function MainPage() {
                     {posts.map((post) => (
                         <PostCard
                             key={post.id}
-                            id={post.id}
-                            title={post.title}
-                            content={post.content}
-                            username={post.username}
-                            tags={post.tags}
-                            createdAt={post.createdAt}/>
+                            post={post}/>
                     ))}
                 </div>
             </div>

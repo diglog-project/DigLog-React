@@ -2,7 +2,7 @@ import BasicLayout from "../../layout/BasicLayout.tsx";
 import {MdArrowDropDown, MdOutlineClear, MdOutlineSearch} from "react-icons/md";
 import {Ref, useEffect, useRef, useState} from "react";
 import * as React from "react";
-import PostCard from "../../components/post/PostCard.tsx";
+// import PostCard from "../../components/post/PostCard.tsx";
 import {faker} from "@faker-js/faker/locale/ko";
 import {Link, useSearchParams} from "react-router-dom";
 import {LoadMoreButton} from "../../components/common/FillButton.tsx";
@@ -153,22 +153,22 @@ function SearchResults({selectedTab}: { selectedTab: string }) {
     if (selectedTab === "게시글") {
         return (
             <div className="my-2">
-                {(Array.from({length: 5}).map(() => (
-                    <PostCard
-                        key={faker.number.int().toString()}
-                        id={faker.number.int().toString()}
-                        title={faker.lorem.sentence()}
-                        content={`${faker.lorem.paragraphs()}<img src=${faker.image.url({
-                            width: 320,
-                            height: 320
-                        })}/>`}
-                        username={faker.animal.cat()}
-                        tags={[{
-                            id: faker.number.int().toString(),
-                            name: faker.word.sample()
-                        }, {id: faker.number.int().toString(), name: faker.word.sample()}]}
-                        createdAt={new Date()}/>
-                )))}
+                {/*{(Array.from({length: 5}).map(() => (*/}
+                {/*    <PostCard*/}
+                {/*        key={faker.number.int().toString()}*/}
+                {/*        id={faker.number.int().toString()}*/}
+                {/*        title={faker.lorem.sentence()}*/}
+                {/*        content={`${faker.lorem.paragraphs()}<img src=${faker.image.url({*/}
+                {/*            width: 320,*/}
+                {/*            height: 320*/}
+                {/*        })}/>`}*/}
+                {/*        username={faker.animal.cat()}*/}
+                {/*        tags={[{*/}
+                {/*            id: faker.number.int().toString(),*/}
+                {/*            name: faker.word.sample()*/}
+                {/*        }, {id: faker.number.int().toString(), name: faker.word.sample()}]}*/}
+                {/*        createdAt={new Date()}/>*/}
+                {/*)))}*/}
                 <LoadMoreButton onClick={() => {
                 }} addStyle={"w-full"}/>
             </div>

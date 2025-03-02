@@ -15,14 +15,13 @@ import {getComments, saveComment, updateComment} from "../../common/apis/comment
 import {CommentResponse, CommentType} from "../../common/types/comment.tsx";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store.tsx";
+import {PageResponse} from "../../common/types/common.tsx";
 
 function PostPage() {
 
     const {id} = useParams();
     const navigate = useNavigate();
     const loginState = useSelector((state: RootState) => state.loginSlice);
-
-    const pageSize = 10;
 
     const [post, setPost] = useState<PostResponse>({
         id: "",
@@ -34,7 +33,7 @@ function PostPage() {
     });
     const [commentInput, setCommentInput] = useState("");
     const [comments, setComments] = useState<CommentType[]>([]);
-    const [pageInfo, setPageInfo] = useState({number: 0, totalPages: 0});
+    const [pageInfo, setPageInfo] = useState<PageResponse>({number: 0, size: 10, totalPages: 0, totalElements: 0});
     const [trigger, setTrigger] = useState(false);
 
     const handleCommentInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -116,7 +115,7 @@ function PostPage() {
             postId: post.id,
             parentCommentId: parentId,
             page: page,
-            size: pageSize,
+            size: pageInfo.size,
         })
             .then((res) => {
                 setComments(prevComments =>
@@ -160,11 +159,11 @@ function PostPage() {
             postId: post.id,
             parentCommentId: null,
             page: pageInfo.number,
-            size: pageSize,
+            size: pageInfo.size,
         })
             .then((res) => {
                 setComments(prev => [...prev, ...getCommentType(res.data.content)]);
-                setPageInfo({number: pageInfo.number, totalPages: res.data.page.totalPages});
+                setPageInfo(res.data.page);
             })
             .catch((error) => alert(error.response.data.message));
     }, [trigger]);
@@ -219,8 +218,6 @@ function PostPage() {
                 <div className="w-4xl mx-auto p-8 break-words"
                      dangerouslySetInnerHTML={{__html: safeContent}}/>
                 <div className="w-full max-w-4xl mx-auto p-8 rounded-2xl flex flex-col gap-y-0 my-8">
-                    <p>댓글</p>
-
                     {loginState.isLogin
                         ? <CommentTextField
                             value={commentInput}
@@ -234,13 +231,14 @@ function PostPage() {
                             <FillLink text={"로그인"} to={"/login"} addStyle={"w-fit"}/>
                         </div>
                     }
+                    <p>댓글 ({pageInfo.totalElements})</p>
                     {comments.map((comment, i) =>
                         <CommentCard
                             key={i}
                             comment={comment}
                             handleLoadMoreSubComment={handleLoadMoreSubComment}
                             handleCommentSubmit={handleCommentSubmit}
-                            pageSize={pageSize}/>)}
+                            pageSize={pageInfo.size}/>)}
                     {pageInfo.number + 1 < pageInfo.totalPages &&
                         <LoadMoreButton
                             onClick={handleLoadMoreComment}
