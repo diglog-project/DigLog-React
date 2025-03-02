@@ -3,10 +3,11 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store.tsx";
 import {useEffect, useRef, useState} from "react";
 import {TextLink} from "./TextButton.tsx";
-import {MdOutlinePerson, MdOutlineSearch} from "react-icons/md";
+import {MdOutlineSearch} from "react-icons/md";
 import IconButton from "./IconButton.tsx";
 import {getProfile, logoutApi} from "../../common/apis/member.tsx";
 import {login, logout} from "../../common/slices/loginSlice.tsx";
+import ProfileImageCircle from "./ProfileImageCircle.tsx";
 
 function Header() {
 
@@ -79,12 +80,7 @@ function Header() {
                     ? <div ref={dashboardRef}>
                         <div
                             className="relative flex justify-around items-center w-full">
-                            {loginState.profileUrl
-                                ? <img className="size-10 rounded-full border border-gray-200 hover:cursor-pointer"
-                                       onClick={handleDropDown}
-                                       src={loginState.profileUrl} alt="user_image"/>
-                                : <MdOutlinePerson className="size-6 m-1 rounded-full hover:cursor-pointer"
-                                                   onClick={handleDropDown}/>}
+                            <ProfileImageCircle profileUrl={loginState.profileUrl} onClick={handleDropDown}/>
                             <div
                                 className={`${isOpen ? "" : "hidden"} absolute z-50 top-12 right-0 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44`}>
                                 <div className="flex flex-col gap-1 px-4 py-3 text-sm text-gray-900">

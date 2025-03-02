@@ -6,7 +6,7 @@ import {dateToKorean} from "../../common/util/date.tsx";
 import {Link} from "react-router-dom";
 import {FaRegComment, FaRegHeart} from "react-icons/fa6";
 
-function PostCard(post: PostResponse) {
+function PostCard({post}: {post: PostResponse}) {
 
     const safeContent = DOMPurify.sanitize(post.content);
     const url = getImgSrc(safeContent);

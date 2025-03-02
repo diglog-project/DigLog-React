@@ -2,33 +2,40 @@ import BlogSearchBar from "../../components/blog/BlogSearchBar.tsx";
 import {useEffect, useState} from "react";
 import {MdSearch} from "react-icons/md";
 import {PostResponse} from "../../common/types/post.tsx";
-import {getPosts} from "../../common/apis/post.tsx";
 import {TextLink} from "../../components/common/TextButton.tsx";
 import PaginationButton from "../../components/common/PaginationButton.tsx";
 import {PageResponse} from "../../common/types/common.tsx";
 import {fullDateToKorean} from "../../common/util/date.tsx";
+import {getMemberPosts} from "../../common/apis/blog.tsx";
+import {useSelector} from "react-redux";
+import {RootState} from "../../store.tsx";
 
 function PostSettingPage() {
+
+    const loginState = useSelector((state: RootState) => state.loginSlice);
 
     const [inputSearch, setInputSearch] = useState("");
     const [posts, setPosts] = useState<PostResponse[]>([]);
     const [page, setPage] = useState(0);
-    const [pageInfo, setPageInfo] = useState<PageResponse>({number: 0, size: 5, totalElements: 0, totalPages: 0});
+    const [pageInfo, setPageInfo] = useState<PageResponse>({number: 0, size: 10, totalElements: 0, totalPages: 0});
 
     useEffect(() => {
-        // todo: 본인 게시글 api로 변경
-        getPosts({
-            sorts: ["createdAt"],
+        if (!loginState.username) {
+            return;
+        }
+
+        getMemberPosts({
+            username: loginState.username,
+            folderId: null,
             page: page,
             size: pageInfo.size,
-            isDescending: true,
         })
             .then((res) => {
                 setPosts([...res.data.content]);
                 setPageInfo(res.data.page);
             })
             .catch((error) => alert(error.response.data.message));
-    }, [page]);
+    }, [loginState, page]);
 
     return (
         <div>
@@ -55,6 +62,10 @@ function PostSettingPage() {
                         </div>
                     </div>
                 ))}
+                {posts.length === 0 &&
+                    <div className="mt-8 w-full text-center text-gray-600">
+                        작성된 게시글이 없습니다.
+                    </div>}
             </div>
             <PaginationButton pageInfo={pageInfo} setPage={setPage}/>
         </div>

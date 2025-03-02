@@ -1,12 +1,13 @@
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store.tsx";
-import {MdOutlineEdit, MdOutlinePerson} from "react-icons/md";
+import {MdOutlineEdit} from "react-icons/md";
 import {ChangeEvent, useRef, useState} from "react";
 import {FillButton} from "../../components/common/FillButton.tsx";
 import {setUsername} from "../../common/slices/loginSlice.tsx";
 import {TextButton} from "../../components/common/TextButton.tsx";
 import {updateProfileImage, updateUsername} from "../../common/apis/member.tsx";
 import {useNavigate} from "react-router-dom";
+import ProfileImageCircle from "../../components/common/ProfileImageCircle.tsx";
 
 function ProfileSettingPage() {
 
@@ -85,12 +86,7 @@ function ProfileSettingPage() {
                         {isImageEdit && image
                             ? <img className="border border-gray-300 size-32 rounded-full group-hover:brightness-50"
                                    src={image} alt="Edit Profile Image"/>
-                            : (loginState.profileUrl
-                                ?
-                                <img className="border border-gray-300 size-32 rounded-full group-hover:brightness-50"
-                                     src={loginState.profileUrl} alt="Profile Image"/>
-                                : <MdOutlinePerson
-                                    className="border border-gray-300 size-32 rounded-full group-hover:brightness-50 text-gray-400"/>)}
+                            : <ProfileImageCircle profileUrl={loginState.profileUrl} size="lg" addStyle="!border-gray-300 group-hover:brightness-50 border !size-32"/>}
                         <div className="absolute size-32 inset-0 flex justify-center items-center">
                             <input
                                 type="file"
@@ -99,7 +95,7 @@ function ProfileSettingPage() {
                                 ref={fileInputRef}
                                 hidden/>
                             <MdOutlineEdit
-                                className="size-10 opacity-0 rounded-full border group-hover:opacity-100 hover:text-gray-400 hover:cursor-pointer"
+                                className="size-10 p-1 opacity-0 rounded-full border bg-white group-hover:opacity-100 hover:brightness-50 hover:cursor-pointer"
                                 onClick={handleImageEdit}>
                             </MdOutlineEdit>
                         </div>

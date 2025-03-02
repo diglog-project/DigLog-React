@@ -9,13 +9,22 @@ import {FolderType} from "../../common/types/blog.tsx";
 import BlogSideBar from "../../components/blog/BlogSideBar.tsx";
 import IconButton from "../../components/common/IconButton.tsx";
 import {PageResponse} from "../../common/types/common.tsx";
+import {getMemberPosts} from "../../common/apis/blog.tsx";
+import {PostResponse} from "../../common/types/post.tsx";
 
 function BlogPage() {
 
+    const navigate = useNavigate();
     const {username} = useParams();
 
     const [page, setPage] = useState(0);
-    const [pageInfo, setPageInfo] = useState<PageResponse>({number: 0, size: 5, totalElements: 53, totalPages: 11});
+    const [pageInfo, setPageInfo] = useState<PageResponse>({
+        number: 0,
+        size: 3,
+        totalElements: 0,
+        totalPages: 0
+    });
+    const [posts, setPosts] = useState<PostResponse[]>([]);
     const folderData: FolderType[] = [
         {
             id: crypto.randomUUID(),
@@ -119,7 +128,6 @@ function BlogPage() {
         };
     }, []);
 
-    const navigate = useNavigate();
     useEffect(() => {
         navigate(`/blog/${username}?folder=${selectedFolder?.id || ""}`);
     }, [selectedFolder]);
@@ -136,10 +144,28 @@ function BlogPage() {
         };
     }, [isOpen]);
 
+    useEffect(() => {
+        if (username === undefined) {
+            return;
+        }
+
+        getMemberPosts({
+            username: username,
+            folderId: null,
+            page: page,
+            size: pageInfo.size,
+        })
+            .then((res) => {
+                setPosts(res.data.content);
+                setPageInfo(res.data.page);
+            })
+            .catch(error => error.response.data.message);
+    }, [username, page]);
+
     return (
         <BasicLayout>
             <div
-                className={`${(isOpen) ? "opacity-50 backdrop-blur-sm z-10 overflow-y-hidden" : "z-10"} flex flex-col`}>
+                className={`${(isOpen) ? "opacity-50 backdrop-blur-sm z-10 overflow-y-hidden" : "z-10"} w-full flex flex-col`}>
                 <div className="flex justify-between items-center text-2xl font-jalnan px-4 pb-4">
                     <div>{username}의 블로그</div>
                     <IconButton
@@ -149,22 +175,15 @@ function BlogPage() {
                 </div>
                 <div className="grid lg:grid-cols-3">
                     <div className="lg:col-span-2 flex flex-col gap-y-4 p-4 lg:border-r border-r-gray-200">
-                        {[Array.from({length: 3}).map(() => (
+                        {posts.map((post) => (
                             <PostCard
-                                key={faker.number.int().toString()}
-                                id={faker.number.int().toString()}
-                                title={faker.lorem.sentence()}
-                                content={`${faker.lorem.paragraphs()}<img src=${faker.image.url({
-                                    width: 320,
-                                    height: 320
-                                })}/>`}
-                                username={username || faker.animal.cat()}
-                                tags={[{
-                                    id: crypto.randomUUID(),
-                                    name: faker.word.sample()
-                                }, {id: crypto.randomUUID(), name: faker.word.sample()}]}
-                                createdAt={new Date()}/>
-                        ))]}
+                                key={post.id}
+                                post={post}/>
+                        ))}
+                        {posts.length === 0 &&
+                            <div className="mt-8 text-center text-gray-600">
+                                작성된 게시글이 없습니다.
+                            </div>}
                         <PaginationButton
                             pageInfo={pageInfo} setPage={setPage}/>
                     </div>

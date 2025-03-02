@@ -78,7 +78,7 @@ function WritePage() {
             .then(() => {
                 alert("작성되었습니다.");
                 setExitPage(true);
-                navigate(`/blog/${loginState.username}username`);
+                navigate(`/blog/${loginState.username}`);
             })
             .catch((error) => alert(error.response.data.message))
             .finally(() => setLoading(false));
@@ -105,7 +105,7 @@ function WritePage() {
             .then(() => {
                 alert("수정되었습니다.");
                 setExitPage(true);
-                navigate(`/blog/${loginState.username}username`);
+                navigate(`/blog/${loginState.username}`);
             })
             .catch((error) => alert(error.response.data.message))
             .finally(() => setLoading(false));

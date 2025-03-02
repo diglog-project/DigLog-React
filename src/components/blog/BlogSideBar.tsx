@@ -5,6 +5,7 @@ import {faker} from "@faker-js/faker/locale/ko";
 import {OutlineLink} from "../common/OutlineButton.tsx";
 import BlogTagCard from "./BlogTagCard.tsx";
 import {getFolderTitle} from "../../common/util/string.tsx";
+import ProfileImageCircle from "../common/ProfileImageCircle.tsx";
 
 function BlogSideBar({folders, username, addTag, setSelectedFolder, bgColor, side}: {
     folders: FolderType[],
@@ -20,8 +21,7 @@ function BlogSideBar({folders, username, addTag, setSelectedFolder, bgColor, sid
     return (
         <div className={`${bgColor} ${side && "h-screen overflow-y-scroll"}`}>
             <div className="flex flex-col justify-start items-center py-4 gap-4 z-200">
-                <img className="border border-gray-300 size-32 rounded-full"
-                     src={faker.image.avatar()} alt="username"/>
+                <ProfileImageCircle profileUrl={loginState.profileUrl} size="lg"/>
                 <div className="flex justify-center items-center text-2xl font-black">
                     {username}
                 </div>
