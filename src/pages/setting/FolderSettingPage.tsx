@@ -1,143 +1,44 @@
-import {faker} from "@faker-js/faker/locale/ko";
 import {useEffect, useRef, useState} from "react";
-import {FolderResponse, FolderType, toFolderRequestList, toFolderTypeList} from "../../common/types/blog.tsx";
+import {FolderType, toFolderRequestList, toFolderTypeList} from "../../common/types/blog.tsx";
 import {FillButton} from "../../components/common/FillButton.tsx";
 import ModalLayout from "../../layout/ModalLayout.tsx";
 import {DragEndEvent} from "@dnd-kit/core";
 import FolderCardList from "../../components/folder/FolderCardList.tsx";
 import {arrayMove} from "@dnd-kit/sortable";
 import FolderSelectBox from "../../components/folder/FolderSelectBox.tsx";
+import {saveAndUpdateFolder} from "../../common/apis/blog.tsx";
+import {useNavigate} from "react-router-dom";
 
 function FolderSettingPage() {
 
-    const idList = Array.from({length: 17}).map(() => crypto.randomUUID());
-
-    const folderData: FolderResponse[] = [
-        {
-            folderId: idList[0],
-            title: "DigLog의 블로그",
-            depth: 0,
-            orderIndex: 0,
-            parentFolderId: null,
-        },
-        {
-            folderId: idList[1],
-            title: faker.lorem.words(),
-            depth: 1,
-            orderIndex: 1,
-            parentFolderId: idList[0],
-        },
-        {
-            folderId: idList[2],
-            title: faker.lorem.words(),
-            depth: 2,
-            orderIndex: 2,
-            parentFolderId: idList[1],
-        },
-        {
-            folderId: idList[3],
-            title: faker.lorem.words(),
-            depth: 2,
-            orderIndex: 3,
-            parentFolderId: idList[1],
-        },
-        {
-            folderId: idList[4],
-            title: faker.lorem.words(),
-            depth: 0,
-            orderIndex: 4,
-            parentFolderId: null,
-        },
-        {
-            folderId: idList[5],
-            title: faker.lorem.words(),
-            depth: 1,
-            orderIndex: 5,
-            parentFolderId: idList[4],
-        },
-        {
-            folderId: idList[6],
-            title: faker.lorem.words(),
-            depth: 0,
-            orderIndex: 6,
-            parentFolderId: null,
-        },
-
-        {
-            folderId: idList[7],
-            title: faker.lorem.words(),
-            depth: 1,
-            orderIndex: 7,
-            parentFolderId: idList[6],
-        },
-        {
-            folderId: idList[8],
-            title: faker.lorem.words(),
-            depth: 2,
-            orderIndex: 8,
-            parentFolderId: idList[7],
-        },
-        {
-            folderId: idList[9],
-            title: faker.lorem.words(),
-            depth: 2,
-            orderIndex: 9,
-            parentFolderId: idList[7],
-        },
-        {
-            folderId: idList[10],
-            title: faker.lorem.words(),
-            depth: 2,
-            orderIndex: 10,
-            parentFolderId: idList[7],
-        },
-        {
-            folderId: idList[11],
-            title: faker.lorem.words(),
-            depth: 1,
-            orderIndex: 11,
-            parentFolderId: idList[6],
-        },
-        {
-            folderId: idList[12],
-            title: faker.lorem.words(),
-            depth: 2,
-            orderIndex: 12,
-            parentFolderId: idList[11],
-        },
-        {
-            folderId: idList[13],
-            title: faker.lorem.words(),
-            depth: 2,
-            orderIndex: 13,
-            parentFolderId: idList[11],
-        },
-    ];
+    const navigate = useNavigate();
 
     const [tempId, setTempId] = useState(0);
-    const [folders, setFolders] = useState<FolderType[]>(toFolderTypeList(folderData));
+    const [folders, setFolders] = useState<FolderType[]>(toFolderTypeList([]));
 
     const getTempId = () => {
         setTempId(prev => prev + 1);
         return `temp${tempId}`;
     }
 
-    const addFolder = (parentFolder: FolderType | null, title: string) => {
+    const addFolder = (parentFolder: FolderType | null) => {
+        const tempTitle = `폴더_${crypto.randomUUID().substring(0, 4)}`;
+
         if (parentFolder === null) {
             const tempId = getTempId();
-            setFolders([...folders, {id: tempId, title: title, subFolders: []}]);
-            setEditFolderTitle(title);
+            setFolders([...folders, {id: tempId, title: tempTitle, subFolders: []}]);
+            setEditFolderTitle("");
             setEditFolderId(tempId);
             return;
         }
 
-        setFolders(prevFolders => getAddFolderList(prevFolders, parentFolder.id, title));
+        setFolders(prevFolders => getAddFolderList(prevFolders, parentFolder.id, tempTitle));
     }
     const getAddFolderList = (folders: FolderType[], id: string, title: string) => {
         return folders.map((folder: FolderType): FolderType => {
             if (folder.id === id) {
                 const tempId = getTempId();
-                setEditFolderTitle(title);
+                setEditFolderTitle("");
                 setEditFolderId(tempId);
                 return {...folder, subFolders: [...folder.subFolders, {id: tempId, title: title, subFolders: []}]};
             } else if (folder.subFolders.length > 0) {
@@ -265,7 +166,7 @@ function FolderSettingPage() {
         if (folders.length === 0) return 0;
 
         const depths = folders.map(folder => 1 + calculateMaxDepth(folder.subFolders));
-        return Math.max(...depths); // 최대 깊이 반환
+        return Math.max(...depths);
     };
     // 폴더의 현재 깊이
     const getFolderDepth = (folders: FolderType[], targetId: string, currentDepth: number = 1): number | null => {
@@ -287,13 +188,34 @@ function FolderSettingPage() {
         if (editFolder.title.trim() === "") {
             alert("폴더 이름을 입력해주세요.");
             return;
-        } else if (folders.findIndex(folder => folder.title === editFolderTitle.trim()) !== -1) {
+        }
+
+        const handleFolders = getHandleFolders(folders, editFolder.id);
+        console.log("handleFolders", handleFolders);
+        console.log("targetId", editFolder.id);
+        if (handleFolders.findIndex(folder => folder.title === editFolderTitle.trim()) !== -1) {
             alert("중복된 폴더 이름입니다.");
             return;
         }
 
         setFolders(prevFolders => getEditFolderList(prevFolders, editFolder.id, editFolder.title));
         setEditFolderId("");
+    }
+    const getHandleFolders = (folders: FolderType[], targetId: string): FolderType[] => {
+        for (const folder of folders) {
+            if (folder.id === targetId) {
+                return folders;
+            }
+
+            if (folder.subFolders) {
+                const subResult = getHandleFolders(folder.subFolders, targetId);
+                if (subResult.length > 0) {
+                    return subResult;
+                }
+            }
+        }
+
+        return [];
     }
     const getEditFolderList = (folders: FolderType[], id: string, title: string) => {
         return folders.map((folder: FolderType): FolderType => {
@@ -305,7 +227,6 @@ function FolderSettingPage() {
             return folder;
         })
     }
-
 
     const handleDelete = (deleteFolder: FolderType) => {
         if (deleteFolder.subFolders.length > 0) {
@@ -333,9 +254,13 @@ function FolderSettingPage() {
             return;
         }
 
-        console.log(toFolderRequestList(folders));
-
-        alert("변경사항이 저장되었습니다.");
+        saveAndUpdateFolder(toFolderRequestList(folders))
+            .then((res) => {
+                console.log(res);
+                alert("변경사항이 저장되었습니다.");
+                navigate(0);
+            })
+            .catch(error => alert(error.response.data.message));
     }
 
     const modalRef = useRef<HTMLDivElement | null>(null);
@@ -372,7 +297,7 @@ function FolderSettingPage() {
                 setOpenMoveModal={setOpenMoveModal}
                 setSelectedFolder={setSelectedFolder}/>
             <button className="w-full border border-gray-400 h-12 px-4 my-4 text-sm hover:cursor-pointer"
-                    onClick={() => addFolder(null, `폴더_${crypto.randomUUID().substring(0, 4)}`)}>
+                    onClick={() => addFolder(null)}>
                 폴더 추가
             </button>
             <div className="flex justify-end">
