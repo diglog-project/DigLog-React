@@ -28,7 +28,7 @@ function FolderCardList({
     setEditFolderId: (editFolderId: string) => void,
     setEditFolderTitle: (editFolderTitle: string) => void,
     handleEdit: (editFolder: FolderType) => void,
-    addFolder: (targetFolder: FolderType, editTitle: string) => void,
+    addFolder: (targetFolder: FolderType) => void,
     handleOnDragEnd: (event: DragEndEvent) => void,
     handleDelete: (deleteFolder: FolderType) => void,
     setOpenMoveModal: (openMoveModal: boolean) => void,
@@ -80,7 +80,7 @@ function FolderCard({
     setEditFolderId: (editFolderId: string) => void,
     setEditFolderTitle: (editFolderTitle: string) => void,
     handleEdit: (editFolder: FolderType) => void,
-    addFolder: (targetFolder: FolderType, editTitle: string) => void,
+    addFolder: (targetFolder: FolderType) => void,
     handleOnDragEnd: (event: DragEndEvent) => void,
     handleDelete: (deleteFolder: FolderType) => void,
     setOpenMoveModal: (openMoveModal: boolean) => void,
@@ -125,7 +125,7 @@ function FolderCard({
                         <div className="flex justify-end items-center">
                             {depth !== 2 &&
                                 <TextButton text={"추가"}
-                                            onClick={() => addFolder(folder, `폴더_${crypto.randomUUID().substring(0, 4)}`)}
+                                            onClick={() => addFolder(folder)}
                                             addStyle={"text-xs hover:text-lime-600"}/>
                             }
                             <TextButton text={"수정"} onClick={() => {
