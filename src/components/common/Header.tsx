@@ -6,7 +6,7 @@ import {TextLink} from "./TextButton.tsx";
 import {MdOutlineSearch} from "react-icons/md";
 import IconButton from "./IconButton.tsx";
 import {getProfile, logoutApi} from "../../common/apis/member.tsx";
-import {login, logout} from "../../common/slices/loginSlice.tsx";
+import {logout, setProfile} from "../../common/slices/loginSlice.tsx";
 import ProfileImageCircle from "./ProfileImageCircle.tsx";
 
 function Header() {
@@ -21,13 +21,12 @@ function Header() {
     useEffect(() => {
         getProfile()
             .then(res => {
-                dispatch(login({
-                    ...loginState,
+                dispatch(setProfile({
                     email: res.data.email,
                     username: res.data.username,
                     profileUrl: res.data.profileUrl,
                 }));
-            })
+            });
     }, []);
 
     const handleDropDown = () => {

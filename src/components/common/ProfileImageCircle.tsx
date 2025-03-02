@@ -17,7 +17,6 @@ function ProfileImageCircle({profileUrl, size, onClick, addStyle}: {
         iconSize += "6";
     }
 
-
     if (profileUrl) {
         return <img className={`${imageSize} ${addStyle} rounded-full border border-gray-200 hover:cursor-pointer`}
                     onClick={onClick}

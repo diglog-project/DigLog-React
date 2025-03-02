@@ -1,7 +1,7 @@
 import BasicLayout from "../../layout/BasicLayout.tsx";
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {handleKakaoLogin, loginApi} from "../../common/apis/member.tsx";
 import {login} from "../../common/slices/loginSlice.tsx";
 import LoginButton from "../../components/member/LoginButton.tsx";
@@ -9,8 +9,11 @@ import LoginTextField from "../../components/member/LoginTextField.tsx";
 import {checkEmail} from "../../common/util/regex.tsx";
 import * as React from "react";
 import {TextLink} from "../../components/common/TextButton.tsx";
+import {RootState} from "../../store.tsx";
 
 function LoginPage() {
+
+    const loginState = useSelector((state: RootState) => state.loginSlice);
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -21,6 +24,7 @@ function LoginPage() {
         loginApi(loginInfo.email, loginInfo.password)
             .then(res => {
                 dispatch(login({
+                    ...loginState,
                     email: res.data.email,
                     roles: res.data.roles,
                     username: res.data.username,
