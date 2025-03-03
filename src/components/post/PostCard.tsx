@@ -4,16 +4,16 @@ import DOMPurify from "dompurify";
 import {MdImage} from "react-icons/md";
 import {dateToKorean} from "../../common/util/date.tsx";
 import {Link} from "react-router-dom";
-import {FaRegComment, FaRegHeart} from "react-icons/fa6";
+import {FaRegHeart} from "react-icons/fa6";
 
-function PostCard({post}: {post: PostResponse}) {
+function PostCard({post}: { post: PostResponse }) {
 
     const safeContent = DOMPurify.sanitize(post.content);
     const url = getImgSrc(safeContent);
 
     return (
         <div className="mx-auto h-96 w-full">
-            <Link to={`/post/${post.id}`} className="rounded-xl overflow-hidden block">
+            <Link to={`/post/${post.id}`} className="rounded-xl overflow-hidden block" target="_blank">
                 {(url)
                     ? <img className="w-full h-52 object-cover
                      transform transition-transform duration-300 ease-out hover:scale-105"
@@ -37,10 +37,6 @@ function PostCard({post}: {post: PostResponse}) {
                         <div className="flex items-center gap-x-1.5">
                             <FaRegHeart className="size-3"/>
                             <p className="text-gray-900">20</p>
-                        </div>
-                        <div className="flex items-center gap-x-1">
-                            <FaRegComment className="size-3"/>
-                            <p className="text-gray-900">10</p>
                         </div>
                     </div>
                 </div>

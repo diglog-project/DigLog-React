@@ -74,7 +74,7 @@ function Header() {
                 <IconButton
                     icon={<MdOutlineSearch
                         className="size-5"/>}
-                    onClick={() => navigate("/search")}/>
+                    onClick={() => navigate("/search?word=&option=TITLE&sort=createdAt&isDescending=false&tab=post")}/>
                 {loginState.isLogin
                     ? <div ref={dashboardRef}>
                         <div

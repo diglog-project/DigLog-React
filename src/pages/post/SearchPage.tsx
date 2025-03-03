@@ -3,50 +3,86 @@ import {MdArrowDropDown, MdOutlineClear, MdOutlineSearch} from "react-icons/md";
 import {Ref, useEffect, useRef, useState} from "react";
 import * as React from "react";
 import PostCard from "../../components/post/PostCard.tsx";
-import {faker} from "@faker-js/faker/locale/ko";
 import {Link, useSearchParams} from "react-router-dom";
 import {LoadMoreButton} from "../../components/common/FillButton.tsx";
-import {PostResponse} from "../../common/types/post.tsx";
+import {PostResponse, PostSearchRequest} from "../../common/types/post.tsx";
 import {PageResponse} from "../../common/types/common.tsx";
 import {searchPost} from "../../common/apis/post.tsx";
+import {searchProfile} from "../../common/apis/member.tsx";
+import {MemberProfileSearchResponse} from "../../common/types/member.tsx";
+import ProfileImageCircle from "../../components/common/ProfileImageCircle.tsx";
 
 function SearchPage() {
 
     const optionRef = useRef<HTMLDivElement | null>(null);
-    const sortRef = useRef<HTMLDivElement | null>(null);
+    const orderRef = useRef<HTMLDivElement | null>(null);
 
     const [openOption, setOpenOption] = useState(false);
-    const [openSort, setOpenSort] = useState(false);
+    const [openOrder, setOpenOrder] = useState(false);
 
     const [posts, setPosts] = useState<PostResponse[]>([]);
+    const [blogs, setBlogs] = useState<MemberProfileSearchResponse[]>([]);
     const [trigger, setTrigger] = useState(false);
-    const [page, setPage] = useState(0);
-    const [pageInfo, setPageInfo] = useState<PageResponse>({number: 0, size: 120, totalPages: 0, totalElements: 0});
+    const [refresh, setRefresh] = useState(true);
+    const [postPage, setPostPage] = useState(0);
+    const [blogPage, setBlogPage] = useState(0);
+    const pageSize = 1;
+    const [postPageInfo, setPostPageInfo] = useState<PageResponse>({
+        number: 0,
+        size: pageSize,
+        totalPages: 0,
+        totalElements: 0
+    });
+    const [blogPageInfo, setBlogPageInfo] = useState<PageResponse>({
+        number: 0,
+        size: pageSize,
+        totalPages: 0,
+        totalElements: 0
+    });
 
-    const [searchParams, setSearchParams] = useSearchParams({"word": "", "option": "ALL", "sort": "createdAt", "tab": "post"});
-    const [searchWord, setSearchWord] = useState<string>(searchParams.get("word") || "");
-    const [option, setOption] = useState<string>(searchParams.get("option") || "ALL");
-    const [sort, setSort] = useState<string>(searchParams.get("sort") || "createdAt");
-    const [selectedTab, setSelectedTab] = useState<string>(searchParams.get("tab") || "post");
+    const [searchParams, setSearchParams] = useSearchParams({
+        "keyword": "",
+        "option": "ALL",
+        "sort": "createdAt",
+        "isDescending": "true",
+        "tab": "post"
+    });
+    const [searchRequest, setSearchRequest] = useState<PostSearchRequest>({
+        keyword: searchParams.get("keyword") || "",
+        option: searchParams.get("option") || "ALL",
+        sorts: [searchParams.get("sort") || "createdAt"],
+        page: 0,
+        size: pageSize,
+        isDescending: searchParams.get("isDescending") ? searchParams.get("isDescending") === "true" : true,
+    });
+    const [selectedTab, setSelectedTab] = useState(searchParams.get("tab") || "post");
 
-    const handlePage = () => {
-        setPage(prev => prev + 1);
-        setTrigger(prev => !prev);
+    const handlePostPage = () => {
+        setPostPage(prev => prev + 1);
+    }
+    const handleBlogPage = () => {
+        setBlogPage(prev => prev + 1);
     }
 
     const handleOpenOption = () => {
         setOpenOption(cur => !cur);
     }
-    const handleOpenSort = () => {
-        setOpenSort(cur => !cur);
+    const handleOpenOrder = () => {
+        setOpenOrder(cur => !cur);
+    }
+    const handleSetOption = (menu: MenuItem) => {
+        setSearchRequest({...searchRequest, option: menu.value});
+    }
+    const handleSetOrder = (menu: MenuItem) => {
+        setSearchRequest({...searchRequest, isDescending: (menu.value === "true")});
     }
 
     const handleClickOutside = (event: MouseEvent) => {
         if (optionRef.current && !optionRef.current.contains(event.target as Node)) {
             setOpenOption(false);
         }
-        if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
-            setOpenSort(false);
+        if (orderRef.current && !orderRef.current.contains(event.target as Node)) {
+            setOpenOrder(false);
         }
     };
 
@@ -54,31 +90,18 @@ function SearchPage() {
         if (event.key !== "Enter") {
             return;
         }
-        handleSearchWord();
+
+        handleSearch();
+    }
+    const handleSearch = () => {
+        setPosts([]);
+        setPostPage(0);
+
+        setBlogs([]);
+        setBlogPage(0);
+
         setTrigger(prev => !prev);
     }
-
-    const handleSearchWord = () => {
-        if (searchWord === "") {
-            return;
-        }
-
-        setSearchParams({
-            "word": searchWord,
-            "option": option,
-            "sort": sort,
-            "tab": selectedTab,
-        });
-    }
-
-    useEffect(() => {
-        setSearchParams({
-            "word": searchWord,
-            "option": option,
-            "sort": sort,
-            "tab": selectedTab,
-        });
-    }, [option, sort, selectedTab]);
 
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
@@ -88,24 +111,85 @@ function SearchPage() {
     }, []);
 
     useEffect(() => {
-        if (searchWord === "") {
+        setSearchParams({
+            "keyword": searchRequest.keyword,
+            "option": searchRequest.option,
+            "sort": searchRequest.sorts[0],
+            "isDescending": searchRequest.isDescending.toString(),
+            "tab": selectedTab,
+        });
+
+        if (searchRequest.keyword === "") {
             return;
         }
 
+        setPostPage(0);
+        setPosts([]);
+        setTrigger(prev => !prev);
+    }, [searchRequest.option, searchRequest.isDescending]);
+
+    useEffect(() => {
+        setSearchParams({
+            "keyword": searchRequest.keyword,
+            "option": searchRequest.option,
+            "sort": searchRequest.sorts[0],
+            "isDescending": searchRequest.isDescending.toString(),
+            "tab": selectedTab,
+        });
+    }, [selectedTab]);
+
+    const handleSearchPosts = () => {
         searchPost({
-            keyword: searchWord,
-            option: "ALL",
-            sorts: ["createdAt"],
-            page: page,
-            size: pageInfo.size,
-            isDescending: true,
+            keyword: searchRequest.keyword,
+            option: searchRequest.option,
+            sorts: searchRequest.sorts,
+            page: postPage,
+            size: pageSize,
+            isDescending: searchRequest.isDescending,
         })
             .then(res => {
                 setPosts(prev => [...prev, ...res.data.content]);
-                setPageInfo(res.data.page);
+                setPostPageInfo(res.data.page);
             })
             .catch(error => alert(error.response.data.message));
+    }
+
+    const handleSearchBlogs = () => {
+        searchProfile({
+            username: searchRequest.keyword,
+            page: blogPage,
+            size: pageSize,
+        })
+            .then((res) => {
+                setBlogs(prev => [...prev, ...res.data.content]);
+                setBlogPageInfo(res.data.page);
+            })
+            .catch(error => alert(error.response.data.message));
+    }
+
+    useEffect(() => {
+        if (refresh) {
+            setRefresh(false);
+            return;
+        }
+        if (searchRequest.keyword === "") {
+            return;
+        }
+        handleSearchPosts();
+        handleSearchBlogs();
     }, [trigger]);
+
+    useEffect(() => {
+        if (postPage >= 1) {
+            handleSearchPosts();
+        }
+    }, [postPage]);
+
+    useEffect(() => {
+        if (blogPage >= 1) {
+            handleSearchBlogs();
+        }
+    }, [blogPage]);
 
     return (
         <BasicLayout>
@@ -113,49 +197,65 @@ function SearchPage() {
                 <div className="w-full flex flex-col max-w-xl mx-auto">
                     <div className="flex">
                         <div className="w-full relative flex justify-between items-center">
-                            <input value={searchWord}
-                                   onChange={(e) => setSearchWord(e.target.value)}
+                            <input value={searchRequest.keyword}
+                                   onChange={(e) => setSearchRequest({...searchRequest, keyword: e.target.value})}
                                    placeholder={"검색어를 입력해주세요."}
                                    className="w-full block mt-0.5 p-3 mr-4 font-jalnan text-xl text-gray-900 border-b-2 border-white focus:outline-none focus:border-black"
                                    onKeyDown={handleSearchEnter}/>
                             <button
-                                className={`${searchWord === "" ? "hidden" : ""} absolute right-16 rounded-full hover:cursor-pointer hover:bg-gray-1000`}
-                                onClick={() => setSearchWord("")}>
+                                className={`${searchRequest.keyword === "" ? "hidden" : ""} absolute right-16 rounded-full hover:cursor-pointer hover:bg-gray-1000`}
+                                onClick={() => setSearchRequest({...searchRequest, keyword: ""})}>
                                 <MdOutlineClear className="size-6 p-1"/>
                             </button>
                             <button className="hover:cursor-pointer"
-                                    onClick={handleSearchWord}>
+                                    onClick={handleSearch}>
                                 <MdOutlineSearch className="size-7 text-gray-600 hover:text-gray-900"/>
                             </button>
                         </div>
                     </div>
                 </div>
                 <div className="w-full max-w-4xl mx-auto flex flex-col gap-y-2">
-                    <div className="flex justify-between items-center">
-                        <div className="text-lg"><span className="font-bold">{pageInfo.totalElements}</span>개의 검색결과
+                    <div className="flex justify-between items-center h-12">
+                        <div className="text-lg"><span className="font-bold">
+                            {selectedTab === "post" ? postPageInfo.totalElements : blogPageInfo.totalElements}
+                        </span>개의 검색결과
                         </div>
-                        <div className="flex items-center justify-end">
-                            <SearchMenu
-                                type={"option"}
-                                open={openOption}
-                                handleOpen={handleOpenOption}
-                                value={option}
-                                setValue={setOption}
-                                customRef={optionRef}/>
-                            <SearchMenu
-                                type={"sort"}
-                                open={openSort}
-                                handleOpen={handleOpenSort}
-                                value={sort}
-                                setValue={setSort}
-                                customRef={sortRef}/>
-                        </div>
+                        {selectedTab === "post" &&
+                            <div className="flex items-center justify-end">
+                                <SearchMenu
+                                    title={"검색 조건"}
+                                    menus={[
+                                        {key: "전체", value: "ALL"},
+                                        {key: "제목", value: "TITLE"},
+                                        {key: "태그", value: "TAG"},
+                                    ]}
+                                    setMenu={handleSetOption}
+                                    open={openOption}
+                                    handleOpen={handleOpenOption}
+                                    value={searchRequest.option}
+                                    customRef={optionRef}/>
+                                <SearchMenu
+                                    title={"정렬 조건"}
+                                    menus={[
+                                        {key: "최신순", value: "true"},
+                                        {key: "오래된순", value: "false"},
+                                    ]}
+                                    setMenu={handleSetOrder}
+                                    open={openOrder}
+                                    handleOpen={handleOpenOrder}
+                                    value={searchRequest.isDescending.toString()}
+                                    customRef={orderRef}/>
+                            </div>
+                        }
                     </div>
                     <SearchTab selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>
                     <SearchResults
                         posts={posts}
-                        pageInfo={pageInfo}
-                        handlePage={handlePage}
+                        blogs={blogs}
+                        postPageInfo={postPageInfo}
+                        blogPageInfo={blogPageInfo}
+                        handlePostPage={handlePostPage}
+                        handleBlogPage={handleBlogPage}
                         selectedTab={selectedTab}/>
                 </div>
             </div>
@@ -168,17 +268,20 @@ function SearchTab({selectedTab, setSelectedTab}: {
     setSelectedTab: (tab: string) => void,
 }) {
 
-    const tabs = ["게시글", "블로그"];
+    const tabs = [
+        {key: "게시글", value: "post"},
+        {key: "블로그", value: "blog"},
+    ];
 
     return (
         <div
             className="text-sm font-bold text-center text-gray-500">
             <ul className="flex flex-wrap">
                 {tabs.map((tab) => (
-                    <li key={tab} className="me-2">
-                        <button onClick={() => setSelectedTab(tab)}
-                                className={`${(selectedTab === tab) ? "border-b-2 text-lime-400 border-lime-400" : "hover:border-b-2 hover:text-lime-400 hover:border-lime-400"} inline-block p-4 hover:cursor-pointer`}>
-                            {tab}
+                    <li key={tab.key} className="me-2">
+                        <button onClick={() => setSelectedTab(tab.value)}
+                                className={`${(selectedTab === tab.value) ? "border-b-2 text-lime-400 border-lime-400" : "hover:border-b-2 hover:text-lime-400 hover:border-lime-400"} inline-block p-4 hover:cursor-pointer`}>
+                            {tab.key}
                         </button>
                     </li>
                 ))}
@@ -187,14 +290,17 @@ function SearchTab({selectedTab, setSelectedTab}: {
     );
 }
 
-function SearchResults({posts, pageInfo, handlePage, selectedTab}: {
+function SearchResults({posts, blogs, postPageInfo, blogPageInfo, handlePostPage, handleBlogPage, selectedTab}: {
     posts: PostResponse[],
-    pageInfo: PageResponse,
-    handlePage: () => void,
+    blogs: MemberProfileSearchResponse[],
+    postPageInfo: PageResponse,
+    blogPageInfo: PageResponse,
+    handlePostPage: () => void,
+    handleBlogPage: () => void,
     selectedTab: string
 }) {
 
-    if (selectedTab === "게시글") {
+    if (selectedTab === "post") {
         return (
             <div className="my-2">
                 {posts.map((post) => (
@@ -202,29 +308,28 @@ function SearchResults({posts, pageInfo, handlePage, selectedTab}: {
                         key={post.id}
                         post={post}/>
                 ))}
-                {pageInfo.number + 1 < pageInfo.totalPages &&
+                {postPageInfo.number + 1 < postPageInfo.totalPages &&
                     <LoadMoreButton
-                        onClick={handlePage}
+                        onClick={handlePostPage}
                         addStyle={"w-full"}/>}
             </div>
         );
-    } else if (selectedTab === "블로그") {
+    } else if (selectedTab === "blog") {
         return (
             <div className="flex flex-col divide-y divide-gray-200 z-0">
-                {(Array.from({length: 5}).map(() => (
-                    <Link key={faker.animal.dog()} to={`/blog/${faker.animal.dog()}`}
+                {blogs.map((blog) => (
+                    <Link key={blog.username} to={`/blog/${blog.username}`} target="_blank"
                           className="flex justify-start items-center px-4 py-6 gap-8 divide-y divide-gray-200 hover:bg-gray-100 shadow-gray-400 duration-300 ease-out">
-                        <img className="border border-gray-300 size-32 rounded-full"
-                             src={faker.image.avatar()} alt="username"/>
+                        <ProfileImageCircle profileUrl={blog.profileUrl || ""} size="lg"/>
                         <div className="flex flex-col gap-y-1 justify-center items-start">
-                            <div className="text-2xl font-black">{faker.animal.dog()}</div>
-                            <div className="text-gray-600">{faker.animal.dog()}</div>
-                            <div className="text-gray-600">{faker.animal.dog()}</div>
+                            <div className="text-2xl font-black">{blog.username}</div>
                         </div>
                     </Link>
-                )))}
-                <LoadMoreButton onClick={() => {
-                }}/>
+                ))}
+                {blogPageInfo.number + 1 < blogPageInfo.totalPages &&
+                    <LoadMoreButton
+                        onClick={handleBlogPage}
+                        addStyle={"w-full"}/>}
             </div>
         );
     }
@@ -232,24 +337,20 @@ function SearchResults({posts, pageInfo, handlePage, selectedTab}: {
     return <></>;
 }
 
-function SearchMenu({type, open, handleOpen, value, setValue, customRef}: {
-    type: string,
+interface MenuItem {
+    key: string,
+    value: string,
+}
+
+function SearchMenu({title, menus, setMenu, value, open, handleOpen, customRef}: {
+    title: string,
+    menus: MenuItem[],
+    setMenu: (menu: MenuItem) => void,
+    value: string,
     open: boolean,
     handleOpen: () => void,
-    value: string,
-    setValue: (newOption: string) => void,
     customRef: Ref<HTMLDivElement>,
 }) {
-
-    let title = "";
-    let searchMenuList: string[] = [];
-    if (type === "option") {
-        title = "검색 조건";
-        searchMenuList = ["전체", "제목", "태그"];
-    } else if (type === "sort") {
-        title = "정렬 조건";
-        searchMenuList = ["최신순", "오래된순"];
-    }
 
     return (
         <div ref={customRef} className="z-50">
@@ -260,14 +361,17 @@ function SearchMenu({type, open, handleOpen, value, setValue, customRef}: {
                         className="w-28 shrink-0 z-10 inline-flex justify-between items-center py-2.5 px-4 text-sm font-medium text-gray-900 hover:cursor-pointer"
                         onClick={handleOpen}
                     >
-                        {value}
+                        {menus.find(menuItem => menuItem.value === value)?.key}
                         <MdArrowDropDown className="size-4"/>
                     </button>
                     <div
                         className={`${(open) ? "" : "hidden"} absolute top-10 left-0 flex flex-col z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44`}>
                         <ul className="py-2 text-sm text-gray-700r">
-                            {searchMenuList.map((menu) => (
-                                <SortMenu key={menu} value={menu} current={value} setValue={setValue}
+                            {menus.map((menu) => (
+                                <SortMenu key={menu.value}
+                                          menu={menu}
+                                          setMenu={setMenu}
+                                          value={value}
                                           handleOpen={handleOpen}/>
                             ))}
                         </ul>
@@ -278,21 +382,21 @@ function SearchMenu({type, open, handleOpen, value, setValue, customRef}: {
     );
 }
 
-function SortMenu({value, current, setValue, handleOpen}: {
+function SortMenu({menu, setMenu, value, handleOpen}: {
+    menu: MenuItem,
+    setMenu: (menu: MenuItem) => void,
     value: string,
-    current: string,
-    setValue: (newSort: string) => void,
     handleOpen: () => void
 }) {
     return (
         <li>
             <button type="button"
                     onClick={() => {
-                        setValue(value);
+                        setMenu(menu);
                         handleOpen();
                     }}
-                    className={`${(value === current) ? "bg-gray-100" : ""} inline-flex w-full px-4 py-2 hover:bg-gray-200 hover:cursor-pointer`}>
-                {value}
+                    className={`${(value === menu.value) ? "bg-gray-100" : ""} inline-flex w-full px-4 py-2 hover:bg-gray-200 hover:cursor-pointer`}>
+                {menu.key}
             </button>
         </li>
     );

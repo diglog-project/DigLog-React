@@ -1,7 +1,7 @@
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store.tsx";
 import {MdOutlineEdit} from "react-icons/md";
-import {ChangeEvent, useRef, useState} from "react";
+import {ChangeEvent, useEffect, useRef, useState} from "react";
 import {FillButton} from "../../components/common/FillButton.tsx";
 import {setUsername} from "../../common/slices/loginSlice.tsx";
 import {TextButton} from "../../components/common/TextButton.tsx";
@@ -75,6 +75,13 @@ function ProfileSettingPage() {
             .catch((error) => alert(error.response.data.message));
     }
 
+    useEffect(() => {
+        if (!loginState.isLogin) {
+            alert("로그인이 필요한 페이지입니다.");
+            navigate("/login");
+        }
+    }, []);
+
     return (
         <div>
             <p className="font-semibold text-xl my-4">프로필 관리</p>
@@ -87,7 +94,7 @@ function ProfileSettingPage() {
                             ? <img className="border border-gray-300 size-32 rounded-full group-hover:brightness-50"
                                    src={image} alt="Edit Profile Image"/>
                             : <ProfileImageCircle profileUrl={loginState.profileUrl} size="lg" addStyle="!border-gray-300 group-hover:brightness-50 border !size-32"/>}
-                        <div className="absolute size-32 inset-0 flex justify-center items-center">
+                        <div className={`${!loginState.profileUrl && "top-1 left-1"} absolute size-32 inset-0 flex justify-center items-center`}>
                             <input
                                 type="file"
                                 accept="image/*"

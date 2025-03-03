@@ -132,8 +132,13 @@ function WritePage() {
         }
     );
 
-    // 새로고침 방지
     useEffect(() => {
+        if (!loginState.isLogin) {
+            alert("로그인이 필요한 페이지입니다.");
+            navigate("/login");
+        }
+
+        // 새로고침 방지
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
             event.preventDefault();
         };

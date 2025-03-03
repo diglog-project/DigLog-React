@@ -7,14 +7,14 @@ function ProfileImageCircle({profileUrl, size, onClick, addStyle}: {
     addStyle?: string,
 }) {
 
-    let imageSize = "size-";
-    let iconSize = "size-";
+    let imageSize = "";
+    let iconSize = "";
     if (size === "lg") {
-        imageSize += "32";
-        iconSize += "28";
+        imageSize = "size-32";
+        iconSize = "size-28";
     } else {
-        imageSize += "10";
-        iconSize += "6";
+        imageSize += "size-10";
+        iconSize += "size-6";
     }
 
     if (profileUrl) {
@@ -23,7 +23,7 @@ function ProfileImageCircle({profileUrl, size, onClick, addStyle}: {
                     src={profileUrl} alt="user_image"/>;
     }
 
-    return <MdOutlinePerson className={`${iconSize} ${addStyle} mx-auto text-gray-700 m-1 rounded-full hover:cursor-pointer`}
+    return <MdOutlinePerson className={`${iconSize} ${addStyle} text-gray-700 m-1 rounded-full hover:cursor-pointer`}
                             onClick={onClick}/>;
 }
 
