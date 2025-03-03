@@ -9,7 +9,7 @@ import {PostResponse, PostSearchRequest} from "../../common/types/post.tsx";
 import {PageResponse} from "../../common/types/common.tsx";
 import {searchPost} from "../../common/apis/post.tsx";
 import {searchProfile} from "../../common/apis/member.tsx";
-import {MemberProfileSearchResponse} from "../../common/types/member.tsx";
+import {MemberProfileResponse} from "../../common/types/member.tsx";
 import ProfileImageCircle from "../../components/common/ProfileImageCircle.tsx";
 
 function SearchPage() {
@@ -21,12 +21,12 @@ function SearchPage() {
     const [openOrder, setOpenOrder] = useState(false);
 
     const [posts, setPosts] = useState<PostResponse[]>([]);
-    const [blogs, setBlogs] = useState<MemberProfileSearchResponse[]>([]);
+    const [blogs, setBlogs] = useState<MemberProfileResponse[]>([]);
     const [trigger, setTrigger] = useState(false);
     const [refresh, setRefresh] = useState(true);
     const [postPage, setPostPage] = useState(0);
     const [blogPage, setBlogPage] = useState(0);
-    const pageSize = 1;
+    const pageSize = 10;
     const [postPageInfo, setPostPageInfo] = useState<PageResponse>({
         number: 0,
         size: pageSize,
@@ -292,7 +292,7 @@ function SearchTab({selectedTab, setSelectedTab}: {
 
 function SearchResults({posts, blogs, postPageInfo, blogPageInfo, handlePostPage, handleBlogPage, selectedTab}: {
     posts: PostResponse[],
-    blogs: MemberProfileSearchResponse[],
+    blogs: MemberProfileResponse[],
     postPageInfo: PageResponse,
     blogPageInfo: PageResponse,
     handlePostPage: () => void,
@@ -320,7 +320,7 @@ function SearchResults({posts, blogs, postPageInfo, blogPageInfo, handlePostPage
                 {blogs.map((blog) => (
                     <Link key={blog.username} to={`/blog/${blog.username}`}
                           className="flex justify-start items-center px-4 py-6 gap-8 divide-y divide-gray-200 hover:bg-gray-100 shadow-gray-400 duration-300 ease-out">
-                        <ProfileImageCircle profileUrl={blog.profileUrl || ""} size="lg"/>
+                        <ProfileImageCircle profileUrl={blog.profileUrl} size="lg"/>
                         <div className="flex flex-col gap-y-1 justify-center items-start">
                             <div className="text-2xl font-black">{blog.username}</div>
                         </div>

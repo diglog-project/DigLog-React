@@ -7,9 +7,10 @@ import BlogTagCard from "./BlogTagCard.tsx";
 import {getFolderTitle} from "../../common/util/string.tsx";
 import ProfileImageCircle from "../common/ProfileImageCircle.tsx";
 
-function BlogSideBar({folders, username, addTag, setSelectedFolder, bgColor, side}: {
+function BlogSideBar({folders, username, profileUrl, addTag, setSelectedFolder, bgColor, side}: {
     folders: FolderType[],
     username: string | undefined,
+    profileUrl: string | null,
     addTag: (tagName: string) => void,
     setSelectedFolder: (folder: FolderType) => void,
     bgColor?: string,
@@ -21,7 +22,7 @@ function BlogSideBar({folders, username, addTag, setSelectedFolder, bgColor, sid
     return (
         <div className={`${bgColor} ${side && "h-screen overflow-y-scroll"}`}>
             <div className="flex flex-col justify-start items-center py-4 gap-4 z-200">
-                <ProfileImageCircle profileUrl={loginState.profileUrl} size="lg"/>
+                <ProfileImageCircle profileUrl={profileUrl} size="lg"/>
                 <div className="flex justify-center items-center text-2xl font-black">
                     {username}
                 </div>

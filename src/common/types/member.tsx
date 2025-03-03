@@ -4,7 +4,7 @@ export interface MemberProfileSearchRequest {
     size: number,
 }
 
-export interface MemberProfileSearchResponse {
+export interface MemberProfileResponse {
     username: string,
     profileUrl: string | null,
 }
