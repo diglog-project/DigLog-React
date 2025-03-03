@@ -19,6 +19,10 @@ function Header() {
     const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
+        if (loginState.isLogin) {
+            return;
+        }
+
         getProfile()
             .then(res => {
                 dispatch(setProfile({

@@ -13,7 +13,7 @@ function PostCard({post}: { post: PostResponse }) {
 
     return (
         <div className="mx-auto h-96 w-full">
-            <Link to={`/post/${post.id}`} className="rounded-xl overflow-hidden block" target="_blank">
+            <Link to={`/post/${post.id}`} className="rounded-xl overflow-hidden block">
                 {(url)
                     ? <img className="w-full h-52 object-cover
                      transform transition-transform duration-300 ease-out hover:scale-105"
