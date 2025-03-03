@@ -1,4 +1,6 @@
 import axiosApi from "./AxiosApi.tsx";
+import {MemberProfileSearchRequest} from "../types/member.tsx";
+import {memberProfileSearchRequestToParameter} from "../util/url.tsx";
 
 export const sendMail = async (email: string) =>
     await axiosApi.post("/verify", {
@@ -46,3 +48,6 @@ export const updateProfileImage = async (image: File) => {
 
     return await axiosApi.post("/member/image", formData);
 }
+
+export const searchProfile = async (memberProfileSearchRequest: MemberProfileSearchRequest) =>
+    await axiosApi.get(`/member/profile/search${memberProfileSearchRequestToParameter(memberProfileSearchRequest)}`);

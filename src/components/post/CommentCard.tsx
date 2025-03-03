@@ -79,7 +79,7 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
                             {dateToKorean(comment.createdAt)}
                         </p>
                     </div>
-                    <p className="mt-4 text-gray-900 flex items-center gap-x-2">
+                    <div className="mt-4 text-gray-900 flex items-center gap-x-2">
                         {!showEditTextField &&
                             comment.taggedUsername &&
                             <span className="text-lime-700">
@@ -94,7 +94,7 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
                                 originalComment={comment}
                                 handleShowTextField={handleShowEdit}/>
                             : <div>{comment.content}</div>}
-                    </p>
+                    </div>
                     <div className="flex justify-between items-center">
                         {depth === 0 &&
                             <button

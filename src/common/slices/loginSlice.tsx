@@ -13,13 +13,13 @@ const loginSlice = createSlice({
     name: "loginSlice",
     initialState: initialState,
     reducers: {
-        login: (_, action) => {
+        login: (state, action) => {
             return {
+                ...state,
                 isLogin: !!action.payload.email,
                 accessToken: action.payload.accessToken,
                 email: action.payload.email,
                 username: action.payload.username,
-                profileUrl: action.payload.profileUrl,
                 roles: action.payload.roles,
             };
         },
@@ -32,9 +32,17 @@ const loginSlice = createSlice({
                 username: action.payload.username,
             };
         },
+        setProfile: (state, action) => {
+            return {
+                ...state,
+                email: action.payload.email,
+                username: action.payload.username,
+                profileUrl: action.payload.profileUrl,
+            };
+        }
     }
 });
 
-export const {login, logout, setUsername} = loginSlice.actions;
+export const {login, logout, setUsername, setProfile} = loginSlice.actions;
 
 export default loginSlice.reducer;

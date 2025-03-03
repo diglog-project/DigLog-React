@@ -35,7 +35,7 @@ axiosApi.interceptors.response.use(
                         username: refreshResponse.data.username,
                         roles: refreshResponse.data.roles,
                         accessToken: refreshResponse.headers.authorization,
-                    }))
+                    }));
                 } else {
                     return Promise.reject();
                 }
