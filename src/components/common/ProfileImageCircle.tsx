@@ -18,12 +18,12 @@ function ProfileImageCircle({profileUrl, size, onClick, addStyle}: {
     }
 
     if (profileUrl) {
-        return <img className={`${imageSize} ${addStyle} rounded-full border border-gray-200 hover:cursor-pointer`}
+        return <img className={`${imageSize} ${addStyle} rounded-full border border-gray-200 ${onClick && "hover:cursor-pointer"}`}
                     onClick={onClick}
                     src={profileUrl} alt="user_image"/>;
     }
 
-    return <MdOutlinePerson className={`${iconSize} ${addStyle} text-gray-700 m-1 rounded-full hover:cursor-pointer`}
+    return <MdOutlinePerson className={`${iconSize} ${addStyle} text-gray-700 m-1 rounded-full ${onClick && "hover:cursor-pointer"}`}
                             onClick={onClick}/>;
 }
 
