@@ -318,7 +318,7 @@ function SearchResults({posts, blogs, postPageInfo, blogPageInfo, handlePostPage
         return (
             <div className="flex flex-col divide-y divide-gray-200 z-0">
                 {blogs.map((blog) => (
-                    <Link key={blog.username} to={`/blog/${blog.username}`} target="_blank"
+                    <Link key={blog.username} to={`/blog/${blog.username}`}
                           className="flex justify-start items-center px-4 py-6 gap-8 divide-y divide-gray-200 hover:bg-gray-100 shadow-gray-400 duration-300 ease-out">
                         <ProfileImageCircle profileUrl={blog.profileUrl || ""} size="lg"/>
                         <div className="flex flex-col gap-y-1 justify-center items-start">
