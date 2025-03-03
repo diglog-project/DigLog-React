@@ -11,6 +11,8 @@ import IconButton from "../../components/common/IconButton.tsx";
 import {PageResponse} from "../../common/types/common.tsx";
 import {getMemberPosts} from "../../common/apis/blog.tsx";
 import {PostResponse} from "../../common/types/post.tsx";
+import {MemberProfileResponse} from "../../common/types/member.tsx";
+import {getProfileByUsername} from "../../common/apis/member.tsx";
 
 function BlogPage() {
 
@@ -25,6 +27,7 @@ function BlogPage() {
         totalPages: 0
     });
     const [posts, setPosts] = useState<PostResponse[]>([]);
+    const [member, setMember] = useState<MemberProfileResponse>({username: username || "", profileUrl: null});
     const folderData: FolderType[] = [
         {
             id: crypto.randomUUID(),
@@ -149,6 +152,12 @@ function BlogPage() {
             return;
         }
 
+        getProfileByUsername(username)
+            .then((res) => {
+                setMember(res.data);
+            })
+            .catch(error => alert(error.response.data.message));
+
         getMemberPosts({
             username: username,
             folderId: null,
@@ -191,6 +200,7 @@ function BlogPage() {
                         <BlogSideBar
                             folders={folders}
                             username={username}
+                            profileUrl={member.profileUrl}
                             addTag={addTag}
                             setSelectedFolder={setSelectedFolder}/>
                     </div>
@@ -206,6 +216,7 @@ function BlogPage() {
                 <BlogSideBar
                     folders={folders}
                     username={username}
+                    profileUrl={member.profileUrl}
                     addTag={addTag}
                     setSelectedFolder={setSelectedFolder}
                     bgColor={"bg-gray-50"}

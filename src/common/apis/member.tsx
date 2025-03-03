@@ -37,6 +37,9 @@ export const handleKakaoLogin = () =>
 export const getProfile = async () =>
     await axiosApi.get("/member/profile");
 
+export const getProfileByUsername = async (username: string) =>
+    await axiosApi.get(`/member/profile/${username}`);
+
 export const updateUsername = async (username: string) =>
     await axiosApi.post("/member/username", {
         username: username,

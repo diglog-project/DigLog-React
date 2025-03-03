@@ -1,7 +1,7 @@
 import {MdOutlinePerson} from "react-icons/md";
 
 function ProfileImageCircle({profileUrl, size, onClick, addStyle}: {
-    profileUrl: string,
+    profileUrl: string | null,
     size?: string,
     onClick?: () => void,
     addStyle?: string,
