@@ -203,7 +203,7 @@ function PostPage() {
                     <div className="flex flex-wrap justify-center items-center gap-4">
                         {post.tags.map(tag =>
                             <TagCard key={tag.id} tag={tag} onClick={() => {
-                                navigate(`/search?word=${tag.name}&option=태그`)
+                                navigate(`/search?keyword=${tag.name}&option=TAG&sort=createdAt&isDescending=true&tab=post`)
                             }}/>)}
                     </div>
                 </div>

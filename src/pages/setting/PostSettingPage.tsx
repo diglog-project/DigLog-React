@@ -58,6 +58,13 @@ function PostSettingPage() {
         return postIds.indexOf(id) > -1;
     }
 
+    const getTargetFolderId = (targetFolder : FolderType | null) => {
+        if (!targetFolder || targetFolder.id === "empty") {
+            return null;
+        }
+
+        return targetFolder.id;
+    }
     const submitPostFolderUpdate = () => {
         if (!confirm("변경사항을 저장하시겠습니까?")) {
             return;
@@ -65,7 +72,7 @@ function PostSettingPage() {
 
         updatePostFolder({
             postIds: postIds,
-            folderId: targetFolder?.id || null,
+            folderId: getTargetFolderId(targetFolder),
         })
             .then(() => {
                 alert("폴더가 수정되었습니다.");
@@ -149,6 +156,11 @@ function PostSettingPage() {
             },
         ];
         setFolders(folderData);
+        setFolders(prev => [{
+            id: "empty",
+            title: "폴더 없음",
+            subFolders: [],
+        }, ...prev]);
     }, [loginState, page]);
 
     return (
@@ -185,8 +197,8 @@ function PostSettingPage() {
                                           addStyle={"text-sm hover:text-lime-600"}/>
                             </div>}
                         {isFolderEdit &&
-                            <input type={"checkbox"}
-                                   className=""
+                            <input type="checkbox"
+                                   className="size-4"
                                    name={post.id}
                                    checked={handleCheckBox(post.id)}
                                    onChange={handleClickCheckBox}/>}

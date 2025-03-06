@@ -6,7 +6,7 @@ import {getFolderTitle} from "../../common/util/string.tsx";
 function FolderSelectBox({folders, depth = 0, selectedFolder, targetFolder, setTargetFolder, center}: {
     folders: FolderType[],
     depth?: number,
-    selectedFolder?: FolderType,
+    selectedFolder?: FolderType | null,
     targetFolder: FolderType | null,
     setTargetFolder: (folder: FolderType) => void,
     center?: boolean,
