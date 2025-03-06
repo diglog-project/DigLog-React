@@ -45,10 +45,6 @@ function PostPage() {
             return;
         }
 
-        if (!confirm("댓글을 등록하시겠습니까?")) {
-            return;
-        }
-
         if (parentCommentId !== null) {
             parentCommentId = findParentCommentId(comments, parentCommentId);
         }
@@ -83,10 +79,6 @@ function PostPage() {
         return null;
     }
     const handleUpdateComment = (content: string, taggedUsername: string | null, originalComment: CommentType | null) => {
-        if (!confirm("댓글을 수정하시겠습니까?")) {
-            return;
-        }
-
         if (!originalComment) {
             alert("업데이트 할 댓글이 존재하지 않습니다.");
             return;

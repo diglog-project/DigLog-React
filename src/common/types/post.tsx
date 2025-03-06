@@ -50,3 +50,7 @@ export interface TagResponse {
     name: string;
 }
 
+export interface PostFolderRequest {
+    postIds: string[],
+    folderId: string | null,
+}
