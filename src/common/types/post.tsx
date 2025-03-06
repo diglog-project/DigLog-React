@@ -43,8 +43,14 @@ export interface PostResponse {
     title: string;
     content: string;
     username: string;
+    folder?: PostFolderResponse;
     tags: TagResponse[];
     createdAt: Date;
+}
+
+export interface PostFolderResponse {
+    id: string;
+    title: string;
 }
 
 export interface TagResponse {

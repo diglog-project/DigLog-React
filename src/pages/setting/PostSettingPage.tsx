@@ -88,7 +88,7 @@ function PostSettingPage() {
 
         getMemberPosts({
             username: loginState.username,
-            folderId: null,
+            folderIds: [],
             page: page,
             size: pageInfo.size,
         })
