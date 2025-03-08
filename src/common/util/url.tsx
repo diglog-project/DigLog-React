@@ -22,9 +22,13 @@ export const commentListRequestToParameter = (commentListRequest: CommentListReq
 export const postListMemberRequestToParameter = (postListMemberRequest: PostListMemberRequest) => {
     let query = `?username=${postListMemberRequest.username}&page=${postListMemberRequest.page}&size=${postListMemberRequest.size}`;
 
-    if (postListMemberRequest.folderId) {
-        query += `&folderId=${postListMemberRequest.folderId}`;
+    if (!postListMemberRequest.folderIds) {
+        return query;
     }
+
+    postListMemberRequest.folderIds.forEach((folderId: string) => {
+        query += `&folderIds=${folderId}`;
+    });
 
     return query;
 }

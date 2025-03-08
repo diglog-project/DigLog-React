@@ -115,6 +115,26 @@ function BlogPage() {
         setSelectedTagList([...selectedTagList, selectTag]);
     }
 
+    const handleSelectedFolder = (folder: FolderType) => {
+        setSelectedFolder(folder);
+        setPage(0);
+    }
+
+    const getSelectedFolders = (folder: FolderType | null) => {
+        if (!folder) {
+            return [];
+        }
+
+        const folderIds = [folder.id];
+
+        if (folder.subFolders.length > 0) {
+            folder.subFolders.forEach((subFolder: FolderType) => {
+                folderIds.push(...getSelectedFolders(subFolder));
+            });
+        }
+        return folderIds;
+    }
+
     useEffect(() => {
         // todo: 내 게시글 불러오기 api
         console.log(page, setPageInfo.toString());
@@ -133,6 +153,8 @@ function BlogPage() {
 
     useEffect(() => {
         navigate(`/blog/${username}?folder=${selectedFolder?.id || ""}`);
+        setPage(-1);
+        setPage(0);
     }, [selectedFolder]);
 
     useEffect(() => {
@@ -157,19 +179,26 @@ function BlogPage() {
                 setMember(res.data);
             })
             .catch(error => alert(error.response.data.message));
+    }, [username]);
+
+    useEffect(() => {
+        if (username === undefined) {
+            return;
+        }
 
         getMemberPosts({
             username: username,
-            folderId: null,
+            folderIds: getSelectedFolders(selectedFolder),
             page: page,
             size: pageInfo.size,
         })
             .then((res) => {
+                console.log(res.data.page);
                 setPosts(res.data.content);
                 setPageInfo(res.data.page);
             })
             .catch(error => error.response.data.message);
-    }, [username, page]);
+    }, [page, selectedFolder, username]);
 
     return (
         <BasicLayout>
@@ -202,7 +231,7 @@ function BlogPage() {
                             username={username}
                             profileUrl={member.profileUrl}
                             addTag={addTag}
-                            setSelectedFolder={setSelectedFolder}/>
+                            setSelectedFolder={handleSelectedFolder}/>
                     </div>
                 </div>
             </div>
@@ -218,7 +247,7 @@ function BlogPage() {
                     username={username}
                     profileUrl={member.profileUrl}
                     addTag={addTag}
-                    setSelectedFolder={setSelectedFolder}
+                    setSelectedFolder={handleSelectedFolder}
                     bgColor={"bg-gray-50"}
                     side={true}/>
             </div>

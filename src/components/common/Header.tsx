@@ -95,7 +95,7 @@ function Header() {
                                           className="w-full block px-4 py-2 text-gray-700 hover:bg-gray-100">
                                         게시글 작성
                                     </Link>
-                                    <Link to={`/blog/${loginState.username}`}
+                                    <Link to={`/blog/${loginState.username}?folder=`}
                                           className="w-full block px-4 py-2 text-gray-700 hover:bg-gray-100">
                                         내 블로그
                                     </Link>

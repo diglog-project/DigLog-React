@@ -45,10 +45,6 @@ function PostPage() {
             return;
         }
 
-        if (!confirm("댓글을 등록하시겠습니까?")) {
-            return;
-        }
-
         if (parentCommentId !== null) {
             parentCommentId = findParentCommentId(comments, parentCommentId);
         }
@@ -83,10 +79,6 @@ function PostPage() {
         return null;
     }
     const handleUpdateComment = (content: string, taggedUsername: string | null, originalComment: CommentType | null) => {
-        if (!confirm("댓글을 수정하시겠습니까?")) {
-            return;
-        }
-
         if (!originalComment) {
             alert("업데이트 할 댓글이 존재하지 않습니다.");
             return;
@@ -189,11 +181,15 @@ function PostPage() {
                 <div className="flex flex-col gap-y-8">
                     <div className="flex justify-between items-center">
                         <div className="flex-1 flex justify-center items-center gap-x-4">
-                            <Link to={`/blog/${post.username}`} className="text-xs">Home</Link>
-                            <div className="text-xs">{` > `}</div>
-                            <Link to={`/blog/${post.username}?folder=폴더`} className="text-xs">폴더</Link>
-                            <div>{` > `}</div>
-                            <div className="text-xs text-gray-600 max-w-96 md:max-w-192 break-words">{post.title}</div>
+                            <Link to={`/blog/${post.username}`} className="text-xs">
+                                Home
+                            </Link>
+                            {post.folder &&
+                                <div className="flex gap-x-4">
+                                    <div className="text-xs">{` > `}</div>
+                                    <Link to={`/blog/${post.username}?folder=${post.folder.id}`}
+                                          className="text-xs">{post.folder.title}</Link>
+                                </div>}
                         </div>
                     </div>
                     <div className="flex flex-row w-full justify-center text-center items-center gap-4">
@@ -211,7 +207,7 @@ function PostPage() {
                     <div className="flex flex-wrap justify-center items-center gap-4">
                         {post.tags.map(tag =>
                             <TagCard key={tag.id} tag={tag} onClick={() => {
-                                navigate(`/search?word=${tag.name}&option=태그`)
+                                navigate(`/search?keyword=${tag.name}&option=TAG&sort=createdAt&isDescending=true&tab=post`)
                             }}/>)}
                     </div>
                 </div>

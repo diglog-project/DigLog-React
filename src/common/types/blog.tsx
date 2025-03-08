@@ -75,7 +75,7 @@ export const toFolderRequestList = (folderTypeList: FolderType[]) => {
 
 export interface PostListMemberRequest {
     username: string,
-    folderId: string | null,
+    folderIds: string[] | null,
     page: number,
     size: number,
 }

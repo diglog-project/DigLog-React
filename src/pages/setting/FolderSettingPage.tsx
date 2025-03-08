@@ -49,11 +49,7 @@ function FolderSettingPage() {
     }
 
     const [openMoveModal, setOpenMoveModal] = useState(false);
-    const [selectedFolder, setSelectedFolder] = useState<FolderType>({
-        id: crypto.randomUUID(),
-        title: "",
-        subFolders: [],
-    });
+    const [selectedFolder, setSelectedFolder] = useState<FolderType | null>(null);
     const [editFolderId, setEditFolderId] = useState("");
     const [editFolderTitle, setEditFolderTitle] = useState("");
     const [targetFolder, setTargetFolder] = useState<FolderType>({
@@ -65,10 +61,11 @@ function FolderSettingPage() {
     const folderMoveTypes = ["폴더 위로 옮깁니다.", "폴더 아래로 옮깁니다.", "폴더 내부로 옮깁니다."];
 
     const handleMoveFolder = () => {
-        if (handleDisabled(folderMoveType)) {
+        if (handleDisabled(folderMoveType) || !selectedFolder) {
             alert("활성화된 동작 중에서 선택해주세요.");
             return;
         }
+
 
         if (folderMoveType === 2) {
             setFolders(prevFolders => {
@@ -85,6 +82,10 @@ function FolderSettingPage() {
         setOpenMoveModal(false);
     }
     const getModalMoveFolderList = (folders: FolderType[]) => {
+        if (!selectedFolder) {
+            return [];
+        }
+
         const targetIndex = folders.findIndex((folder) => folder.id === targetFolder.id);
 
         if (targetIndex !== -1) {
@@ -99,6 +100,10 @@ function FolderSettingPage() {
         });
     }
     const getAddFolderModalList = (folders: FolderType[]) => {
+        if (!selectedFolder) {
+            return [];
+        }
+
         return folders.map((folder: FolderType): FolderType => {
             if (folder.id === targetFolder.id) {
                 return {...folder, subFolders: [...folder.subFolders, selectedFolder]};
@@ -132,7 +137,7 @@ function FolderSettingPage() {
     }
 
     const handleDisabled = (moveType: number) => {
-        if (targetFolder.title === "") {
+        if (targetFolder.title === "" || !selectedFolder) {
             return true;
         }
 
@@ -307,7 +312,9 @@ function FolderSettingPage() {
                 <ModalLayout addStyle={"!w-128"} customRef={modalRef}>
                     <div className="w-full h-full">
                         <div className="flex flex-col justify-center items-center gap-y-8">
-                            <p><span className="font-bold">{selectedFolder.title}</span> 폴더를</p>
+                            <p>
+                                <span className="font-bold">{selectedFolder?.title}</span> 폴더를
+                            </p>
                             <FolderSelectBox
                                 folders={folders}
                                 selectedFolder={selectedFolder}

@@ -3,6 +3,7 @@ import {PageResponse} from "./common.tsx";
 export interface PostRequest {
     title: string,
     content: string,
+    folderId: string | null,
     tagNames: string[],
     urls: string[],
 }
@@ -11,6 +12,7 @@ export interface PostUpdateRequest {
     id: string,
     title: string,
     content: string,
+    folderId: string | null,
     tagNames: string[],
     urls: string[],
 }
@@ -41,8 +43,14 @@ export interface PostResponse {
     title: string;
     content: string;
     username: string;
+    folder?: PostFolderResponse;
     tags: TagResponse[];
     createdAt: Date;
+}
+
+export interface PostFolderResponse {
+    id: string;
+    title: string;
 }
 
 export interface TagResponse {
@@ -50,3 +58,7 @@ export interface TagResponse {
     name: string;
 }
 
+export interface PostFolderRequest {
+    postIds: string[],
+    folderId: string | null,
+}

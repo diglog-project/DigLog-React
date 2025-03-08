@@ -6,8 +6,8 @@ import {getFolderTitle} from "../../common/util/string.tsx";
 function FolderSelectBox({folders, depth = 0, selectedFolder, targetFolder, setTargetFolder, center}: {
     folders: FolderType[],
     depth?: number,
-    selectedFolder?: FolderType,
-    targetFolder: FolderType,
+    selectedFolder?: FolderType | null,
+    targetFolder: FolderType | null,
     setTargetFolder: (folder: FolderType) => void,
     center?: boolean,
 }) {
@@ -36,7 +36,7 @@ function FolderSelectBox({folders, depth = 0, selectedFolder, targetFolder, setT
             <button
                 className="w-full flex justify-between items-center gap-x-2 px-4 py-2 border border-gray-200 hover:bg-gray-50 hover:cursor-pointer"
                 onClick={handleFolderOpen}>
-                {targetFolder.title === "" ? "폴더 선택" : targetFolder.title}
+                {targetFolder ? targetFolder.title : "폴더 선택"}
                 <MdOutlineArrowDropDown/>
             </button>
             <div
@@ -58,7 +58,7 @@ function FolderSelectBox({folders, depth = 0, selectedFolder, targetFolder, setT
 function FolderSelectCard({folder, depth, selectedFolder, setTargetFolder, setFolderOpen}: {
     folder: FolderType,
     depth: number,
-    selectedFolder?: FolderType,
+    selectedFolder?: FolderType | null,
     setTargetFolder: (folder: FolderType) => void,
     setFolderOpen: (open: boolean) => void,
 }) {

@@ -40,7 +40,7 @@ function WritePage() {
     });
     const [showTag, setShowTag] = useState(false);
 
-    const [targetFolder, setTargetFolder] = useState<FolderType>({id: crypto.randomUUID(), title: "", subFolders: []});
+    const [targetFolder, setTargetFolder] = useState<FolderType | null>(null);
     const [uploadCount, setUploadCount] = useState(0);
     const [exitPage, setExitPage] = useState(false);
 
@@ -59,9 +59,20 @@ function WritePage() {
         setPost({...post, tags: [...post.tags, post.inputTag], inputTag: ""});
     }
 
+    const getFolderId = (targetFolder: FolderType) => {
+        if (!targetFolder || targetFolder.id === "empty") {
+            return null;
+        }
+
+        return targetFolder.id;
+    }
     const handleSubmit = () => {
         if (uploadCount > 0) {
             alert("업로드 중인 이미지가 있습니다. 잠시만 기다려주세요.");
+            return;
+        }
+        if (!targetFolder) {
+            alert("폴더를 선택해주세요.");
             return;
         }
 
@@ -72,13 +83,14 @@ function WritePage() {
         createPost({
             title: post.title,
             content: post.content,
+            folderId: getFolderId(targetFolder),
             tagNames: post.tags,
             urls: urls,
         })
             .then(() => {
                 alert("작성되었습니다.");
                 setExitPage(true);
-                navigate(`/blog/${loginState.username}`);
+                navigate(`/blog/${loginState.username}?folder=`);
             })
             .catch((error) => alert(error.response.data.message))
             .finally(() => setLoading(false));
@@ -89,8 +101,12 @@ function WritePage() {
             alert("업로드 중인 이미지가 있습니다. 잠시만 기다려주세요.");
             return;
         }
-
+        if (!targetFolder) {
+            alert("폴더를 선택해주세요.");
+            return;
+        }
         if (!id) return;
+
         setLoading(true);
 
         const urls: string[] = getImgUrls(post.content);
@@ -99,13 +115,14 @@ function WritePage() {
             id: id,
             title: post.title,
             content: post.content,
+            folderId: getFolderId(targetFolder),
             tagNames: post.tags,
             urls: urls,
         })
             .then(() => {
                 alert("수정되었습니다.");
                 setExitPage(true);
-                navigate(`/blog/${loginState.username}`);
+                navigate(`/blog/${loginState.username}?folder=`);
             })
             .catch((error) => alert(error.response.data.message))
             .finally(() => setLoading(false));
@@ -119,7 +136,7 @@ function WritePage() {
         deletePost(id)
             .then(() => {
                 alert("삭제되었습니다.");
-                navigate(`/blog/${loginState.username}`);
+                navigate(`/blog/${loginState.username}?folder=`);
             })
             .catch((error) => alert(error.response.data.message));
     }
@@ -151,6 +168,11 @@ function WritePage() {
     }, []);
 
     const folderData: FolderType[] = [
+        {
+            id: "empty",
+            title: "폴더 없음",
+            subFolders: [],
+        },
         {
             id: crypto.randomUUID(),
             title: faker.lorem.words(),
@@ -225,6 +247,11 @@ function WritePage() {
                     title: res.data.title,
                     content: res.data.content,
                     tags: sortByName(res.data.tags.map((tag: TagResponse) => tag.name)),
+                });
+                setTargetFolder({
+                    id: res.data.folder.id,
+                    title: res.data.folder.title,
+                    subFolders: [],
                 });
             })
             .catch((error) => alert(error.response.data.message));

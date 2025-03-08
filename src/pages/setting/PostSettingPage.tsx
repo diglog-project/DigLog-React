@@ -1,6 +1,4 @@
-import BlogSearchBar from "../../components/blog/BlogSearchBar.tsx";
-import {useEffect, useState} from "react";
-import {MdSearch} from "react-icons/md";
+import {ChangeEvent, useEffect, useState} from "react";
 import {PostResponse} from "../../common/types/post.tsx";
 import {TextLink} from "../../components/common/TextButton.tsx";
 import PaginationButton from "../../components/common/PaginationButton.tsx";
@@ -9,15 +7,79 @@ import {fullDateToKorean} from "../../common/util/date.tsx";
 import {getMemberPosts} from "../../common/apis/blog.tsx";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store.tsx";
+import {FillButton} from "../../components/common/FillButton.tsx";
+import {updatePostFolder} from "../../common/apis/post.tsx";
+import FolderSelectBox from "../../components/folder/FolderSelectBox.tsx";
+import {FolderType} from "../../common/types/blog.tsx";
+import {faker} from "@faker-js/faker/locale/ko";
 
 function PostSettingPage() {
 
     const loginState = useSelector((state: RootState) => state.loginSlice);
 
-    const [inputSearch, setInputSearch] = useState("");
     const [posts, setPosts] = useState<PostResponse[]>([]);
     const [page, setPage] = useState(0);
     const [pageInfo, setPageInfo] = useState<PageResponse>({number: 0, size: 10, totalElements: 0, totalPages: 0});
+
+    const [isFolderEdit, setIsFolderEdit] = useState(false);
+    const [postIds, setPostIds] = useState<string[]>([]);
+    const [folders, setFolders] = useState<FolderType[]>([]);
+    const [targetFolder, setTargetFolder] = useState<FolderType | null>(null);
+
+    const handleIsFolderEdit = () => {
+        if (!isFolderEdit) {
+            setIsFolderEdit(true);
+            setPostIds([]);
+            setTargetFolder(null);
+            return;
+        }
+
+        if (postIds.length === 0) {
+            setIsFolderEdit(false);
+            return;
+        }
+
+        if (confirm("폴더 수정을 취소하시겠습니까?")) {
+            setIsFolderEdit(false);
+            return;
+        }
+    }
+
+    const handleClickCheckBox = (event: ChangeEvent<HTMLInputElement>) => {
+        const {name, checked} = event.target;
+
+        if (checked) {
+            setPostIds(prev => [...prev, name]);
+        } else {
+            setPostIds(prev => prev.filter(id => id !== name));
+        }
+    }
+    const handleCheckBox = (id: string) => {
+        return postIds.indexOf(id) > -1;
+    }
+
+    const getTargetFolderId = (targetFolder : FolderType | null) => {
+        if (!targetFolder || targetFolder.id === "empty") {
+            return null;
+        }
+
+        return targetFolder.id;
+    }
+    const submitPostFolderUpdate = () => {
+        if (!confirm("변경사항을 저장하시겠습니까?")) {
+            return;
+        }
+
+        updatePostFolder({
+            postIds: postIds,
+            folderId: getTargetFolderId(targetFolder),
+        })
+            .then(() => {
+                alert("폴더가 수정되었습니다.");
+                setIsFolderEdit(false);
+            })
+            .catch((error) => alert(error.response.data.message));
+    }
 
     useEffect(() => {
         if (!loginState.username) {
@@ -26,7 +88,7 @@ function PostSettingPage() {
 
         getMemberPosts({
             username: loginState.username,
-            folderId: null,
+            folderIds: [],
             page: page,
             size: pageInfo.size,
         })
@@ -35,18 +97,91 @@ function PostSettingPage() {
                 setPageInfo(res.data.page);
             })
             .catch((error) => alert(error.response.data.message));
+
+        // todo: folders 데이터
+        const folderData: FolderType[] = [
+            {
+                id: crypto.randomUUID(),
+                title: faker.lorem.words(),
+                subFolders: [
+                    {
+                        id: crypto.randomUUID(),
+                        title: faker.lorem.words(),
+                        subFolders: [
+                            {
+                                id: crypto.randomUUID(),
+                                title: faker.lorem.words(),
+                                subFolders: [],
+                            },
+                        ],
+                    },
+                    {
+                        id: crypto.randomUUID(),
+                        title: faker.lorem.words(),
+                        subFolders: [],
+                    },
+                ]
+            },
+            {
+                id: crypto.randomUUID(),
+                title: faker.lorem.words(),
+                subFolders: [
+                    {
+                        id: crypto.randomUUID(),
+                        title: faker.lorem.words(),
+                        subFolders: [],
+                    },
+                ],
+            },
+            {
+                id: crypto.randomUUID(),
+                title: faker.lorem.words(),
+                subFolders: [
+                    {
+                        id: crypto.randomUUID(),
+                        title: faker.lorem.words(),
+                        subFolders: [],
+                    },
+                    {
+                        id: crypto.randomUUID(),
+                        title: faker.lorem.words(),
+                        subFolders: [],
+                    },
+                    {
+                        id: crypto.randomUUID(),
+                        title: faker.lorem.words(),
+                        subFolders: [],
+                    },
+                ]
+            },
+        ];
+        setFolders(folderData);
+        setFolders(prev => [{
+            id: "empty",
+            title: "폴더 없음",
+            subFolders: [],
+        }, ...prev]);
     }, [loginState, page]);
 
     return (
         <div>
-            <div className="flex justify-between items-center">
-                <p className="font-semibold text-xl my-4">게시글 관리</p>
-                <div className="flex items-center gap-x-4">
-                    <BlogSearchBar value={inputSearch} setValue={setInputSearch}/>
-                    <button className="hover:cursor-pointer">
-                        <MdSearch className="size-5"/>
-                    </button>
-                </div>
+            <div className="flex justify-between items-center gap-x-4 my-4">
+                <p className="font-semibold text-xl">게시글 관리</p>
+                {isFolderEdit &&
+                    <div
+                        className="flex justify-end flex-1 flex-wrap-reverse md:flex-nowrap max-w-64 md:max-w-[calc(600px)] items-center gap-x-2">
+                        <FolderSelectBox
+                            folders={folders}
+                            targetFolder={targetFolder}
+                            setTargetFolder={setTargetFolder}
+                            center={false}/>
+                        <FillButton text={"취소"} onClick={handleIsFolderEdit} addStyle={"!bg-gray-400 w-22 h-10"}/>
+                        <FillButton text={"저장"} onClick={submitPostFolderUpdate} addStyle={"w-22 h-10"}/>
+                    </div>}
+                {!isFolderEdit &&
+                    <div className="flex gap-x-2">
+                        <FillButton text={"폴더 수정"} onClick={handleIsFolderEdit}/>
+                    </div>}
             </div>
             <div>
                 {posts.map((post: PostResponse) => (
@@ -56,10 +191,17 @@ function PostSettingPage() {
                             <p className="font-semibold">{post.title}</p>
                             <p className="text-sm font-light">{fullDateToKorean(post.createdAt)}</p>
                         </div>
-                        <div className="flex items-center gap-x-4">
-                            <TextLink text={"수정"} to={`/post/edit/${post.id}`}
-                                      addStyle={"text-sm hover:text-lime-600"}/>
-                        </div>
+                        {!isFolderEdit &&
+                            <div className="flex items-center gap-x-4">
+                                <TextLink text={"수정"} to={`/post/edit/${post.id}`}
+                                          addStyle={"text-sm hover:text-lime-600"}/>
+                            </div>}
+                        {isFolderEdit &&
+                            <input type="checkbox"
+                                   className="size-4"
+                                   name={post.id}
+                                   checked={handleCheckBox(post.id)}
+                                   onChange={handleClickCheckBox}/>}
                     </div>
                 ))}
                 {posts.length === 0 &&
