@@ -63,18 +63,31 @@ function BlogFolderList({depth = 0, folders, setSelectedFolder}: {
     setSelectedFolder: (folder: FolderType) => void,
 }) {
 
+    const getPostCount = (folder: FolderType) => {
+        let resultCount = folder.postCount;
+
+        if (folder.subFolders) {
+            folder.subFolders.forEach(subFolder => {
+                resultCount += getPostCount(subFolder);
+            })
+        }
+
+        return resultCount;
+    }
+
     return (
         <div className="w-full flex flex-col gap-y-1">
             {folders.map(folder =>
                 <div key={folder.id} className={`flex flex-col gap-y-2`}>
                     {depth === 0 && <div className="h-2"/>}
                     <button
-                        className={`flex justify-start items-center hover:opacity-50 hover:cursor-pointer 
+                        className={`flex justify-start items-center hover:opacity-50 hover:cursor-pointer gap-x-2
                         ${depth === 0 && "font-bold"}
                         ${depth > 0 && `text-gray-500`}`}
                         onClick={() => setSelectedFolder(folder)}>
                         {depth === 2 && <div className="w-8"/>}
                         {getFolderTitle(folder.title, depth)}
+                        <p className="text-xs font-light">({getPostCount(folder)})</p>
                     </button>
                     {depth === 0 && <hr className="text-gray-400"/>}
                     <BlogFolderList

@@ -5,7 +5,6 @@ import {Editor} from "@tinymce/tinymce-react";
 import {FillButton} from "../../components/common/FillButton.tsx";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store.tsx";
-import {faker} from "@faker-js/faker/locale/ko";
 import {MdOutlineClear} from "react-icons/md";
 import {createPost, deletePost, getPost, updatePost} from "../../common/apis/post.tsx";
 import LoadingLayout from "../../layout/LoadingLayout.tsx";
@@ -14,8 +13,9 @@ import {uploadImage} from "../../common/apis/image.tsx";
 import {checkUUID} from "../../common/util/regex.tsx";
 import {TagResponse} from "../../common/types/post.tsx";
 import {sortByName} from "../../common/util/sort.tsx";
-import {FolderType} from "../../common/types/blog.tsx";
+import {FolderType, toFolderTypeList} from "../../common/types/blog.tsx";
 import FolderSelectBox from "../../components/folder/FolderSelectBox.tsx";
+import {getMemberFolders} from "../../common/apis/blog.tsx";
 
 interface WritePostType {
     inputTag: string;
@@ -32,6 +32,7 @@ function WritePage() {
     const {id} = useParams();
 
     const [loading, setLoading] = useState(false);
+    const [folders, setFolders] = useState<FolderType[]>([]);
     const [post, setPost] = useState<WritePostType>({
         inputTag: "",
         tags: [],
@@ -167,68 +168,6 @@ function WritePage() {
         };
     }, []);
 
-    const folderData: FolderType[] = [
-        {
-            id: "empty",
-            title: "폴더 없음",
-            subFolders: [],
-        },
-        {
-            id: crypto.randomUUID(),
-            title: faker.lorem.words(),
-            subFolders: [
-                {
-                    id: crypto.randomUUID(),
-                    title: faker.lorem.words(),
-                    subFolders: [
-                        {
-                            id: crypto.randomUUID(),
-                            title: faker.lorem.words(),
-                            subFolders: [],
-                        },
-                    ],
-                },
-                {
-                    id: crypto.randomUUID(),
-                    title: faker.lorem.words(),
-                    subFolders: [],
-                },
-            ]
-        },
-        {
-            id: crypto.randomUUID(),
-            title: faker.lorem.words(),
-            subFolders: [
-                {
-                    id: crypto.randomUUID(),
-                    title: faker.lorem.words(),
-                    subFolders: [],
-                },
-            ],
-        },
-        {
-            id: crypto.randomUUID(),
-            title: faker.lorem.words(),
-            subFolders: [
-                {
-                    id: crypto.randomUUID(),
-                    title: faker.lorem.words(),
-                    subFolders: [],
-                },
-                {
-                    id: crypto.randomUUID(),
-                    title: faker.lorem.words(),
-                    subFolders: [],
-                },
-                {
-                    id: crypto.randomUUID(),
-                    title: faker.lorem.words(),
-                    subFolders: [],
-                },
-            ]
-        },
-    ];
-
     useEffect(() => {
         if (!path.endsWith("edit")) {
             return;
@@ -251,16 +190,25 @@ function WritePage() {
                 setTargetFolder({
                     id: res.data.folder.id,
                     title: res.data.folder.title,
+                    postCount: res.data.folder.postCount,
                     subFolders: [],
                 });
             })
             .catch((error) => alert(error.response.data.message));
 
-        // 폴더 불러오기 api
-        // if (loginState.isLogin) {
-        //     alert("해당 페이지 이용에는 로그인이 필요합니다.");
-        //     navigate("/login");
-        // }
+        getMemberFolders(loginState.username)
+            .then(res => {
+                setFolders(toFolderTypeList(res.data));
+                setFolders(prev => [
+                    {
+                        id: "empty",
+                        title: "폴더 없음",
+                        postCount: 0,
+                        subFolders: [],
+                    },
+                    ...prev
+                ]);
+            });
     }, []);
 
     useEffect(() => {
@@ -275,7 +223,7 @@ function WritePage() {
             <div className="flex flex-col w-full">
                 <div className="flex justify-start items-center">
                     <div className="w-108">
-                        <FolderSelectBox folders={folderData}
+                        <FolderSelectBox folders={folders}
                                          targetFolder={targetFolder}
                                          setTargetFolder={setTargetFolder}/>
                     </div>

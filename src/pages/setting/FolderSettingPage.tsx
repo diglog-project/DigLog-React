@@ -6,15 +6,17 @@ import {DragEndEvent} from "@dnd-kit/core";
 import FolderCardList from "../../components/folder/FolderCardList.tsx";
 import {arrayMove} from "@dnd-kit/sortable";
 import FolderSelectBox from "../../components/folder/FolderSelectBox.tsx";
-import {saveAndUpdateFolder} from "../../common/apis/blog.tsx";
-import {useNavigate} from "react-router-dom";
+import {getMemberFolders, saveAndUpdateFolder} from "../../common/apis/blog.tsx";
+import {useSelector} from "react-redux";
+import {RootState} from "../../store.tsx";
 
 function FolderSettingPage() {
 
-    const navigate = useNavigate();
+    const loginState = useSelector((state: RootState) => state.loginSlice);
 
+    const [trigger, setTrigger] = useState(false);
     const [tempId, setTempId] = useState(0);
-    const [folders, setFolders] = useState<FolderType[]>(toFolderTypeList([]));
+    const [folders, setFolders] = useState<FolderType[]>([]);
 
     const getTempId = () => {
         setTempId(prev => prev + 1);
@@ -26,7 +28,7 @@ function FolderSettingPage() {
 
         if (parentFolder === null) {
             const tempId = getTempId();
-            setFolders([...folders, {id: tempId, title: tempTitle, subFolders: []}]);
+            setFolders([...folders, {id: tempId, title: tempTitle, postCount: 0, subFolders: []}]);
             setEditFolderTitle("");
             setEditFolderId(tempId);
             return;
@@ -40,7 +42,10 @@ function FolderSettingPage() {
                 const tempId = getTempId();
                 setEditFolderTitle("");
                 setEditFolderId(tempId);
-                return {...folder, subFolders: [...folder.subFolders, {id: tempId, title: title, subFolders: []}]};
+                return {
+                    ...folder,
+                    subFolders: [...folder.subFolders, {id: tempId, title: title, postCount: 0, subFolders: []}]
+                };
             } else if (folder.subFolders.length > 0) {
                 return {...folder, subFolders: getAddFolderList(folder.subFolders, id, title)};
             }
@@ -55,6 +60,7 @@ function FolderSettingPage() {
     const [targetFolder, setTargetFolder] = useState<FolderType>({
         id: crypto.randomUUID(),
         title: "",
+        postCount: 0,
         subFolders: [],
     });
     const [folderMoveType, setFolderMoveType] = useState(0);
@@ -196,8 +202,6 @@ function FolderSettingPage() {
         }
 
         const handleFolders = getHandleFolders(folders, editFolder.id);
-        console.log("handleFolders", handleFolders);
-        console.log("targetId", editFolder.id);
         if (handleFolders.findIndex(folder => folder.title === editFolderTitle.trim()) !== -1) {
             alert("중복된 폴더 이름입니다.");
             return;
@@ -234,6 +238,11 @@ function FolderSettingPage() {
     }
 
     const handleDelete = (deleteFolder: FolderType) => {
+        if (deleteFolder.postCount > 0) {
+            alert("게시글을 모두 이동한 후에 제거할 수 있습니다.");
+            return;
+        }
+
         if (deleteFolder.subFolders.length > 0) {
             alert("하위 폴더를 모두 제거한 후에 제거할 수 있습니다.");
             return;
@@ -260,10 +269,9 @@ function FolderSettingPage() {
         }
 
         saveAndUpdateFolder(toFolderRequestList(folders))
-            .then((res) => {
-                console.log(res);
+            .then(() => {
                 alert("변경사항이 저장되었습니다.");
-                navigate(0);
+                setTrigger(prev => !prev);
             })
             .catch(error => alert(error.response.data.message));
     }
@@ -274,6 +282,14 @@ function FolderSettingPage() {
             setOpenMoveModal(false);
         }
     };
+
+    useEffect(() => {
+        getMemberFolders(loginState.username)
+            .then(res => {
+                setFolders(toFolderTypeList(res.data));
+            })
+            .catch(error => alert(error.response.data.message));
+    }, [trigger]);
 
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
