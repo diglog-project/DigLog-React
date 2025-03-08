@@ -1,5 +1,5 @@
 import BasicLayout from "../../layout/BasicLayout.tsx";
-import {useNavigate, useParams} from "react-router-dom";
+import {useParams, useSearchParams} from "react-router-dom";
 import PostCard from "../../components/post/PostCard.tsx";
 import {useEffect, useRef, useState} from "react";
 import {MdMenu, MdOutlineExitToApp} from "react-icons/md";
@@ -15,8 +15,8 @@ import {getProfileByUsername} from "../../common/apis/member.tsx";
 
 function BlogPage() {
 
-    const navigate = useNavigate();
     const {username} = useParams();
+    const [folderParam, setFolderParam] = useSearchParams();
 
     const [page, setPage] = useState(0);
     const [pageInfo, setPageInfo] = useState<PageResponse>({
@@ -48,9 +48,32 @@ function BlogPage() {
         setSelectedTagList([...selectedTagList, selectTag]);
     }
 
+    const handlePage = (page: number) => {
+        setFolderParam({...folderParam, "page": page.toString()});
+        setPage(page);
+    }
+
     const handleSelectedFolder = (folder: FolderType) => {
         setSelectedFolder(folder);
+        setFolderParam({"folder": folder.id, "page": page.toString()});
         setPage(0);
+    }
+
+    const getSelectedFolderById = (folders: FolderType[], folderId: string): FolderType | null => {
+        for (const folder of folders) {
+            if (folder.id === folderId) {
+                return folder;
+            }
+
+            if (folder.subFolders) {
+                const selectedSubFolder = getSelectedFolderById(folder.subFolders, folderId);
+                if (selectedSubFolder) {
+                    return selectedSubFolder;
+                }
+            }
+        }
+
+        return null;
     }
 
     const getSelectedFolders = (folder: FolderType | null) => {
@@ -79,12 +102,6 @@ function BlogPage() {
     }, []);
 
     useEffect(() => {
-        navigate(`/blog/${username}?folder=${selectedFolder?.id || ""}`);
-        setPage(-1);
-        setPage(0);
-    }, [selectedFolder]);
-
-    useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
         } else {
@@ -109,7 +126,19 @@ function BlogPage() {
 
         getMemberFolders(username)
             .then(res => {
-                setFolders(toFolderTypeList(res.data));
+                const folders = toFolderTypeList(res.data);
+                setFolders(folders);
+
+                setPage(Number(folderParam.get("page")) || 0);
+
+                const initialSelectedFolderId = folderParam.get("folder");
+                if (!initialSelectedFolderId) {
+                    return;
+                }
+                const initialSelectedFolder = getSelectedFolderById(folders, initialSelectedFolderId);
+                if (initialSelectedFolder) {
+                    setSelectedFolder(initialSelectedFolder);
+                }
             });
     }, [username]);
 
@@ -154,7 +183,7 @@ function BlogPage() {
                                 작성된 게시글이 없습니다.
                             </div>}
                         <PaginationButton
-                            pageInfo={pageInfo} setPage={setPage}/>
+                            pageInfo={pageInfo} setPage={handlePage}/>
                     </div>
                     <div className="col-span-1 hidden lg:block flex-col">
                         <BlogSideBar

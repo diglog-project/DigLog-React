@@ -2,8 +2,8 @@ import BasicLayout from "../../layout/BasicLayout.tsx";
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {handleKakaoLogin, loginApi} from "../../common/apis/member.tsx";
-import {login} from "../../common/slices/loginSlice.tsx";
+import {getProfile, handleKakaoLogin, loginApi} from "../../common/apis/member.tsx";
+import {login, setProfile} from "../../common/slices/loginSlice.tsx";
 import LoginButton from "../../components/member/LoginButton.tsx";
 import LoginTextField from "../../components/member/LoginTextField.tsx";
 import {checkEmail} from "../../common/util/regex.tsx";
@@ -30,6 +30,16 @@ function LoginPage() {
                     username: res.data.username,
                     accessToken: res.headers.authorization,
                 }));
+
+                getProfile()
+                    .then(res => {
+                        dispatch(setProfile({
+                            email: res.data.email,
+                            username: res.data.username,
+                            profileUrl: res.data.profileUrl,
+                        }));
+                    });
+
                 navigate("/");
             })
             .catch(error => alert(error.response.data.message));

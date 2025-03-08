@@ -72,7 +72,6 @@ function FolderSettingPage() {
             return;
         }
 
-
         if (folderMoveType === 2) {
             setFolders(prevFolders => {
                 const deleteFolderList = getDeleteFolderList(prevFolders, selectedFolder.id);
@@ -147,7 +146,7 @@ function FolderSettingPage() {
             return true;
         }
 
-        const maxDepth = 2;
+        const maxDepth = 3;
 
         const selectedFolderMaxDepth = getMaxFolderDepth(folders, selectedFolder.id) || 1;
         const selectedFolderDepth = getFolderDepth(folders, selectedFolder.id) || 1;
@@ -158,14 +157,15 @@ function FolderSettingPage() {
             return selectedFolderMaxDepth - selectedFolderDepth + targetFolderDepth > maxDepth;
         }
     }
+
     // 하위 폴더의 최대 깊이
-    const getMaxFolderDepth = (folders: FolderType[], folderId: string, currentDepth: number = 1): number | null => {
+    const getMaxFolderDepth = (folders: FolderType[], folderId: string): number | null => {
         for (const folder of folders) {
             if (folder.id === folderId) {
                 return calculateMaxDepth(folder.subFolders);
             }
 
-            const depth = getMaxFolderDepth(folder.subFolders, folder.id, currentDepth + 1);
+            const depth = getMaxFolderDepth(folder.subFolders, folderId);
             if (depth !== null) {
                 return depth;
             }
@@ -174,7 +174,7 @@ function FolderSettingPage() {
         return null;
     }
     const calculateMaxDepth = (folders: FolderType[]): number => {
-        if (folders.length === 0) return 0;
+        if (folders.length === 0) return 1;
 
         const depths = folders.map(folder => 1 + calculateMaxDepth(folder.subFolders));
         return Math.max(...depths);
