@@ -9,6 +9,7 @@ export interface FolderRequest {
 export interface FolderType {
     id: string,
     title: string,
+    postCount: number,
     subFolders: FolderType[],
 }
 
@@ -18,6 +19,7 @@ export interface FolderResponse {
     depth: number,
     orderIndex: number,
     parentFolderId: string | null,
+    postCount: number,
 }
 
 export const toFolderTypeList = (folderResponseList: FolderResponse[]) => {
@@ -44,6 +46,7 @@ const toFolderType = (folderResponse: FolderResponse) => {
     return {
         id: folderResponse.folderId,
         title: folderResponse.title,
+        postCount: folderResponse.postCount,
         subFolders: [],
     };
 }

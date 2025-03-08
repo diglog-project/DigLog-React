@@ -101,7 +101,7 @@ function Header() {
                                     </Link>
                                     <Link to={`/setting/profile`}
                                           className="w-full block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                                        프로필 설정
+                                        설정
                                     </Link>
                                 </div>
                                 <div className="py-1">

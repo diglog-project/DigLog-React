@@ -117,10 +117,11 @@ function FolderCard({
                         </div>
                     </div>
                     : <div className="w-full flex justify-between items-center ">
-                        <div className="flex items-center gap-x-4">
+                        <div className="flex items-center gap-x-2">
                             <MdOutlineMenu {...attributes} {...listeners}
                                            className="hover:cursor-pointer text-gray-600"/>
-                            <p>{folder.title}</p>
+                            <p className="ml-2">{folder.title}</p>
+                            <p className="text-xs font-light">({folder.postCount})</p>
                         </div>
                         <div className="flex justify-end items-center">
                             {depth !== 2 &&

@@ -1,15 +1,14 @@
 import BasicLayout from "../../layout/BasicLayout.tsx";
 import {useNavigate, useParams} from "react-router-dom";
-import {faker} from "@faker-js/faker/locale/ko";
 import PostCard from "../../components/post/PostCard.tsx";
 import {useEffect, useRef, useState} from "react";
 import {MdMenu, MdOutlineExitToApp} from "react-icons/md";
 import PaginationButton from "../../components/common/PaginationButton.tsx";
-import {FolderType} from "../../common/types/blog.tsx";
+import {FolderType, toFolderTypeList} from "../../common/types/blog.tsx";
 import BlogSideBar from "../../components/blog/BlogSideBar.tsx";
 import IconButton from "../../components/common/IconButton.tsx";
 import {PageResponse} from "../../common/types/common.tsx";
-import {getMemberPosts} from "../../common/apis/blog.tsx";
+import {getMemberFolders, getMemberPosts} from "../../common/apis/blog.tsx";
 import {PostResponse} from "../../common/types/post.tsx";
 import {MemberProfileResponse} from "../../common/types/member.tsx";
 import {getProfileByUsername} from "../../common/apis/member.tsx";
@@ -28,72 +27,6 @@ function BlogPage() {
     });
     const [posts, setPosts] = useState<PostResponse[]>([]);
     const [member, setMember] = useState<MemberProfileResponse>({username: username || "", profileUrl: null});
-    const folderData: FolderType[] = [
-        {
-            id: crypto.randomUUID(),
-            title: faker.lorem.words(),
-            subFolders: [
-                {
-                    id: crypto.randomUUID(),
-                    title: faker.lorem.words(),
-                    subFolders: [
-                        {
-                            id: crypto.randomUUID(),
-                            title: faker.lorem.words(),
-                            subFolders: [],
-                        },
-                    ],
-                },
-                {
-                    id: crypto.randomUUID(),
-                    title: faker.lorem.words(),
-                    subFolders: [],
-                },
-                {
-                    id: crypto.randomUUID(),
-                    title: faker.lorem.words(),
-                    subFolders: [],
-                },
-                {
-                    id: crypto.randomUUID(),
-                    title: faker.lorem.words(),
-                    subFolders: [],
-                },
-            ]
-        },
-        {
-            id: crypto.randomUUID(),
-            title: faker.lorem.words(),
-            subFolders: [
-                {
-                    id: crypto.randomUUID(),
-                    title: faker.lorem.words(),
-                    subFolders: [],
-                },
-            ],
-        },
-        {
-            id: crypto.randomUUID(),
-            title: faker.lorem.words(),
-            subFolders: [
-                {
-                    id: crypto.randomUUID(),
-                    title: faker.lorem.words(),
-                    subFolders: [],
-                },
-                {
-                    id: crypto.randomUUID(),
-                    title: faker.lorem.words(),
-                    subFolders: [],
-                },
-                {
-                    id: crypto.randomUUID(),
-                    title: faker.lorem.words(),
-                    subFolders: [],
-                },
-            ]
-        },
-    ];
     const [folders, setFolders] = useState<FolderType[]>([]);
 
     const [isOpen, setIsOpen] = useState(false);
@@ -136,12 +69,6 @@ function BlogPage() {
     }
 
     useEffect(() => {
-        // todo: 내 게시글 불러오기 api
-        console.log(page, setPageInfo.toString());
-        setFolders(folderData);
-    }, []);
-
-    useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
         document.title = username || "DIGLOG";
 
@@ -179,6 +106,11 @@ function BlogPage() {
                 setMember(res.data);
             })
             .catch(error => alert(error.response.data.message));
+
+        getMemberFolders(username)
+            .then(res => {
+                setFolders(toFolderTypeList(res.data));
+            });
     }, [username]);
 
     useEffect(() => {
@@ -193,7 +125,6 @@ function BlogPage() {
             size: pageInfo.size,
         })
             .then((res) => {
-                console.log(res.data.page);
                 setPosts(res.data.content);
                 setPageInfo(res.data.page);
             })
@@ -236,7 +167,7 @@ function BlogPage() {
                 </div>
             </div>
             <div ref={sideBarRef}
-                 className={`${isOpen ? "translate-x-0 overflow-y-scroll" : "translate-x-full overflow-y-hidden"} absolute top-0 right-0 w-96 flex-col
+                 className={`${isOpen ? "block translate-x-0 overflow-y-scroll" : "hidden translate-x-full overflow-y-hidden"} !bg-orange-400 absolute top-0 right-0 w-96 flex-col
                      transform transition-transform duration-300 ease-out z-20`}>
                 <button className="absolute top-4 right-[calc(320px)] hover:cursor-pointer"
                         onClick={() => setIsOpen(false)}>

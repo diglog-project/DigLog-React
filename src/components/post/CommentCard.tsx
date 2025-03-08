@@ -1,4 +1,4 @@
-import {dateToKorean} from "../../common/util/date.tsx";
+import {fullDateToKorean} from "../../common/util/date.tsx";
 import {MdOutlineAddComment, MdOutlineComment, MdOutlinePerson} from "react-icons/md";
 import {ChangeEvent, useState} from "react";
 import CommentTextField from "./CommentTextField.tsx";
@@ -76,7 +76,7 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
                             {comment.member.username}
                         </p>
                         <p className="text-gray-400 text-sm">
-                            {dateToKorean(comment.createdAt)}
+                            {fullDateToKorean(comment.createdAt)}
                         </p>
                     </div>
                     <div className="mt-4 text-gray-900 flex items-center gap-x-2">

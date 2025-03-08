@@ -4,14 +4,13 @@ import {TextLink} from "../../components/common/TextButton.tsx";
 import PaginationButton from "../../components/common/PaginationButton.tsx";
 import {PageResponse} from "../../common/types/common.tsx";
 import {fullDateToKorean} from "../../common/util/date.tsx";
-import {getMemberPosts} from "../../common/apis/blog.tsx";
+import {getMemberFolders, getMemberPosts} from "../../common/apis/blog.tsx";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store.tsx";
 import {FillButton} from "../../components/common/FillButton.tsx";
 import {updatePostFolder} from "../../common/apis/post.tsx";
 import FolderSelectBox from "../../components/folder/FolderSelectBox.tsx";
-import {FolderType} from "../../common/types/blog.tsx";
-import {faker} from "@faker-js/faker/locale/ko";
+import {FolderType, toFolderTypeList} from "../../common/types/blog.tsx";
 
 function PostSettingPage() {
 
@@ -98,69 +97,17 @@ function PostSettingPage() {
             })
             .catch((error) => alert(error.response.data.message));
 
-        // todo: folders 데이터
-        const folderData: FolderType[] = [
-            {
-                id: crypto.randomUUID(),
-                title: faker.lorem.words(),
-                subFolders: [
-                    {
-                        id: crypto.randomUUID(),
-                        title: faker.lorem.words(),
-                        subFolders: [
-                            {
-                                id: crypto.randomUUID(),
-                                title: faker.lorem.words(),
-                                subFolders: [],
-                            },
-                        ],
-                    },
-                    {
-                        id: crypto.randomUUID(),
-                        title: faker.lorem.words(),
-                        subFolders: [],
-                    },
-                ]
-            },
-            {
-                id: crypto.randomUUID(),
-                title: faker.lorem.words(),
-                subFolders: [
-                    {
-                        id: crypto.randomUUID(),
-                        title: faker.lorem.words(),
-                        subFolders: [],
-                    },
-                ],
-            },
-            {
-                id: crypto.randomUUID(),
-                title: faker.lorem.words(),
-                subFolders: [
-                    {
-                        id: crypto.randomUUID(),
-                        title: faker.lorem.words(),
-                        subFolders: [],
-                    },
-                    {
-                        id: crypto.randomUUID(),
-                        title: faker.lorem.words(),
-                        subFolders: [],
-                    },
-                    {
-                        id: crypto.randomUUID(),
-                        title: faker.lorem.words(),
-                        subFolders: [],
-                    },
-                ]
-            },
-        ];
-        setFolders(folderData);
-        setFolders(prev => [{
-            id: "empty",
-            title: "폴더 없음",
-            subFolders: [],
-        }, ...prev]);
+        getMemberFolders(loginState.username)
+            .then(res => {
+                setFolders(toFolderTypeList(res.data));
+                setFolders(prev => [{
+                    id: "empty",
+                    title: "폴더 없음",
+                    postCount: 0,
+                    subFolders: [],
+                }, ...prev]);
+            })
+            .catch(error => alert(error.response.data.message));
     }, [loginState, page]);
 
     return (
