@@ -169,6 +169,20 @@ function WritePage() {
     }, []);
 
     useEffect(() => {
+        getMemberFolders(loginState.username)
+            .then(res => {
+                setFolders(toFolderTypeList(res.data));
+                setFolders(prev => [
+                    {
+                        id: "empty",
+                        title: "폴더 없음",
+                        postCount: 0,
+                        subFolders: [],
+                    },
+                    ...prev
+                ]);
+            });
+
         if (!path.endsWith("edit")) {
             return;
         }
@@ -195,20 +209,6 @@ function WritePage() {
                 });
             })
             .catch((error) => alert(error.response.data.message));
-
-        getMemberFolders(loginState.username)
-            .then(res => {
-                setFolders(toFolderTypeList(res.data));
-                setFolders(prev => [
-                    {
-                        id: "empty",
-                        title: "폴더 없음",
-                        postCount: 0,
-                        subFolders: [],
-                    },
-                    ...prev
-                ]);
-            });
     }, []);
 
     useEffect(() => {
@@ -220,7 +220,7 @@ function WritePage() {
 
     return (
         <BasicLayout>
-            <div className="flex flex-col w-full">
+            <div className="flex flex-col w-full max-w-4xl mx-auto">
                 <div className="flex justify-start items-center">
                     <div className="w-108">
                         <FolderSelectBox folders={folders}

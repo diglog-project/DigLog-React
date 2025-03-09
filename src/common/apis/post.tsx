@@ -1,6 +1,17 @@
 import axiosApi from "./AxiosApi.tsx";
-import {PostFolderRequest, PostListRequest, PostRequest, PostSearchRequest, PostUpdateRequest} from "../types/post.tsx";
-import {postListRequestToParameter, postListSearchRequestToParameter} from "../util/url.tsx";
+import {
+    PostFolderRequest,
+    PostListRequest,
+    PostListTagRequest,
+    PostRequest,
+    PostSearchRequest,
+    PostUpdateRequest
+} from "../types/post.tsx";
+import {
+    postListRequestToParameter,
+    postListSearchRequestToParameter,
+    postListTagRequestToParameter
+} from "../util/url.tsx";
 
 export const createPost = async (postRequest: PostRequest) =>
     await axiosApi.post("/post", postRequest);
@@ -19,6 +30,9 @@ export const getPost = async (id: string) =>
 
 export const getPosts = async (postListRequest: PostListRequest) =>
     await axiosApi.get(`/post${postListRequestToParameter(postListRequest)}`);
+
+export const getMemberTagPosts = async (postListTagRequest: PostListTagRequest) =>
+    await axiosApi.get(`/post/member/tag${postListTagRequestToParameter(postListTagRequest)}`);
 
 export const searchPost = async (postSearchRequest: PostSearchRequest) =>
     await axiosApi.get(`/post/search${postListSearchRequestToParameter(postSearchRequest)}`);

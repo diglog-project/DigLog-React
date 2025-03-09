@@ -11,6 +11,7 @@ import {FillButton} from "../../components/common/FillButton.tsx";
 import {updatePostFolder} from "../../common/apis/post.tsx";
 import FolderSelectBox from "../../components/folder/FolderSelectBox.tsx";
 import {FolderType, toFolderTypeList} from "../../common/types/blog.tsx";
+import {FaRegFolder} from "react-icons/fa6";
 
 function PostSettingPage() {
 
@@ -57,7 +58,7 @@ function PostSettingPage() {
         return postIds.indexOf(id) > -1;
     }
 
-    const getTargetFolderId = (targetFolder : FolderType | null) => {
+    const getTargetFolderId = (targetFolder: FolderType | null) => {
         if (!targetFolder || targetFolder.id === "empty") {
             return null;
         }
@@ -65,7 +66,12 @@ function PostSettingPage() {
         return targetFolder.id;
     }
     const submitPostFolderUpdate = () => {
-        if (!confirm("변경사항을 저장하시겠습니까?")) {
+        if (!targetFolder) {
+            alert("폴더를 선택해주세요.");
+            return;
+        }
+
+        if (!confirm(`선택한 게시글을 ${targetFolder.title}로 이동하시겠습니까?`)) {
             return;
         }
 
@@ -75,6 +81,17 @@ function PostSettingPage() {
         })
             .then(() => {
                 alert("폴더가 수정되었습니다.");
+                getMemberPosts({
+                    username: loginState.username,
+                    folderIds: [],
+                    page: page,
+                    size: pageInfo.size,
+                })
+                    .then((res) => {
+                        setPosts([...res.data.content]);
+                        setPageInfo(res.data.page);
+                    })
+                    .catch((error) => alert(error.response.data.message));
                 setIsFolderEdit(false);
             })
             .catch((error) => alert(error.response.data.message));
@@ -137,6 +154,10 @@ function PostSettingPage() {
                         <div className="flex flex-col gap-y-2 flex-1">
                             <p className="font-semibold">{post.title}</p>
                             <p className="text-sm font-light">{fullDateToKorean(post.createdAt)}</p>
+                            <div className="flex items-center gap-x-2">
+                                <FaRegFolder color={"gray"}/>
+                                <p>{post.folder ? post.folder.title : "폴더 없음"}</p>
+                            </div>
                         </div>
                         {!isFolderEdit &&
                             <div className="flex items-center gap-x-4">

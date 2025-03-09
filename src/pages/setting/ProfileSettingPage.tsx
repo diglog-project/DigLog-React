@@ -1,7 +1,7 @@
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store.tsx";
 import {MdOutlineEdit} from "react-icons/md";
-import {ChangeEvent, useEffect, useRef, useState} from "react";
+import {ChangeEvent, useRef, useState} from "react";
 import {FillButton} from "../../components/common/FillButton.tsx";
 import {setUsername} from "../../common/slices/loginSlice.tsx";
 import {TextButton} from "../../components/common/TextButton.tsx";
@@ -75,20 +75,13 @@ function ProfileSettingPage() {
             .catch((error) => alert(error.response.data.message));
     }
 
-    useEffect(() => {
-        if (!loginState.isLogin) {
-            alert("로그인이 필요한 페이지입니다.");
-            navigate("/login");
-        }
-    }, []);
-
     return (
         <div>
             <p className="font-semibold text-xl my-4">프로필 관리</p>
             <div
                 className="border border-gray-200 rounded-2xl p-16 flex flex-col justify-start items-center py-4 gap-4 z-200">
                 <div className="flex justify-center items-center gap-x-4">
-                    <div className={`${isImageEdit ? "w-32" : "w-0"}`}/>
+                    <div className={`${isImageEdit ? "w-36" : "w-0"}`}/>
                     <div className="relative group">
                         {isImageEdit && image
                             ? <img className="border border-gray-300 size-32 rounded-full group-hover:brightness-50"

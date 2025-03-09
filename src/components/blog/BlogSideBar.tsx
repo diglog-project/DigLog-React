@@ -1,17 +1,18 @@
 import {FolderType} from "../../common/types/blog.tsx";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store.tsx";
-import {faker} from "@faker-js/faker/locale/ko";
 import {OutlineLink} from "../common/OutlineButton.tsx";
 import BlogTagCard from "./BlogTagCard.tsx";
 import {getFolderTitle} from "../../common/util/string.tsx";
 import ProfileImageCircle from "../common/ProfileImageCircle.tsx";
+import {TagResponse} from "../../common/types/post.tsx";
 
-function BlogSideBar({folders, username, profileUrl, addTag, setSelectedFolder, bgColor, side}: {
+function BlogSideBar({folders, tags, username, profileUrl, selectedFolder, setSelectedFolder, bgColor, side}: {
     folders: FolderType[],
+    tags: TagResponse[],
     username: string | undefined,
     profileUrl: string | null,
-    addTag: (tagName: string) => void,
+    selectedFolder: FolderType | null,
     setSelectedFolder: (folder: FolderType) => void,
     bgColor?: string,
     side?: boolean,
@@ -38,28 +39,28 @@ function BlogSideBar({folders, username, profileUrl, addTag, setSelectedFolder, 
                 <div className="w-full font-bold text-lime-700 text-center">폴더</div>
                 <BlogFolderList
                     folders={folders}
+                    selectedFolder={selectedFolder}
                     setSelectedFolder={setSelectedFolder}/>
             </div>
             <div className="flex flex-col justify-center items-center gap-4 py-8">
                 <div className="font-bold text-lime-700 text-center">태그</div>
                 <div className="w-72 flex flex-wrap justify-center gap-x-2 gap-y-4 p-2">
-                    {[Array.from({length: 24}).map(() => (
-                        <BlogTagCard key={faker.number.int().toString()}
-                                     tag={{
-                                         id: faker.number.int().toString(),
-                                         name: faker.word.sample()
-                                     }}
-                                     addTag={addTag}/>
-                    ))]}
+                    {tags.map((tag) => (
+                        <BlogTagCard
+                            key={tag.id}
+                            tag={tag}
+                            username={username || ""}/>
+                    ))}
                 </div>
             </div>
         </div>
     );
 }
 
-function BlogFolderList({depth = 0, folders, setSelectedFolder}: {
+function BlogFolderList({depth = 0, folders, selectedFolder, setSelectedFolder}: {
     depth?: number,
     folders: FolderType[],
+    selectedFolder: FolderType | null,
     setSelectedFolder: (folder: FolderType) => void,
 }) {
 
@@ -83,16 +84,19 @@ function BlogFolderList({depth = 0, folders, setSelectedFolder}: {
                     <button
                         className={`flex justify-start items-center hover:opacity-50 hover:cursor-pointer gap-x-2
                         ${depth === 0 && "font-bold"}
-                        ${depth > 0 && `text-gray-500`}`}
+                        ${depth > 0 && "text-gray-500"}
+                        ${selectedFolder?.id === folder.id && "!text-lime-600"}
+                        ${!selectedFolder && folder.id === "" && "!text-lime-600"}`}
                         onClick={() => setSelectedFolder(folder)}>
                         {depth === 2 && <div className="w-8"/>}
                         {getFolderTitle(folder.title, depth)}
-                        <p className="text-xs font-light">({getPostCount(folder)})</p>
+                        {folder.id !== "" && <p className="text-xs font-light">({getPostCount(folder)})</p>}
                     </button>
                     {depth === 0 && <hr className="text-gray-400"/>}
                     <BlogFolderList
                         depth={depth + 1}
                         folders={folder.subFolders}
+                        selectedFolder={selectedFolder}
                         setSelectedFolder={setSelectedFolder}/>
                 </div>)}
         </div>
