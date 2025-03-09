@@ -8,5 +8,8 @@ export const getMemberPosts = (postListMemberRequest: PostListMemberRequest) =>
 export const getMemberFolders = (username: string) =>
     axiosApi.get(`/folders/${username}`);
 
+export const getMemberTags = (username: string) =>
+    axiosApi.get(`/tag/${username}`);
+
 export const saveAndUpdateFolder = (folderRequestList: FolderRequest[]) =>
     axiosApi.put("/folders", folderRequestList);

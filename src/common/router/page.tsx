@@ -28,3 +28,4 @@ export const Post = lazy(() => import('../../pages/post/PostPage.tsx'));
 export const Write = lazy(() => import('../../pages/post/WritePage.tsx'));
 
 export const Blog = lazy(() => import('../../pages/blog/BlogPage.tsx'));
+export const BlogTag = lazy(() => import('../../pages/blog/BlogTagPage.tsx'));

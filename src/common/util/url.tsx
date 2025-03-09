@@ -1,4 +1,4 @@
-import {PostListRequest, PostSearchRequest} from "../types/post.tsx";
+import {PostListRequest, PostListTagRequest, PostSearchRequest} from "../types/post.tsx";
 import {CommentListRequest} from "../types/comment.tsx";
 import {PostListMemberRequest} from "../types/blog.tsx";
 import {MemberProfileSearchRequest} from "../types/member.tsx";
@@ -37,6 +37,10 @@ export const postListSearchRequestToParameter = (postSearchRequest: PostSearchRe
     const sorts = postSearchRequest.sorts.map(sort => `sorts=${sort}`).join("&");
 
     return `?${sorts}&keyword=${postSearchRequest.keyword}&option=${postSearchRequest.option}&page=${postSearchRequest.page}&size=${postSearchRequest.size}&isDescending=${postSearchRequest.isDescending}`;
+}
+
+export const postListTagRequestToParameter = (postListTagRequest: PostListTagRequest) => {
+    return `?username=${postListTagRequest.username}&tagId=${postListTagRequest.tagId}&page=${postListTagRequest.page}&size=${postListTagRequest.size}`;
 }
 
 export const memberProfileSearchRequestToParameter = (memberProfileSearchRequest: MemberProfileSearchRequest) => {

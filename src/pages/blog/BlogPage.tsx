@@ -8,10 +8,11 @@ import {FolderType, toFolderTypeList} from "../../common/types/blog.tsx";
 import BlogSideBar from "../../components/blog/BlogSideBar.tsx";
 import IconButton from "../../components/common/IconButton.tsx";
 import {PageResponse} from "../../common/types/common.tsx";
-import {getMemberFolders, getMemberPosts} from "../../common/apis/blog.tsx";
-import {PostResponse} from "../../common/types/post.tsx";
+import {getMemberFolders, getMemberPosts, getMemberTags} from "../../common/apis/blog.tsx";
+import {PostResponse, TagResponse} from "../../common/types/post.tsx";
 import {MemberProfileResponse} from "../../common/types/member.tsx";
 import {getProfileByUsername} from "../../common/apis/member.tsx";
+import {TextLink} from "../../components/common/TextButton.tsx";
 
 function BlogPage() {
 
@@ -28,10 +29,10 @@ function BlogPage() {
     const [posts, setPosts] = useState<PostResponse[]>([]);
     const [member, setMember] = useState<MemberProfileResponse>({username: username || "", profileUrl: null});
     const [folders, setFolders] = useState<FolderType[]>([]);
+    const [tags, setTags] = useState<TagResponse[]>([]);
 
     const [isOpen, setIsOpen] = useState(false);
     const [selectedFolder, setSelectedFolder] = useState<FolderType | null>(null);
-    const [selectedTagList, setSelectedTagList] = useState<string[]>([]);
 
     const sideBarRef = useRef<HTMLDivElement | null>(null);
 
@@ -43,10 +44,6 @@ function BlogPage() {
             setIsOpen(false);
         }
     };
-
-    const addTag = (selectTag: string) => {
-        setSelectedTagList([...selectedTagList, selectTag]);
-    }
 
     const handlePage = (page: number) => {
         setFolderParam({...folderParam, "page": page.toString()});
@@ -128,6 +125,15 @@ function BlogPage() {
             .then(res => {
                 const folders = toFolderTypeList(res.data);
                 setFolders(folders);
+                setFolders(prev => [
+                    {
+                        id: "",
+                        title: "전체",
+                        postCount: 0,
+                        subFolders: []
+                    },
+                    ...prev,
+                ])
 
                 setPage(Number(folderParam.get("page")) || 0);
 
@@ -140,6 +146,12 @@ function BlogPage() {
                     setSelectedFolder(initialSelectedFolder);
                 }
             });
+
+        getMemberTags(username)
+            .then(res => {
+                setTags(res.data);
+            })
+            .catch(error => alert(error.response.data.message));
     }, [username]);
 
     useEffect(() => {
@@ -164,15 +176,18 @@ function BlogPage() {
         <BasicLayout>
             <div
                 className={`${(isOpen) ? "opacity-50 backdrop-blur-sm z-10 overflow-y-hidden" : "z-10"} w-full flex flex-col`}>
-                <div className="flex justify-between items-center text-2xl font-jalnan px-4 pb-4">
-                    <div>{username}의 블로그</div>
+                <div className="flex justify-between items-center px-0 lg:px-8 text-2xl font-jalnan pb-4">
+                    <TextLink text={`${username}의 블로그`}
+                              to={`/blog/${username}`}
+                              addStyle="!text-2xl !font-jalnan"/>
                     <IconButton
                         icon={<MdMenu className="size-8"/>}
                         onClick={handleMenuOpen}
                         addStyle="lg:hidden"/>
                 </div>
                 <div className="grid lg:grid-cols-3">
-                    <div className="lg:col-span-2 flex flex-col gap-y-4 p-4 lg:border-r border-r-gray-200">
+                    <div
+                        className="lg:col-span-2 flex flex-col gap-y-4 px-0 lg:px-8 py-4 lg:border-r border-r-gray-200">
                         {posts.map((post) => (
                             <PostCard
                                 key={post.id}
@@ -188,9 +203,10 @@ function BlogPage() {
                     <div className="col-span-1 hidden lg:block flex-col">
                         <BlogSideBar
                             folders={folders}
+                            tags={tags}
                             username={username}
                             profileUrl={member.profileUrl}
-                            addTag={addTag}
+                            selectedFolder={selectedFolder}
                             setSelectedFolder={handleSelectedFolder}/>
                     </div>
                 </div>
@@ -204,9 +220,10 @@ function BlogPage() {
                 </button>
                 <BlogSideBar
                     folders={folders}
+                    tags={tags}
                     username={username}
                     profileUrl={member.profileUrl}
-                    addTag={addTag}
+                    selectedFolder={selectedFolder}
                     setSelectedFolder={handleSelectedFolder}
                     bgColor={"bg-gray-50"}
                     side={true}/>

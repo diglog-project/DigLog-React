@@ -33,6 +33,13 @@ export interface PostSearchRequest {
     isDescending: boolean,
 }
 
+export interface PostListTagRequest {
+    username: string,
+    tagId: string,
+    page: number,
+    size: number,
+}
+
 export interface PostListResponse {
     content: PostResponse[];
     page: PageResponse;
