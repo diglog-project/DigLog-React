@@ -5,6 +5,7 @@ import ProfileSettingPage from "./ProfileSettingPage.tsx";
 import FolderSettingPage from "./FolderSettingPage.tsx";
 import {useNavigate, useParams} from "react-router-dom";
 import SettingSideBar from "../../components/setting/SettingSideBar.tsx";
+import FolderSettingPageTest from "./FolderSettingPageTest.tsx";
 
 function SettingPage() {
 
@@ -27,6 +28,10 @@ function SettingPage() {
                 {(selectedSection === "folder") &&
                     <div className="min-w-160 border-l border-gray-200 w-full ps-8">
                         <FolderSettingPage/>
+                    </div>}
+                {(selectedSection === "folder-test") &&
+                    <div className="min-w-160 border-l border-gray-200 w-full ps-8">
+                        <FolderSettingPageTest/>
                     </div>}
                 {(selectedSection === "post") &&
                     <div className="min-w-160 border-l border-gray-200 w-full ps-8">
