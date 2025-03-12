@@ -6,7 +6,7 @@ import {DragEndEvent} from "@dnd-kit/core";
 import FolderCardList from "../../components/folder/FolderCardList.tsx";
 import {arrayMove} from "@dnd-kit/sortable";
 import FolderSelectBox from "../../components/folder/FolderSelectBox.tsx";
-import {getMemberFolders, saveAndUpdateFolder} from "../../common/apis/blog.tsx";
+import {deleteFolder, getMemberFolders, saveAndUpdateFolder} from "../../common/apis/blog.tsx";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store.tsx";
 
@@ -17,6 +17,7 @@ function FolderSettingPage() {
     const [trigger, setTrigger] = useState(false);
     const [tempId, setTempId] = useState(0);
     const [folders, setFolders] = useState<FolderType[]>([]);
+    const [deleteFolderIds, setDeleteFolderIds] = useState<string[]>([]);
 
     const getTempId = () => {
         setTempId(prev => prev + 1);
@@ -248,6 +249,10 @@ function FolderSettingPage() {
             return;
         }
 
+        if (!deleteFolder.id.startsWith("temp")) {
+            setDeleteFolderIds(prev => [...prev, deleteFolder.id]);
+        }
+
         setFolders(prevFolders => getDeleteFolderList(prevFolders, deleteFolder.id));
     }
     const getDeleteFolderList = (folders: FolderType[], id: string) => {
@@ -270,8 +275,13 @@ function FolderSettingPage() {
 
         saveAndUpdateFolder(toFolderRequestList(folders))
             .then(() => {
-                alert("변경사항이 저장되었습니다.");
-                setTrigger(prev => !prev);
+                console.log(deleteFolderIds);
+                deleteFolder({folderIds: deleteFolderIds})
+                    .then(() => {
+                        alert("변경사항이 저장되었습니다.");
+                        setTrigger(prev => !prev);
+                    })
+                    .catch((error) => alert(error.response.data.message));
             })
             .catch(error => alert(error.response.data.message));
     }
