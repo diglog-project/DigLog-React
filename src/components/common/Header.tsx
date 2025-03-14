@@ -6,7 +6,7 @@ import {TextLink} from "./TextButton.tsx";
 import {MdOutlineSearch} from "react-icons/md";
 import IconButton from "./IconButton.tsx";
 import {getProfile, logoutApi} from "../../common/apis/member.tsx";
-import {logout, setProfile} from "../../common/slices/loginSlice.tsx";
+import {logout, setProfile, setReloadedFalse} from "../../common/slices/loginSlice.tsx";
 import ProfileImageCircle from "./ProfileImageCircle.tsx";
 
 function Header() {
@@ -19,6 +19,10 @@ function Header() {
     const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
+        if (!loginState.isReloaded) {
+            return;
+        }
+
         if (loginState.isLogin) {
             return;
         }
@@ -30,6 +34,9 @@ function Header() {
                     username: res.data.username,
                     profileUrl: res.data.profileUrl,
                 }));
+            })
+            .catch(() => {
+                dispatch(setReloadedFalse());
             });
     }, []);
 

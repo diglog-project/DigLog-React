@@ -1,4 +1,4 @@
-import {FolderRequest, PostListMemberRequest} from "../types/blog.tsx";
+import {FolderDeleteRequest, FolderRequest, PostListMemberRequest} from "../types/blog.tsx";
 import axiosApi from "./AxiosApi.tsx";
 import {postListMemberRequestToParameter} from "../util/url.tsx";
 
@@ -13,3 +13,6 @@ export const getMemberTags = (username: string) =>
 
 export const saveAndUpdateFolder = (folderRequestList: FolderRequest[]) =>
     axiosApi.put("/folders", folderRequestList);
+
+export const deleteFolder = (folderDeleteRequestList: FolderDeleteRequest[]) =>
+    axiosApi.delete("/folders", {data: folderDeleteRequestList});

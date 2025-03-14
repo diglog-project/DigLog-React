@@ -5,9 +5,12 @@ import ProfileSettingPage from "./ProfileSettingPage.tsx";
 import FolderSettingPage from "./FolderSettingPage.tsx";
 import {useNavigate, useParams} from "react-router-dom";
 import SettingSideBar from "../../components/setting/SettingSideBar.tsx";
+import {useSelector} from "react-redux";
+import {RootState} from "../../store.tsx";
 
 function SettingPage() {
 
+    const loginState = useSelector((state: RootState) => state.loginSlice);
     const {section} = useParams();
     const navigate = useNavigate();
     const [selectedSection, setSelectedSection] = useState<string>(section || "profile");
@@ -15,6 +18,17 @@ function SettingPage() {
     useEffect(() => {
         navigate(`/setting/${selectedSection}`);
     }, [selectedSection]);
+
+    useEffect(() => {
+        if (loginState.isReloaded) {
+            return;
+        }
+
+        if (!loginState.isLogin) {
+            alert("로그인이 필요한 페이지입니다.");
+            navigate("/login");
+        }
+    }, [loginState.isReloaded]);
 
     return (
         <BasicLayout>
