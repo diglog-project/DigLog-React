@@ -11,7 +11,6 @@ function SettingSideBar({setSelectedSection}: {
     const tabList: TabType[] = [
         {section: "profile", title: "프로필"},
         {section: "folder", title: "폴더"},
-        {section: "folder-test", title: "폴더 테스트"},
         {section: "post", title: "게시글"},
     ];
 
