@@ -275,8 +275,7 @@ function FolderSettingPage() {
 
         saveAndUpdateFolder(toFolderRequestList(folders))
             .then(() => {
-                console.log(deleteFolderIds);
-                deleteFolder({folderIds: deleteFolderIds})
+                deleteFolder(deleteFolderIds.map(id => ({folderId: id})))
                     .then(() => {
                         alert("변경사항이 저장되었습니다.");
                         setTrigger(prev => !prev);

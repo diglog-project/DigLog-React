@@ -14,5 +14,5 @@ export const getMemberTags = (username: string) =>
 export const saveAndUpdateFolder = (folderRequestList: FolderRequest[]) =>
     axiosApi.put("/folders", folderRequestList);
 
-export const deleteFolder = (folderDeleteRequest: FolderDeleteRequest) =>
-    axiosApi.delete("/folders", {data: folderDeleteRequest});
+export const deleteFolder = (folderDeleteRequestList: FolderDeleteRequest[]) =>
+    axiosApi.delete("/folders", {data: folderDeleteRequestList});

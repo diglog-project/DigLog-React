@@ -77,7 +77,7 @@ export const toFolderRequestList = (folderTypeList: FolderType[]) => {
 }
 
 export interface FolderDeleteRequest {
-    folderIds: string[],
+    folderId: string,
 }
 
 export interface PostListMemberRequest {
