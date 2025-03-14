@@ -293,12 +293,16 @@ function FolderSettingPage() {
     };
 
     useEffect(() => {
+        if (loginState.isReloaded) {
+            return;
+        }
+
         getMemberFolders(loginState.username)
             .then(res => {
                 setFolders(toFolderTypeList(res.data));
             })
             .catch(error => alert(error.response.data.message));
-    }, [trigger]);
+    }, [trigger, loginState.isReloaded]);
 
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);

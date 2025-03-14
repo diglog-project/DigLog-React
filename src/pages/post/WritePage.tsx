@@ -151,7 +151,7 @@ function WritePage() {
     );
 
     useEffect(() => {
-        if (!loginState.isLogin) {
+        if (!loginState.isReloaded && !loginState.isLogin) {
             alert("로그인이 필요한 페이지입니다.");
             navigate("/login");
         }
@@ -166,7 +166,7 @@ function WritePage() {
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
         };
-    }, []);
+    }, [loginState.isReloaded]);
 
     useEffect(() => {
         getMemberFolders(loginState.username)
