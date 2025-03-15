@@ -269,6 +269,11 @@ function FolderSettingPage() {
     }
 
     const handleSubmit = () => {
+        if (editFolderId !== "") {
+            alert("변경중인 폴더가 있습니다.");
+            return;
+        }
+
         if (!confirm("변경사항을 저장하시겠습니까?")) {
             return;
         }

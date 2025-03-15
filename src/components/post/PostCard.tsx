@@ -4,7 +4,6 @@ import DOMPurify from "dompurify";
 import {MdImage} from "react-icons/md";
 import {dateToKorean} from "../../common/util/date.tsx";
 import {Link} from "react-router-dom";
-import {FaRegHeart} from "react-icons/fa6";
 
 function PostCard({post}: { post: PostResponse }) {
 
@@ -33,12 +32,12 @@ function PostCard({post}: { post: PostResponse }) {
                             {dateToKorean(post.createdAt)}
                         </div>
                     </div>
-                    <div className="flex justify-end items-center gap-x-3 text-sm text-gray-400">
-                        <div className="flex items-center gap-x-1.5">
-                            <FaRegHeart className="size-3"/>
-                            <p className="text-gray-900">20</p>
-                        </div>
-                    </div>
+                    {/*<div className="flex justify-end items-center gap-x-3 text-sm text-gray-400">*/}
+                    {/*    <div className="flex items-center gap-x-1.5">*/}
+                    {/*        <FaRegHeart className="size-3"/>*/}
+                    {/*        <p className="text-gray-900">20</p>*/}
+                    {/*    </div>*/}
+                    {/*</div>*/}
                 </div>
                 <Link to={`/post/${post.id}`}>
                     <div className="line-clamp-2 text-lg hover:text-gray-600 font-medium">

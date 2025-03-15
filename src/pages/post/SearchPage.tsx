@@ -16,6 +16,7 @@ function SearchPage() {
 
     const optionRef = useRef<HTMLDivElement | null>(null);
     const orderRef = useRef<HTMLDivElement | null>(null);
+    const searchRef = useRef<HTMLInputElement>(null);
 
     const [openOption, setOpenOption] = useState(false);
     const [openOrder, setOpenOrder] = useState(false);
@@ -168,6 +169,10 @@ function SearchPage() {
     }
 
     useEffect(() => {
+        searchRef.current?.focus();
+    }, []);
+
+    useEffect(() => {
         if (refresh) {
             setRefresh(false);
             return;
@@ -201,6 +206,7 @@ function SearchPage() {
                                    onChange={(e) => setSearchRequest({...searchRequest, keyword: e.target.value})}
                                    placeholder={"검색어를 입력해주세요."}
                                    className="w-full block mt-0.5 p-3 mr-4 font-jalnan text-xl text-gray-900 border-b-2 border-white focus:outline-none focus:border-black"
+                                   ref={searchRef}
                                    onKeyDown={handleSearchEnter}/>
                             <button
                                 className={`${searchRequest.keyword === "" ? "hidden" : ""} absolute right-16 rounded-full hover:cursor-pointer hover:bg-gray-1000`}
@@ -215,17 +221,18 @@ function SearchPage() {
                     </div>
                 </div>
                 <div className="w-full max-w-4xl mx-auto flex flex-col gap-y-2">
-                    <div className="flex justify-between items-center h-12">
-                        <div className="text-lg"><span className="font-bold">
+                    <div className="flex justify-between flex-wrap items-center h-16 sm:h-12">
+                        <div className="text-lg">
+                            <span className="font-bold">
                             {selectedTab === "post" ? postPageInfo.totalElements : blogPageInfo.totalElements}
-                        </span>개의 검색결과
+                            </span>
+                            개의 검색결과
                         </div>
                         {selectedTab === "post" &&
-                            <div className="flex items-center justify-end">
+                            <div className="flex items-center justify-end gap-x-8">
                                 <SearchMenu
-                                    title={"검색 조건"}
                                     menus={[
-                                        {key: "전체", value: "ALL"},
+                                        {key: "전체 검색", value: "ALL"},
                                         {key: "제목", value: "TITLE"},
                                         {key: "태그", value: "TAG"},
                                     ]}
@@ -235,7 +242,6 @@ function SearchPage() {
                                     value={searchRequest.option}
                                     customRef={optionRef}/>
                                 <SearchMenu
-                                    title={"정렬 조건"}
                                     menus={[
                                         {key: "최신순", value: "true"},
                                         {key: "오래된순", value: "false"},
@@ -342,8 +348,7 @@ interface MenuItem {
     value: string,
 }
 
-function SearchMenu({title, menus, setMenu, value, open, handleOpen, customRef}: {
-    title: string,
+function SearchMenu({menus, setMenu, value, open, handleOpen, customRef}: {
     menus: MenuItem[],
     setMenu: (menu: MenuItem) => void,
     value: string,
@@ -354,11 +359,10 @@ function SearchMenu({title, menus, setMenu, value, open, handleOpen, customRef}:
 
     return (
         <div ref={customRef} className="z-50">
-            <div className="flex justify-start items-center">
-                <p>{title}</p>
+            <div className="flex justify-start items-center gap-x-4">
                 <div className="relative">
                     <button
-                        className="w-28 shrink-0 z-10 inline-flex justify-between items-center py-2.5 px-4 text-sm font-medium text-gray-900 hover:cursor-pointer"
+                        className="w-28 shrink-0 z-10 inline-flex justify-between items-center py-2.5 text-sm font-medium text-gray-900 hover:cursor-pointer"
                         onClick={handleOpen}
                     >
                         {menus.find(menuItem => menuItem.value === value)?.key}

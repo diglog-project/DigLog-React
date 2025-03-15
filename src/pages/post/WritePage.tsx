@@ -1,6 +1,6 @@
 import BasicLayout from "../../layout/BasicLayout.tsx";
 import {useEffect, useState} from "react";
-import {useBlocker, useLocation, useNavigate, useParams} from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {Editor} from "@tinymce/tinymce-react";
 import {FillButton} from "../../components/common/FillButton.tsx";
 import {useSelector} from "react-redux";
@@ -16,6 +16,7 @@ import {sortByName} from "../../common/util/sort.tsx";
 import {FolderType, toFolderTypeList} from "../../common/types/blog.tsx";
 import FolderSelectBox from "../../components/folder/FolderSelectBox.tsx";
 import {getMemberFolders} from "../../common/apis/blog.tsx";
+import * as React from "react";
 
 interface WritePostType {
     inputTag: string;
@@ -43,17 +44,32 @@ function WritePage() {
 
     const [targetFolder, setTargetFolder] = useState<FolderType | null>(null);
     const [uploadCount, setUploadCount] = useState(0);
-    const [exitPage, setExitPage] = useState(false);
 
     const removeTag = (tag: string | null) => {
         setPost({...post, tags: post.tags.filter(prevTag => prevTag !== tag)});
     }
-    const handleTag = (tag: string) => {
+    const handleInputTag = (tag: string) => {
         if (!tag.endsWith(",")) {
             setPost({...post, inputTag: tag});
             return;
         }
-        if (post.tags.includes(tag.substring(0, tag.length - 1))) {
+        handleTag(post.inputTag);
+    }
+    const handleTagEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key !== "Enter") {
+            return;
+        }
+        handleTag(post.inputTag);
+    }
+    const handleTag = (tag: string) => {
+        console.log(tag);
+        console.log(tag.trim() === "");
+        if (tag.trim() === "") {
+            setPost({...post, inputTag: tag});
+            return;
+        }
+
+        if (post.tags.includes(tag.trim())) {
             setPost({...post, inputTag: ""});
             return;
         }
@@ -90,7 +106,6 @@ function WritePage() {
         })
             .then(() => {
                 alert("작성되었습니다.");
-                setExitPage(true);
                 navigate(`/blog/${loginState.username}`);
             })
             .catch((error) => alert(error.response.data.message))
@@ -122,7 +137,6 @@ function WritePage() {
         })
             .then(() => {
                 alert("수정되었습니다.");
-                setExitPage(true);
                 navigate(`/blog/${loginState.username}`);
             })
             .catch((error) => alert(error.response.data.message))
@@ -142,20 +156,7 @@ function WritePage() {
             .catch((error) => alert(error.response.data.message));
     }
 
-    // 뒤로가기 방지
-    useBlocker(() => {
-            return (!!post.title || !!post.content) &&
-                exitPage &&
-                !confirm("페이지를 이동하시겠습니까?\n\n작성중인 내용이 저장되지 않습니다.");
-        }
-    );
-
     useEffect(() => {
-        if (!loginState.isReloaded && !loginState.isLogin) {
-            alert("로그인이 필요한 페이지입니다.");
-            navigate("/login");
-        }
-
         // 새로고침 방지
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
             event.preventDefault();
@@ -166,11 +167,21 @@ function WritePage() {
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
         };
-    }, [loginState.isReloaded]);
+    }, []);
 
     useEffect(() => {
+        if (loginState.isReloaded) {
+            return;
+        }
+
+        if (!loginState.isReloaded && !loginState.isLogin) {
+            alert("로그인이 필요한 페이지입니다.");
+            navigate("/login");
+        }
+
         getMemberFolders(loginState.username)
             .then(res => {
+                console.log(res);
                 setFolders(toFolderTypeList(res.data));
                 setFolders(prev => [
                     {
@@ -209,7 +220,7 @@ function WritePage() {
                 });
             })
             .catch((error) => alert(error.response.data.message));
-    }, []);
+    }, [loginState.isReloaded]);
 
     useEffect(() => {
         if (uploadCount > 0) {
@@ -245,13 +256,17 @@ function WritePage() {
                             </button>)}
                         <input className="flex-1 text-lg focus:outline-none"
                                type="text" placeholder="태그를 입력하세요" value={post.inputTag}
-                               onChange={(event) => handleTag(event.target.value)}
+                               onChange={(event) => handleInputTag(event.target.value)}
                                onFocus={() => setShowTag(true)}
-                               onBlur={() => setShowTag(false)}/>
+                               onBlur={() => {
+                                   setShowTag(false);
+                                   handleTag(post.inputTag);
+                               }}
+                               onKeyDown={handleTagEnter}/>
                     </div>
                     {showTag && <div
-                        className="absolute -bottom-6 left-0 flex flex-col rounded-md bg-gray-700 text-white w-[calc(302px)] px-4 py-2 text-sm">
-                        <span className="pb-1">쉼표를 입력하여 태그를 등록할 수 있습니다.</span>
+                        className="absolute -bottom-6 left-0 flex flex-col rounded-md bg-gray-700 text-white w-[calc(346px)] px-4 py-2 text-sm">
+                        <span className="pb-1">쉼표나 엔터를 입력하여 태그를 등록할 수 있습니다.</span>
                     </div>}
                 </div>
                 <Editor
