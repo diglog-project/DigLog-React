@@ -1,6 +1,6 @@
 import BasicLayout from "../../layout/BasicLayout.tsx";
 import LoginTextField from "../../components/member/LoginTextField.tsx";
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import LoginButton from "../../components/member/LoginButton.tsx";
 import {useNavigate} from "react-router-dom";
 import * as React from "react";
@@ -14,6 +14,8 @@ function EmailPage() {
     const [email, setEmail] = useState("");
 
     const navigate = useNavigate();
+
+    const emailRef = useRef<HTMLInputElement>(null);
 
     const handleEmailEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key !== "Enter") {
@@ -38,6 +40,10 @@ function EmailPage() {
             .finally(() => setLoading(false));
     }
 
+    useEffect(() => {
+        emailRef.current?.focus();
+    }, []);
+
     return (
         <BasicLayout center={true}>
             <div
@@ -48,6 +54,7 @@ function EmailPage() {
                     placeholder={"diglog@example.com"}
                     value={email}
                     setValue={(value) => setEmail(value)}
+                    customRef={emailRef}
                     onKeyDown={handleEmailEnter}/>
                 <LoginButton text={"인증코드 전송"} onClick={handleVerifyEmail} disable={!checkEmail(email)} bgColor={"bg-lime-400"}/>
             </div>

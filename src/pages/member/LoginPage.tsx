@@ -1,6 +1,6 @@
 import BasicLayout from "../../layout/BasicLayout.tsx";
 import {useNavigate} from "react-router-dom";
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {getProfile, handleKakaoLogin, loginApi} from "../../common/apis/member.tsx";
 import {login, setProfile} from "../../common/slices/loginSlice.tsx";
@@ -17,6 +17,9 @@ function LoginPage() {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
+    const emailRef = useRef<HTMLInputElement>(null);
+    const passwordRef = useRef<HTMLInputElement>(null);
 
     const [loginInfo, setLoginInfo] = useState({email: "", password: ""});
 
@@ -45,6 +48,14 @@ function LoginPage() {
             .catch(error => alert(error.response.data.message));
     }
 
+    const handleEmailEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key !== "Enter") {
+            return;
+        }
+
+        passwordRef.current?.focus();
+    }
+
     const handlePasswordEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key !== "Enter") {
             return;
@@ -57,6 +68,10 @@ function LoginPage() {
         handleLogin();
     }
 
+    useEffect(() => {
+        emailRef.current?.focus();
+    }, []);
+
     return (
         <BasicLayout center={true}>
             <div
@@ -68,21 +83,24 @@ function LoginPage() {
                         DIGLOG
                     </div>
                 </div>
-                <div className="flex flex-col justify-center items-center w-full">
+                <form onSubmit={e => e.preventDefault()} className="flex flex-col justify-center items-center w-full">
                     <LoginTextField
                         label={"이메일"}
                         type={"email"}
-                        placeholder={"diglog@example.com"}
+                        placeholder={"이메일을 입력해주세요."}
                         value={loginInfo.email}
-                        setValue={(value) => setLoginInfo({...loginInfo, email: value})}/>
+                        setValue={(value) => setLoginInfo({...loginInfo, email: value})}
+                        customRef={emailRef}
+                        onKeyDown={handleEmailEnter}/>
                     <LoginTextField
                         label={"비밀번호"}
                         type={"password"}
-                        placeholder={"영문, 숫자 포함 8-16자"}
+                        placeholder={"비밀번호를 입력해주세요."}
                         value={loginInfo.password}
                         setValue={(value) => setLoginInfo({...loginInfo, password: value})}
+                        customRef={passwordRef}
                         onKeyDown={handlePasswordEnter}/>
-                </div>
+                </form>
                 <div className="flex flex-col justify-center items-center gap-y-4 w-full">
                     <LoginButton text={"로그인"} onClick={handleLogin} bgColor={"bg-lime-300"}/>
                     <LoginButton text={"카카오로 시작하기"} onClick={handleKakaoLogin} bgColor={"bg-[#FEE500]"}
