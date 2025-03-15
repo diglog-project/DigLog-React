@@ -6,6 +6,8 @@ import {FillButton} from "../common/FillButton.tsx";
 import {MdOutlineMenu} from "react-icons/md";
 import {TextButton} from "../common/TextButton.tsx";
 import {restrictToVerticalAxis} from "@dnd-kit/modifiers";
+import {useEffect, useRef} from "react";
+import * as React from "react";
 
 function FolderCardList({
                             folders,
@@ -87,12 +89,32 @@ function FolderCard({
     setSelectedFolder: (selectedFolder: FolderType) => void,
 }) {
 
+    const folderTitleRef = useRef<HTMLInputElement>(null);
+
     const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id: folder.id});
 
     const style = {
         transform: CSS.Translate.toString(transform),
         transition,
     };
+
+    useEffect(() => {
+        if (folder.id === editFolderId) {
+            folderTitleRef.current?.focus();
+        }
+    }, [editFolderId]);
+
+    const handleEditTitleEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key !== "Enter") {
+            return;
+        }
+
+        handleEditTitle();
+    }
+
+    const handleEditTitle = () => {
+        handleEdit({...folder, title: editFolderTitle});
+    }
 
     return (
         <div key={folder.id} ref={setNodeRef} style={style}
@@ -105,13 +127,15 @@ function FolderCard({
                             className={"flex-1 font-bold border p-2"}
                             value={editFolderTitle}
                             onChange={(e) => setEditFolderTitle(e.target.value)}
+                            onKeyDown={handleEditTitleEnter}
+                            ref={folderTitleRef}
                             placeholder="폴더 이름"/>
                         <div className="flex items-center gap-x-2">
                             <FillButton text={"취소"}
                                         onClick={() => setEditFolderId("")}
                                         addStyle={"!bg-gray-400 hover:brightness-110"}/>
                             <FillButton text={"수정"}
-                                        onClick={() => handleEdit({...folder, title: editFolderTitle})}
+                                        onClick={handleEditTitle}
                                         addStyle={`${folder.title === editFolderTitle && "opacity-50 hover:!cursor-auto"}`}
                                         disabled={folder.title === editFolderTitle}/>
                         </div>
