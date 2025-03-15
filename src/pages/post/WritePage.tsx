@@ -1,6 +1,6 @@
 import BasicLayout from "../../layout/BasicLayout.tsx";
 import {useEffect, useState} from "react";
-import {useBlocker, useLocation, useNavigate, useParams} from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {Editor} from "@tinymce/tinymce-react";
 import {FillButton} from "../../components/common/FillButton.tsx";
 import {useSelector} from "react-redux";
@@ -44,7 +44,6 @@ function WritePage() {
 
     const [targetFolder, setTargetFolder] = useState<FolderType | null>(null);
     const [uploadCount, setUploadCount] = useState(0);
-    const [exitPage, setExitPage] = useState(false);
 
     const removeTag = (tag: string | null) => {
         setPost({...post, tags: post.tags.filter(prevTag => prevTag !== tag)});
@@ -107,7 +106,6 @@ function WritePage() {
         })
             .then(() => {
                 alert("작성되었습니다.");
-                setExitPage(true);
                 navigate(`/blog/${loginState.username}`);
             })
             .catch((error) => alert(error.response.data.message))
@@ -139,7 +137,6 @@ function WritePage() {
         })
             .then(() => {
                 alert("수정되었습니다.");
-                setExitPage(true);
                 navigate(`/blog/${loginState.username}`);
             })
             .catch((error) => alert(error.response.data.message))
@@ -158,13 +155,6 @@ function WritePage() {
             })
             .catch((error) => alert(error.response.data.message));
     }
-
-    // 뒤로가기 방지
-    useBlocker(() => {
-            return ((post.title !== "" || post.content !== "") &&
-                !exitPage && !confirm("페이지를 이동하시겠습니까?\n\n작성중인 내용이 저장되지 않습니다."));
-        }
-    );
 
     useEffect(() => {
         // 새로고침 방지
@@ -191,6 +181,7 @@ function WritePage() {
 
         getMemberFolders(loginState.username)
             .then(res => {
+                console.log(res);
                 setFolders(toFolderTypeList(res.data));
                 setFolders(prev => [
                     {

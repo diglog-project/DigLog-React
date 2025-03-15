@@ -74,7 +74,7 @@ function FolderSelectCard({folder, depth, selectedFolder, setTargetFolder, setFo
                 <div className={`flex items-center gap-x-1 ${depth === 0 && "font-bold text-black"}`}>
                     <div className={`w-${depth * 4}`}/>
                     {getFolderTitle(folder.title, depth)}
-                    <p className="text-xs font-light">({folder.postCount})</p>
+                    {folder.id !== "empty" && <p className="text-xs font-light">({folder.postCount})</p>}
                 </div>
             </button>
             {folder.subFolders &&
