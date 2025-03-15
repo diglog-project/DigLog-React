@@ -180,7 +180,7 @@ function PostPage() {
             <div className="w-full flex flex-col">
                 <div className="flex flex-col gap-y-8">
                     <div className="flex justify-between items-center">
-                        <div className="flex-1 flex justify-center items-center gap-x-4">
+                        <div className="flex-1 flex flex-wrap justify-center items-center gap-x-4">
                             <Link to={`/blog/${post.username}`} className="text-xs">
                                 Home
                             </Link>
@@ -192,7 +192,7 @@ function PostPage() {
                                 </div>}
                         </div>
                     </div>
-                    <div className="flex flex-row w-full justify-center text-center items-center gap-4">
+                    <div className="flex flex-row flex-wrap w-full justify-center text-center items-center gap-4">
                         <Link to={`/blog/${post.username}`}
                               className="text-md font-semibold text-lime-700 hover:text-lime-400">
                             {post.username}
@@ -211,9 +211,9 @@ function PostPage() {
                             }}/>)}
                     </div>
                 </div>
-                <div className="w-4xl mx-auto p-8 break-words"
+                <div className="max-w-4xl mx-auto py-8 break-words"
                      dangerouslySetInnerHTML={{__html: safeContent}}/>
-                <div className="w-full max-w-4xl mx-auto p-8 rounded-2xl flex flex-col gap-y-0 my-8">
+                <div className="w-full max-w-4xl mx-auto py-8 rounded-2xl flex flex-col gap-y-0 my-8">
                     {loginState.isLogin
                         ? <CommentTextField
                             value={commentInput}

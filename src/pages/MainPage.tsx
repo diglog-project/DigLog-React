@@ -34,7 +34,7 @@ function MainPage() {
         <BasicLayout>
             <div className="w-full flex flex-col justify-center items-start">
                 <div className="text-2xl font-jalnan mb-8">
-                    인기 있는 게시글
+                    최근 게시글
                 </div>
                 <div ref={pageRef}
                      className="w-full grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8">

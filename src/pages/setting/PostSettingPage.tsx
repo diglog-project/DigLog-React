@@ -140,11 +140,11 @@ function PostSettingPage() {
                             setTargetFolder={setTargetFolder}
                             center={false}/>
                         <FillButton text={"취소"} onClick={handleIsFolderEdit} addStyle={"!bg-gray-400 w-22 h-10"}/>
-                        <FillButton text={"저장"} onClick={submitPostFolderUpdate} addStyle={"w-22 h-10"}/>
+                        <FillButton text={"이동"} onClick={submitPostFolderUpdate} addStyle={"w-22 h-10"}/>
                     </div>}
                 {!isFolderEdit &&
                     <div className="flex gap-x-2">
-                        <FillButton text={"폴더 수정"} onClick={handleIsFolderEdit}/>
+                        <FillButton text={"폴더 이동"} onClick={handleIsFolderEdit}/>
                     </div>}
             </div>
             <div>

@@ -44,13 +44,17 @@ function BlogSideBar({folders, tags, username, profileUrl, selectedFolder, setSe
             </div>
             <div className="flex flex-col justify-center items-center gap-4 py-8">
                 <div className="font-bold text-lime-700 text-center">태그</div>
-                <div className="w-72 flex flex-wrap justify-center gap-x-2 gap-y-4 p-2">
+                <div className="w-72 flex flex-wrap justify-center gap-x-2 gap-y-4">
                     {tags.map((tag) => (
                         <BlogTagCard
                             key={tag.id}
                             tag={tag}
                             username={username || ""}/>
                     ))}
+                    {tags.length === 0 &&
+                        <div className="text-center text-gray-600">
+                            생성된 태그가 없습니다.
+                        </div>}
                 </div>
             </div>
         </div>
@@ -78,7 +82,7 @@ function BlogFolderList({depth = 0, folders, selectedFolder, setSelectedFolder}:
 
     return (
         <div className="w-full flex flex-col gap-y-1">
-            {folders.map(folder =>
+            {folders.length > 1 && folders.map(folder =>
                 <div key={folder.id} className={`flex flex-col gap-y-2`}>
                     {depth === 0 && <div className="h-2"/>}
                     <button
@@ -92,13 +96,17 @@ function BlogFolderList({depth = 0, folders, selectedFolder, setSelectedFolder}:
                         {getFolderTitle(folder.title, depth)}
                         {folder.id !== "" && <p className="text-xs font-light">({getPostCount(folder)})</p>}
                     </button>
-                    {depth === 0 && <hr className="text-gray-400"/>}
+                    {folder.subFolders.length > 0 && depth === 0 && <hr className="text-gray-400"/>}
                     <BlogFolderList
                         depth={depth + 1}
                         folders={folder.subFolders}
                         selectedFolder={selectedFolder}
                         setSelectedFolder={setSelectedFolder}/>
                 </div>)}
+            {depth === 0 && folders.length <= 1 &&
+                <div className="text-center text-gray-600">
+                    생성된 폴더가 없습니다.
+                </div>}
         </div>
     );
 }
