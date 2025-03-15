@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && aws s3 sync dist/ s3://[bucket_name] --delete",
+    "invalidate": "aws cloudfront create-invalidation --profile=[profile_name] --distribution-id [cloudfront ID] --paths /assets/* /index.html"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
