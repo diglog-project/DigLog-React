@@ -52,9 +52,9 @@ function SettingPage() {
         <BasicLayout>
             <div
                 ref={sideBarRef}
-                className={`${menuOpen ? "block translate-x-0 overflow-y-scroll" : "hidden translate-x-full overflow-y-hidden"} absolute top-0 left-0 flex-col
+                className={`${menuOpen ? "block translate-x-0" : "hidden translate-x-full"} absolute top-0 left-0 flex-col
                      transform transition-transform duration-300 ease-out z-20`}>
-                <button className="absolute top-4 left-4 hover:cursor-pointer"
+                <button className="absolute top-6 right-6 hover:cursor-pointer"
                         onClick={() => setMenuOpen(false)}>
                     <MdOutlineExitToApp className="size-8 text-gray-500"/>
                 </button>
@@ -62,27 +62,27 @@ function SettingPage() {
                     setSelectedSection={setSelectedSection}
                     side={true}/>
             </div>
-            <div className={`${(menuOpen) ? "opacity-50 backdrop-blur-sm z-10 overflow-y-hidden" : "z-10"} flex flex-col sm:flex-row w-full gap-x-4 sm:gap-y-4`}>
-                <div className="hidden sm:block">
+            <div className={`${(menuOpen) ? "opacity-50 backdrop-blur-sm z-10 overflow-y-hidden" : "z-10"} px-4 flex flex-col md:flex-row w-full gap-x-4 md:gap-y-4`}>
+                <div className="hidden md:block">
                     <SettingSideBar
                         setSelectedSection={setSelectedSection}
                         side={false}/>
                 </div>
-                <div className="block sm:hidden">
+                <div className="block md:hidden">
                     <IconButton
                         icon={<MdMenu size={24}/>}
                         onClick={() => setMenuOpen(prev => !prev)}/>
                 </div>
                 {(selectedSection === "profile") &&
-                    <div className="sm:border-l border-gray-200 w-full ps-8">
+                    <div className="md:border-l border-gray-200 w-full ps-8">
                         <ProfileSettingPage/>
                     </div>}
                 {(selectedSection === "folder") &&
-                    <div className="sm:border-l border-gray-200 w-full ps-8">
+                    <div className="md:border-l border-gray-200 w-full ps-8">
                         <FolderSettingPage/>
                     </div>}
                 {(selectedSection === "post") &&
-                    <div className="sm:border-l border-gray-200 w-full ps-8">
+                    <div className="md:border-l border-gray-200 w-full ps-8">
                         <PostSettingPage/>
                     </div>}
             </div>

@@ -23,7 +23,7 @@ function SettingSideBar({setSelectedSection, side}: {
 
     return (
         <div
-            className={`w-52 h-full flex-col justify-start items-start ${side && "pt-16 px-4 bg-gray-50 h-screen overflow-y-scroll"}`}>
+            className={`w-48 h-full flex-col justify-start items-start ${side && "pt-16 px-4 bg-gray-50 h-screen"}`}>
             <ul className="w-full flex flex-col gap-y-1.5 flex-wrap">
                 {tabList.map((tab) =>
                     <li key={tab.section}>

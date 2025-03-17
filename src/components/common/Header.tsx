@@ -92,7 +92,7 @@ function Header() {
                             className="relative flex justify-around items-center w-full">
                             <ProfileImageCircle profileUrl={loginState.profileUrl} onClick={handleDropDown}/>
                             <div
-                                className={`${isOpen ? "" : "hidden"} absolute z-50 top-12 right-0 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44`}>
+                                className={`${isOpen ? "" : "hidden"} absolute z-99 top-12 right-0 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44`}>
                                 <div className="flex flex-col gap-1 px-4 py-3 text-sm text-gray-900">
                                     <div className="font-medium truncate">{loginState.username}</div>
                                     <div className="font-medium truncate">{loginState.email}</div>
