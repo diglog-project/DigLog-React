@@ -214,7 +214,7 @@ function BlogPage() {
             <div ref={sideBarRef}
                  className={`${isOpen ? "block translate-x-0 overflow-y-scroll" : "hidden translate-x-full overflow-y-hidden"} !bg-orange-400 absolute top-0 right-0 w-96 flex-col
                      transform transition-transform duration-300 ease-out z-20`}>
-                <button className="absolute top-4 right-[calc(320px)] hover:cursor-pointer"
+                <button className="absolute top-4 left-[calc(320px)] hover:cursor-pointer"
                         onClick={() => setIsOpen(false)}>
                     <MdOutlineExitToApp className="size-8 text-gray-500"/>
                 </button>
