@@ -220,7 +220,7 @@ function SearchPage() {
                         </div>
                     </div>
                 </div>
-                <div className="w-full max-w-4xl mx-auto flex flex-col gap-y-2">
+                <div className="w-full max-w-3xl mx-auto flex flex-col gap-y-2">
                     <div className="flex justify-between flex-wrap items-center h-16 sm:h-12">
                         <div className="text-lg">
                             <span className="font-bold">

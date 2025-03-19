@@ -231,7 +231,7 @@ function WritePage() {
 
     return (
         <BasicLayout>
-            <div className="flex flex-col w-full max-w-4xl mx-auto">
+            <div className="flex flex-col w-full max-w-3xl mx-auto">
                 <div className="flex justify-start items-center">
                     <div className="w-108">
                         <FolderSelectBox folders={folders}

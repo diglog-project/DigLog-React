@@ -74,10 +74,10 @@ function Header() {
 
     return (
         <div className="border border-b-2 border-gray-200 px-4 flex justify-between items-center w-full">
-            <Link to={"/"} className="flex items-center justify-center gap-x-3 ml-4">
+            <Link to={"/"} className="flex items-center justify-center gap-x-2">
                 <img src="/logo.png" alt="logo"
-                     className="size-10 mb-1"/>
-                <div className="flex items-center text-xl h-16 font-jalnan">
+                     className="size-8 mb-1"/>
+                <div className="flex items-center text-lg h-16 font-jalnan">
                     DIGLOG
                 </div>
             </Link>

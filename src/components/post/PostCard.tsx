@@ -2,7 +2,7 @@ import {PostResponse} from "../../common/types/post.tsx";
 import {getImgSrc, removeHtmlTags} from "../../common/util/html.tsx";
 import DOMPurify from "dompurify";
 import {MdImage} from "react-icons/md";
-import {dateToKorean} from "../../common/util/date.tsx";
+import {relativeDateToKorean} from "../../common/util/date.tsx";
 import {Link} from "react-router-dom";
 
 function PostCard({post}: { post: PostResponse }) {
@@ -23,13 +23,13 @@ function PostCard({post}: { post: PostResponse }) {
             </Link>
             <div className="flex flex-col gap-y-2 my-4">
                 <div className="flex justify-between items-center">
-                    <div className="flex justify-center items-center gap-x-4">
+                    <div className="flex justify-center items-center gap-x-4 text-sm">
                         <Link to={`/blog/${post.username}`}
-                              className="text-sm font-semibold text-lime-700 hover:text-lime-400">
+                              className="font-semibold text-lime-700 hover:text-lime-400">
                             {post.username}
                         </Link>
-                        <div className="text-sm text-gray-500 font-semibold">
-                            {dateToKorean(post.createdAt)}
+                        <div className="text-gray-500 font-normal">
+                            {relativeDateToKorean(post.createdAt)}
                         </div>
                     </div>
                     {/*<div className="flex justify-end items-center gap-x-3 text-sm text-gray-400">*/}
@@ -40,11 +40,11 @@ function PostCard({post}: { post: PostResponse }) {
                     {/*</div>*/}
                 </div>
                 <Link to={`/post/${post.id}`}>
-                    <div className="line-clamp-2 text-lg hover:text-gray-600 font-medium">
+                    <div className="line-clamp-2 hover:text-gray-600 font-medium">
                         {post.title}
                     </div>
                 </Link>
-                <div className="line-clamp-3 text-gray-500 font-normal">
+                <div className="line-clamp-3 text-gray-500 text-sm font-normal">
                     {removeHtmlTags(safeContent)}
                 </div>
             </div>

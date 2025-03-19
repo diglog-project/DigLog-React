@@ -23,12 +23,12 @@ function BlogSideBar({folders, tags, username, profileUrl, selectedFolder, setSe
     return (
         <div className={`${bgColor} ${side && "h-screen overflow-y-scroll"}`}>
             <div className="flex flex-col justify-start items-center py-4 gap-4 z-200">
-                <ProfileImageCircle profileUrl={profileUrl} size="lg"/>
-                <div className="flex justify-center items-center text-2xl font-black">
+                <ProfileImageCircle profileUrl={profileUrl} size="md"/>
+                <div className="flex justify-center items-center text-xl font-black">
                     {username}
                 </div>
                 {username === loginState.username && (
-                    <div className="flex justify-between items-center gap-x-4 text-xs">
+                    <div className="flex justify-between items-center gap-x-4 my-2 text-xs">
                         <OutlineLink text={"게시글 작성"} to={"/write"}/>
                         <OutlineLink text={"블로그 설정"} to={"/setting/folder"}
                                      addStyle={"!border-neutral-500 !text-neutral-500 hover:bg-neutral-500 hover:!text-white"}/>

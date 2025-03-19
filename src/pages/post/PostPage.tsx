@@ -201,7 +201,7 @@ function PostPage() {
                             {fullDateToKorean(post.createdAt)}
                         </div>
                     </div>
-                    <div className="text-center leading-relaxed text-4xl text-gray-900 font-jalnan break-words">
+                    <div className="text-center leading-relaxed text-3xl text-gray-900 font-jalnan break-words">
                         {post.title}
                     </div>
                     <div className="flex flex-wrap justify-center items-center gap-4">
@@ -211,9 +211,11 @@ function PostPage() {
                             }}/>)}
                     </div>
                 </div>
-                <div className="max-w-4xl mx-auto py-8 break-words"
+                <div className="w-full max-w-3xl mx-auto py-8 break-words"
                      dangerouslySetInnerHTML={{__html: safeContent}}/>
-                <div className="w-full max-w-4xl mx-auto py-8 rounded-2xl flex flex-col gap-y-0 my-8">
+                <div>
+                </div>
+                <div className="w-full max-w-3xl mx-auto py-8 rounded-2xl flex flex-col gap-y-0 my-8">
                     {loginState.isLogin
                         ? <CommentTextField
                             value={commentInput}

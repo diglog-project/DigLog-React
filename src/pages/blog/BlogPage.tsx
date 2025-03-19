@@ -176,10 +176,10 @@ function BlogPage() {
         <BasicLayout>
             <div
                 className={`${(isOpen) ? "opacity-50 backdrop-blur-sm z-10 overflow-y-hidden" : "z-10"} w-full flex flex-col`}>
-                <div className="flex justify-between items-center px-0 lg:px-8 text-2xl font-jalnan pb-4">
+                <div className="flex justify-between items-center px-0 lg:px-5 font-jalnan pb-4">
                     <TextLink text={`${username}의 블로그`}
                               to={`/blog/${username}`}
-                              addStyle="!text-2xl !font-jalnan"/>
+                              addStyle="!text-xl !font-jalnan"/>
                     <IconButton
                         icon={<MdMenu className="size-8"/>}
                         onClick={handleMenuOpen}

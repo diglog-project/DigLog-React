@@ -78,7 +78,7 @@ function BlogTagPage() {
             <div className="w-full flex flex-col gap-y-8">
                 <TextLink text={`${username}의 블로그`}
                           to={`/blog/${username}`}
-                          addStyle="flex justify-start !text-2xl !font-jalnan"/>
+                          addStyle="flex justify-start !text-xl !font-jalnan"/>
                 <div className="flex gap-x-4">
                     {tags.map(tag =>
                         <TagCard
