@@ -33,7 +33,7 @@ function MainPage() {
     return (
         <BasicLayout>
             <div className="w-full flex flex-col justify-center items-start">
-                <div className="text-2xl font-jalnan mb-8">
+                <div className="text-xl font-jalnan mb-8">
                     최근 게시글
                 </div>
                 <div ref={pageRef}

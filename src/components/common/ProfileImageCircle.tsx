@@ -12,6 +12,9 @@ function ProfileImageCircle({profileUrl, size, onClick, addStyle}: {
     if (size === "lg") {
         imageSize = "size-32";
         iconSize = "size-28";
+    } else if (size === "md") {
+        imageSize = "size-28";
+        iconSize = "size-24";
     } else {
         imageSize += "size-10";
         iconSize += "size-6";

@@ -1,4 +1,4 @@
-import {fullDateToKorean} from "../../common/util/date.tsx";
+import {relativeDateToKorean} from "../../common/util/date.tsx";
 import {MdOutlineAddComment, MdOutlineComment, MdOutlinePerson} from "react-icons/md";
 import {ChangeEvent, useState} from "react";
 import CommentTextField from "./CommentTextField.tsx";
@@ -72,14 +72,14 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
                             ? <img className="size-6 rounded-full hover:cursor-pointer"
                                    src={comment.member.profileUrl} alt="user_image"/>
                             : <MdOutlinePerson className="size-5 text-gray-600"/>}
-                        <p className="font-bold">
+                        <p className="font-semibold">
                             {comment.member.username}
                         </p>
-                        <p className="text-gray-400 text-sm">
-                            {fullDateToKorean(comment.createdAt)}
+                        <p className="text-gray-500 text-xs ml-2">
+                            {relativeDateToKorean(comment.createdAt)}
                         </p>
                     </div>
-                    <div className="mt-4 text-gray-900 flex items-center gap-x-2">
+                    <div className="my-2 text-gray-900 flex items-center gap-x-2">
                         {!showEditTextField &&
                             comment.taggedUsername &&
                             <span className="text-lime-700">
@@ -93,12 +93,12 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
                                 taggedUsername={comment.taggedUsername}
                                 originalComment={comment}
                                 handleShowTextField={handleShowEdit}/>
-                            : <div>{comment.content}</div>}
+                            : <div className="leading-relaxed">{comment.content}</div>}
                     </div>
                     <div className="flex justify-between items-center">
                         {depth === 0 &&
                             <button
-                                className="w-fit py-2 flex justify-center items-center gap-x-2 text-gray-600 hover:cursor-pointer rounded-md hover:brightness-120"
+                                className="w-fit py-2 flex justify-center items-center gap-x-1.5 text-sm text-gray-600 hover:cursor-pointer rounded-md hover:brightness-120"
                                 onClick={() => {
                                     handleLoadMoreSubComment(page, comment.id);
                                     setPage(page + 1);
@@ -111,15 +111,15 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
                             <div className="flex items-center gap-x-4 text-gray-600">
                                 {comment.member.username === loginState.username &&
                                     <div className="flex items-center">
-                                        <TextButton text={"수정"} onClick={handleShowEdit}/>
-                                        <TextButton text={"삭제"} onClick={handleDeleteComment}/>
+                                        <TextButton text={"수정"} onClick={handleShowEdit} addStyle={"!text-xs"}/>
+                                        <TextButton text={"삭제"} onClick={handleDeleteComment} addStyle={"!text-xs"}/>
                                     </div>
                                 }
                                 <button
-                                    className="w-fit py-2 flex justify-center items-center gap-x-2 hover:cursor-pointer rounded-md hover:brightness-120"
+                                    className="w-fit flex justify-center items-center gap-x-1.5 text-xs hover:cursor-pointer rounded-md hover:brightness-120"
                                     onClick={handleOpenTextField}>
-                                    <MdOutlineAddComment className="size-4"/>
-                                    댓글 작성하기
+                                    <MdOutlineAddComment className="size-3 mt-0.5"/>
+                                    댓글 작성
                                 </button>
                             </div>
                         }
