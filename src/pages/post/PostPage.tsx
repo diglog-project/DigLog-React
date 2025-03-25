@@ -135,9 +135,7 @@ function PostPage() {
             .then((res) => {
                 setPost({
                     ...res.data,
-                    id: id,
                     tags: sortTagByName(res.data.tags),
-                    createdAt: new Date(),
                 });
                 setTrigger(prev => !prev);
             })

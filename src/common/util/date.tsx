@@ -18,16 +18,20 @@ export const relativeDateToKorean = (date: Date) => {
     const outputDate = new Date(date);
     const now = new Date();
 
-    const diffHours = now.getHours() - outputDate.getHours();
+    const diffMilliseconds = now.getTime() - outputDate.getTime();
 
-    if (diffHours < 0) {
+    const hour = 60 * 60 * 1000;
+    const day = 24 * hour;
+    const week = 7 * day;
+
+    if (diffMilliseconds < 0) {
         return dateToKorean(date);
-    } else if (diffHours < 1) {
+    } else if (diffMilliseconds < hour) {
         return `방금 전`;
-    } else if (diffHours < 24) {
-        return `${diffHours}시간 전`;
-    } else if (diffHours < 24 * 7) {
-        return `${diffHours / 24}일 전`;
+    } else if (diffMilliseconds < day) {
+        return `${Math.round(diffMilliseconds / hour)}시간 전`;
+    } else if (diffMilliseconds < week) {
+        return `${Math.round(diffMilliseconds / day)}일 전`;
     } else {
         return dateToKorean(date);
     }
