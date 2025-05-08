@@ -209,7 +209,7 @@ function PostPage() {
                             }}/>)}
                     </div>
                 </div>
-                <div className="w-full max-w-3xl mx-auto py-8 break-words"
+                <div className="w-full max-w-3xl mx-auto py-8 space-y-4 break-words"
                      dangerouslySetInnerHTML={{__html: safeContent}}/>
                 <div>
                 </div>
