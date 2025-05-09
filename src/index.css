@@ -30,6 +30,16 @@
         padding-left: 1rem;
         border-left: 2px solid #e5e7eb;
     }
+    ul {
+        list-style: disc;
+        margin-left: 1.5em;
+        padding-left: 1.5em;
+    }
+    ol {
+        list-style: decimal;
+        margin-left: 1.5em;
+        padding-left: 1.5em;
+    }
 }
 
 @theme {
