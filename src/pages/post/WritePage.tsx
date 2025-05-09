@@ -45,6 +45,13 @@ function WritePage() {
     const [targetFolder, setTargetFolder] = useState<FolderType | null>(null);
     const [uploadCount, setUploadCount] = useState(0);
 
+    const emptyFolder = {
+        id: "empty",
+        title: "폴더 없음",
+        postCount: 0,
+        subFolders: [],
+    };
+
     const removeTag = (tag: string | null) => {
         setPost({...post, tags: post.tags.filter(prevTag => prevTag !== tag)});
     }
@@ -62,8 +69,6 @@ function WritePage() {
         handleTag(post.inputTag);
     }
     const handleTag = (tag: string) => {
-        console.log(tag);
-        console.log(tag.trim() === "");
         if (tag.trim() === "") {
             setPost({...post, inputTag: tag});
             return;
@@ -137,7 +142,7 @@ function WritePage() {
         })
             .then(() => {
                 alert("수정되었습니다.");
-                navigate(`/blog/${loginState.username}`);
+                navigate(`/post/${id}`);
             })
             .catch((error) => alert(error.response.data.message))
             .finally(() => setLoading(false));
@@ -151,7 +156,7 @@ function WritePage() {
         deletePost(id)
             .then(() => {
                 alert("삭제되었습니다.");
-                navigate(`/blog/${loginState.username}`);
+                navigate(`/setting/post`);
             })
             .catch((error) => alert(error.response.data.message));
     }
@@ -181,17 +186,8 @@ function WritePage() {
 
         getMemberFolders(loginState.username)
             .then(res => {
-                console.log(res);
                 setFolders(toFolderTypeList(res.data));
-                setFolders(prev => [
-                    {
-                        id: "empty",
-                        title: "폴더 없음",
-                        postCount: 0,
-                        subFolders: [],
-                    },
-                    ...prev
-                ]);
+                setFolders(prev => [emptyFolder, ...prev]);
             });
 
         if (!path.endsWith("edit")) {
@@ -212,6 +208,12 @@ function WritePage() {
                     content: res.data.content,
                     tags: sortByName(res.data.tags.map((tag: TagResponse) => tag.name)),
                 });
+
+                if (res.data.folder === null) {
+                    setTargetFolder(emptyFolder);
+                    return;
+                }
+
                 setTargetFolder({
                     id: res.data.folder.id,
                     title: res.data.folder.title,
