@@ -356,9 +356,9 @@ function FolderSettingPage() {
                                 setTargetFolder={setTargetFolder}
                                 center={true}
                             />
-                            <ul className="flex flex-col justify-center items-center gap-y-2 mb-4">
+                            <div className="flex flex-col justify-center items-center gap-y-2 mb-8">
                                 {folderMoveTypes.map((moveType, index) =>
-                                    <li key={index}
+                                    <div key={index}
                                         className="w-48 flex justify-start items-center gap-x-4">
                                         <input
                                             key={`folder-radio-${index}`}
@@ -372,9 +372,9 @@ function FolderSettingPage() {
                                         <label key={`folder-radio-label-${index}`}
                                                className={`${handleDisabled(index) && "text-gray-400"}`}
                                                htmlFor={`folderMoveType${index}`}>{moveType}</label>
-                                    </li>
+                                    </div>
                                 )}
-                            </ul>
+                            </div>
                         </div>
                         <div className="flex justify-center items-center gap-x-4">
                             <FillButton text={"취소"} onClick={() => {
