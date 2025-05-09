@@ -282,16 +282,16 @@ function SearchTab({selectedTab, setSelectedTab}: {
     return (
         <div
             className="text-sm font-bold text-center text-gray-500">
-            <ul className="flex flex-wrap">
+            <div className="flex flex-wrap">
                 {tabs.map((tab) => (
-                    <li key={tab.key} className="me-2">
+                    <div key={tab.key} className="me-2">
                         <button onClick={() => setSelectedTab(tab.value)}
                                 className={`${(selectedTab === tab.value) ? "border-b-2 text-lime-400 border-lime-400" : "hover:border-b-2 hover:text-lime-400 hover:border-lime-400"} inline-block p-4 hover:cursor-pointer`}>
                             {tab.key}
                         </button>
-                    </li>
+                    </div>
                 ))}
-            </ul>
+            </div>
         </div>
     );
 }
@@ -370,7 +370,7 @@ function SearchMenu({menus, setMenu, value, open, handleOpen, customRef}: {
                     </button>
                     <div
                         className={`${(open) ? "" : "hidden"} absolute top-10 left-0 flex flex-col z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44`}>
-                        <ul className="py-2 text-sm text-gray-700r">
+                        <div className="py-2 text-sm text-gray-700">
                             {menus.map((menu) => (
                                 <SortMenu key={menu.value}
                                           menu={menu}
@@ -378,7 +378,7 @@ function SearchMenu({menus, setMenu, value, open, handleOpen, customRef}: {
                                           value={value}
                                           handleOpen={handleOpen}/>
                             ))}
-                        </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -393,16 +393,14 @@ function SortMenu({menu, setMenu, value, handleOpen}: {
     handleOpen: () => void
 }) {
     return (
-        <li>
-            <button type="button"
-                    onClick={() => {
-                        setMenu(menu);
-                        handleOpen();
-                    }}
-                    className={`${(value === menu.value) ? "bg-gray-100" : ""} inline-flex w-full px-4 py-2 hover:bg-gray-200 hover:cursor-pointer`}>
-                {menu.key}
-            </button>
-        </li>
+        <button type="button"
+                onClick={() => {
+                    setMenu(menu);
+                    handleOpen();
+                }}
+                className={`${(value === menu.value) ? "bg-gray-100" : ""} inline-flex w-full px-4 py-2 hover:bg-gray-200 hover:cursor-pointer`}>
+            {menu.key}
+        </button>
     );
 }
 
