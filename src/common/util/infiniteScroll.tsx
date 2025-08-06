@@ -1,5 +1,5 @@
-import {useEffect, useState, useMemo, useRef, MutableRefObject} from 'react';
-import {PostResponse} from "../types/post.tsx";
+import { useEffect, useState, useMemo, useRef, MutableRefObject } from 'react';
+import { PostResponse } from "../types/post.tsx";
 
 export interface InfiniteScrollProps {
     root?: Element | null;
@@ -11,13 +11,13 @@ export interface InfiniteScrollProps {
 }
 
 const useInfiniteScroll = ({
-                               root = null,
-                               target,
-                               threshold = 1,
-                               rootMargin = '0px',
-                               targetArray,
-                               endPoint = 1
-                           }: InfiniteScrollProps) => {
+    root = null,
+    target,
+    threshold = 1,
+    rootMargin = '0px',
+    targetArray,
+    endPoint = 1
+}: InfiniteScrollProps) => {
 
     const [page, setPage] = useState<number>(0);
     const currentChild = useRef<Element | null>(null);

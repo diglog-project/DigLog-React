@@ -1,4 +1,4 @@
-import {PageResponse} from "./common.tsx";
+import { PageResponse } from "./common.tsx";
 
 export interface PostRequest {
     title: string,
@@ -52,6 +52,7 @@ export interface PostResponse {
     username: string;
     folder?: PostFolderResponse;
     tags: TagResponse[];
+    viewCount: number;
     createdAt: Date;
 }
 

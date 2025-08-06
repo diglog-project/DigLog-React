@@ -1,17 +1,17 @@
-import {ChangeEvent, useEffect, useState} from "react";
-import {PostResponse} from "../../common/types/post.tsx";
-import {TextLink} from "../../components/common/TextButton.tsx";
+import { ChangeEvent, useEffect, useState } from "react";
+import { PostResponse } from "../../common/types/post.tsx";
+import { TextLink } from "../../components/common/TextButton.tsx";
 import PaginationButton from "../../components/common/PaginationButton.tsx";
-import {PageResponse} from "../../common/types/common.tsx";
-import {fullDateToKorean} from "../../common/util/date.tsx";
-import {getMemberFolders, getMemberPosts} from "../../common/apis/blog.tsx";
-import {useSelector} from "react-redux";
-import {RootState} from "../../store.tsx";
-import {FillButton} from "../../components/common/FillButton.tsx";
-import {updatePostFolder} from "../../common/apis/post.tsx";
+import { PageResponse } from "../../common/types/common.tsx";
+import { fullDateToKorean } from "../../common/util/date.tsx";
+import { getMemberFolders, getMemberPosts } from "../../common/apis/blog.tsx";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store.tsx";
+import { FillButton } from "../../components/common/FillButton.tsx";
+import { updatePostFolder } from "../../common/apis/post.tsx";
 import FolderSelectBox from "../../components/folder/FolderSelectBox.tsx";
-import {FolderType, toFolderTypeList} from "../../common/types/blog.tsx";
-import {FaRegFolder} from "react-icons/fa6";
+import { FolderType, toFolderTypeList } from "../../common/types/blog.tsx";
+import { FaRegFolder } from "react-icons/fa6";
 
 function PostSettingPage() {
 
@@ -19,7 +19,7 @@ function PostSettingPage() {
 
     const [posts, setPosts] = useState<PostResponse[]>([]);
     const [page, setPage] = useState(0);
-    const [pageInfo, setPageInfo] = useState<PageResponse>({number: 0, size: 10, totalElements: 0, totalPages: 0});
+    const [pageInfo, setPageInfo] = useState<PageResponse>({ number: 0, size: 10, totalElements: 0, totalPages: 0 });
 
     const [isFolderEdit, setIsFolderEdit] = useState(false);
     const [postIds, setPostIds] = useState<string[]>([]);
@@ -46,7 +46,7 @@ function PostSettingPage() {
     }
 
     const handleClickCheckBox = (event: ChangeEvent<HTMLInputElement>) => {
-        const {name, checked} = event.target;
+        const { name, checked } = event.target;
 
         if (checked) {
             setPostIds(prev => [...prev, name]);
@@ -138,38 +138,38 @@ function PostSettingPage() {
                             folders={folders}
                             targetFolder={targetFolder}
                             setTargetFolder={setTargetFolder}
-                            center={false}/>
-                        <FillButton text={"취소"} onClick={handleIsFolderEdit} addStyle={"!bg-gray-400 w-22 h-10"}/>
-                        <FillButton text={"이동"} onClick={submitPostFolderUpdate} addStyle={"w-22 h-10"}/>
+                            center={false} />
+                        <FillButton text={"취소"} onClick={handleIsFolderEdit} addStyle={"!bg-gray-400 w-22 h-10"} />
+                        <FillButton text={"이동"} onClick={submitPostFolderUpdate} addStyle={"w-22 h-10"} />
                     </div>}
                 {!isFolderEdit &&
                     <div className="flex gap-x-2">
-                        <FillButton text={"폴더 이동"} onClick={handleIsFolderEdit}/>
+                        <FillButton text={"폴더 이동"} onClick={handleIsFolderEdit} />
                     </div>}
             </div>
             <div>
                 {posts.map((post: PostResponse) => (
                     <div key={post.id}
-                         className="flex justify-between items-center rounded-2xl shadow p-4 my-4">
+                        className="flex justify-between items-center rounded-2xl shadow p-4 my-4">
                         <div className="flex flex-col gap-y-2 flex-1">
                             <p className="font-semibold">{post.title}</p>
                             <p className="text-sm font-light">{fullDateToKorean(post.createdAt)}</p>
                             <div className="flex items-center gap-x-2">
-                                <FaRegFolder color={"gray"}/>
+                                <FaRegFolder color={"gray"} />
                                 <p>{post.folder ? post.folder.title : "폴더 없음"}</p>
                             </div>
                         </div>
                         {!isFolderEdit &&
                             <div className="flex items-center gap-x-4">
                                 <TextLink text={"수정"} to={`/post/edit/${post.id}`}
-                                          addStyle={"text-sm hover:text-lime-600"}/>
+                                    addStyle={"text-sm hover:text-lime-600"} />
                             </div>}
                         {isFolderEdit &&
                             <input type="checkbox"
-                                   className="size-4"
-                                   name={post.id}
-                                   checked={handleCheckBox(post.id)}
-                                   onChange={handleClickCheckBox}/>}
+                                className="size-4"
+                                name={post.id}
+                                checked={handleCheckBox(post.id)}
+                                onChange={handleClickCheckBox} />}
                     </div>
                 ))}
                 {posts.length === 0 &&
@@ -177,7 +177,7 @@ function PostSettingPage() {
                         작성된 게시글이 없습니다.
                     </div>}
             </div>
-            <PaginationButton pageInfo={pageInfo} setPage={setPage}/>
+            <PaginationButton pageInfo={pageInfo} setPage={setPage} />
         </div>
     );
 }

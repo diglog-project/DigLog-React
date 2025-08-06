@@ -1,25 +1,26 @@
-import {Link, useNavigate, useParams} from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import BasicLayout from "../../layout/BasicLayout.tsx";
 import DOMPurify from "dompurify";
-import {fullDateToKorean} from "../../common/util/date.tsx";
+import { fullDateToKorean } from "../../common/util/date.tsx";
 import TagCard from "../../components/post/TagCard.tsx";
-import {getPost} from "../../common/apis/post.tsx";
-import {ChangeEvent, useEffect, useState} from "react";
-import {PostResponse} from "../../common/types/post.tsx";
-import {checkUUID} from "../../common/util/regex.tsx";
-import {sortTagByName} from "../../common/util/sort.tsx";
+import { getPost, getPostViewCount, incrementPostViewCount } from "../../common/apis/post.tsx";
+import { ChangeEvent, useEffect, useState } from "react";
+import { PostResponse } from "../../common/types/post.tsx";
+import { checkUUID } from "../../common/util/regex.tsx";
+import { sortTagByName } from "../../common/util/sort.tsx";
 import CommentCard from "../../components/post/CommentCard.tsx";
 import CommentTextField from "../../components/post/CommentTextField.tsx";
-import {FillLink, LoadMoreButton} from "../../components/common/FillButton.tsx";
-import {getComments, saveComment, updateComment} from "../../common/apis/comment.tsx";
-import {CommentResponse, CommentType} from "../../common/types/comment.tsx";
-import {useSelector} from "react-redux";
-import {RootState} from "../../store.tsx";
-import {PageResponse} from "../../common/types/common.tsx";
+import { FillLink, LoadMoreButton } from "../../components/common/FillButton.tsx";
+import { getComments, saveComment, updateComment } from "../../common/apis/comment.tsx";
+import { CommentResponse, CommentType } from "../../common/types/comment.tsx";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store.tsx";
+import { PageResponse } from "../../common/types/common.tsx";
+import { FaEye } from "react-icons/fa6";
 
 function PostPage() {
 
-    const {id} = useParams();
+    const { id } = useParams();
     const navigate = useNavigate();
     const loginState = useSelector((state: RootState) => state.loginSlice);
 
@@ -29,11 +30,12 @@ function PostPage() {
         content: "",
         username: "",
         tags: [],
+        viewCount: 0,
         createdAt: new Date(),
     });
     const [commentInput, setCommentInput] = useState("");
     const [comments, setComments] = useState<CommentType[]>([]);
-    const [pageInfo, setPageInfo] = useState<PageResponse>({number: 0, size: 10, totalPages: 0, totalElements: 0});
+    const [pageInfo, setPageInfo] = useState<PageResponse>({ number: 0, size: 10, totalPages: 0, totalElements: 0 });
     const [trigger, setTrigger] = useState(false);
 
     const handleCommentInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -99,7 +101,7 @@ function PostPage() {
     }
 
     const handleLoadMoreComment = () => {
-        setPageInfo({...pageInfo, number: pageInfo.number + 1});
+        setPageInfo({ ...pageInfo, number: pageInfo.number + 1 });
         setTrigger(prev => !prev);
     }
     const handleLoadMoreSubComment = (page: number, parentId: string) => {
@@ -131,15 +133,29 @@ function PostPage() {
             return;
         }
 
+        incrementPostViewCount(id);
+
+        getPostViewCount(id)
+            .then((res) => {
+                setPost(prev => ({ ...prev, viewCount: res.data.viewCount }));
+            });
+
         getPost(id)
             .then((res) => {
-                setPost({
-                    ...res.data,
+                setPost(prev => ({
+                    ...prev,
+                    id: res.data.id,
+                    title: res.data.title,
+                    content: res.data.content,
+                    username: res.data.username,
+                    folder: res.data.folder,
                     tags: sortTagByName(res.data.tags),
-                });
+                    createdAt: new Date(res.data.createdAt),
+                }))
                 setTrigger(prev => !prev);
             })
             .catch((error) => alert(error.response.data.message));
+
     }, []);
 
     useEffect(() => {
@@ -186,13 +202,13 @@ function PostPage() {
                                 <div className="flex gap-x-4">
                                     <div className="text-xs">{` > `}</div>
                                     <Link to={`/blog/${post.username}?folder=${post.folder.id}`}
-                                          className="text-xs">{post.folder.title}</Link>
+                                        className="text-xs">{post.folder.title}</Link>
                                 </div>}
                         </div>
                     </div>
                     <div className="flex flex-row flex-wrap w-full justify-center text-center items-center gap-4">
                         <Link to={`/blog/${post.username}`}
-                              className="text-md font-semibold text-lime-700 hover:text-lime-400">
+                            className="text-md font-semibold text-lime-700 hover:text-lime-400">
                             {post.username}
                         </Link>
                         <div className="text-md text-gray-600">
@@ -206,11 +222,14 @@ function PostPage() {
                         {post.tags.map(tag =>
                             <TagCard key={tag.id} tag={tag} onClick={() => {
                                 navigate(`/search?keyword=${tag.name}&option=TAG&sort=createdAt&isDescending=true&tab=post`)
-                            }}/>)}
+                            }} />)}
+                    </div>
+                    <div className="w-full max-w-3xl mx-auto flex justify-end items-center gap-x-2 text-gray-600">
+                        <FaEye />{post.viewCount}
                     </div>
                 </div>
                 <div className="w-full max-w-3xl mx-auto py-8 space-y-4 break-words"
-                     dangerouslySetInnerHTML={{__html: safeContent}}/>
+                    dangerouslySetInnerHTML={{ __html: safeContent }} />
                 <div>
                 </div>
                 <div className="w-full max-w-3xl mx-auto py-8 rounded-2xl flex flex-col gap-y-0 my-8">
@@ -218,13 +237,13 @@ function PostPage() {
                         ? <CommentTextField
                             value={commentInput}
                             onChange={handleCommentInput}
-                            handleSubmit={handleCommentSubmit}/>
+                            handleSubmit={handleCommentSubmit} />
                         : <div className="flex flex-col items-end gap-y-2">
                             <textarea className="w-full border border-gray-400 bg-gray-100 opacity-50"
-                                      disabled={true}
-                                      rows={5}
-                                      minLength={5}/>
-                            <FillLink text={"로그인"} to={"/login"} addStyle={"w-fit"}/>
+                                disabled={true}
+                                rows={5}
+                                minLength={5} />
+                            <FillLink text={"로그인"} to={"/login"} addStyle={"w-fit"} />
                         </div>
                     }
                     <p>댓글 ({pageInfo.totalElements})</p>
@@ -234,11 +253,11 @@ function PostPage() {
                             comment={comment}
                             handleLoadMoreSubComment={handleLoadMoreSubComment}
                             handleCommentSubmit={handleCommentSubmit}
-                            pageSize={pageInfo.size}/>)}
+                            pageSize={pageInfo.size} />)}
                     {pageInfo.number + 1 < pageInfo.totalPages &&
                         <LoadMoreButton
                             onClick={handleLoadMoreComment}
-                            addStyle={"!bg-gray-400"}/>}
+                            addStyle={"!bg-gray-400"} />}
                 </div>
 
             </div>

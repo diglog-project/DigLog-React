@@ -1,14 +1,14 @@
-import {useEffect, useRef, useState} from "react";
-import {FolderType, toFolderRequestList, toFolderTypeList} from "../../common/types/blog.tsx";
-import {FillButton} from "../../components/common/FillButton.tsx";
+import { useEffect, useRef, useState } from "react";
+import { FolderType, toFolderRequestList, toFolderTypeList } from "../../common/types/blog.tsx";
+import { FillButton } from "../../components/common/FillButton.tsx";
 import ModalLayout from "../../layout/ModalLayout.tsx";
-import {DragEndEvent} from "@dnd-kit/core";
+import { DragEndEvent } from "@dnd-kit/core";
 import FolderCardList from "../../components/folder/FolderCardList.tsx";
-import {arrayMove} from "@dnd-kit/sortable";
+import { arrayMove } from "@dnd-kit/sortable";
 import FolderSelectBox from "../../components/folder/FolderSelectBox.tsx";
-import {deleteFolder, getMemberFolders, saveAndUpdateFolder} from "../../common/apis/blog.tsx";
-import {useSelector} from "react-redux";
-import {RootState} from "../../store.tsx";
+import { deleteFolder, getMemberFolders, saveAndUpdateFolder } from "../../common/apis/blog.tsx";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store.tsx";
 
 function FolderSettingPage() {
 
@@ -29,7 +29,7 @@ function FolderSettingPage() {
 
         if (parentFolder === null) {
             const tempId = getTempId();
-            setFolders([...folders, {id: tempId, title: tempTitle, postCount: 0, subFolders: []}]);
+            setFolders([...folders, { id: tempId, title: tempTitle, postCount: 0, subFolders: [] }]);
             setEditFolderTitle("");
             setEditFolderId(tempId);
             return;
@@ -45,10 +45,10 @@ function FolderSettingPage() {
                 setEditFolderId(tempId);
                 return {
                     ...folder,
-                    subFolders: [...folder.subFolders, {id: tempId, title: title, postCount: 0, subFolders: []}]
+                    subFolders: [...folder.subFolders, { id: tempId, title: title, postCount: 0, subFolders: [] }]
                 };
             } else if (folder.subFolders.length > 0) {
-                return {...folder, subFolders: getAddFolderList(folder.subFolders, id, title)};
+                return { ...folder, subFolders: getAddFolderList(folder.subFolders, id, title) };
             }
             return folder;
         });
@@ -100,7 +100,7 @@ function FolderSettingPage() {
         }
         return folders.map((folder: FolderType): FolderType => {
             if (folder.subFolders.length > 0) {
-                return {...folder, subFolders: getModalMoveFolderList(folder.subFolders)};
+                return { ...folder, subFolders: getModalMoveFolderList(folder.subFolders) };
             }
             return folder;
         });
@@ -112,15 +112,15 @@ function FolderSettingPage() {
 
         return folders.map((folder: FolderType): FolderType => {
             if (folder.id === targetFolder.id) {
-                return {...folder, subFolders: [...folder.subFolders, selectedFolder]};
+                return { ...folder, subFolders: [...folder.subFolders, selectedFolder] };
             } else if (folder.subFolders.length > 0) {
-                return {...folder, subFolders: getAddFolderModalList(folder.subFolders)};
+                return { ...folder, subFolders: getAddFolderModalList(folder.subFolders) };
             }
             return folder;
         });
     }
 
-    const handleOnDragEnd = ({active, over}: DragEndEvent) => {
+    const handleOnDragEnd = ({ active, over }: DragEndEvent) => {
         if (!over || active.id === over.id) {
             return;
         }
@@ -136,7 +136,7 @@ function FolderSettingPage() {
         }
         return folders.map((folder: FolderType): FolderType => {
             if (folder.subFolders.length > 0) {
-                return {...folder, subFolders: getMoveFolderList(folder.subFolders, activeId, overId)};
+                return { ...folder, subFolders: getMoveFolderList(folder.subFolders, activeId, overId) };
             }
             return folder;
         });
@@ -230,9 +230,9 @@ function FolderSettingPage() {
     const getEditFolderList = (folders: FolderType[], id: string, title: string) => {
         return folders.map((folder: FolderType): FolderType => {
             if (folder.id === id) {
-                return {...folder, title: title};
+                return { ...folder, title: title };
             } else if (folder.subFolders.length > 0) {
-                return {...folder, subFolders: getEditFolderList(folder.subFolders, id, title)};
+                return { ...folder, subFolders: getEditFolderList(folder.subFolders, id, title) };
             }
             return folder;
         })
@@ -262,7 +262,7 @@ function FolderSettingPage() {
 
         return folders.map((folder: FolderType): FolderType => {
             if (folder.subFolders.length > 0) {
-                return {...folder, subFolders: getDeleteFolderList(folder.subFolders, id)};
+                return { ...folder, subFolders: getDeleteFolderList(folder.subFolders, id) };
             }
             return folder;
         })
@@ -280,7 +280,7 @@ function FolderSettingPage() {
 
         saveAndUpdateFolder(toFolderRequestList(folders))
             .then(() => {
-                deleteFolder(deleteFolderIds.map(id => ({folderId: id})))
+                deleteFolder(deleteFolderIds.map(id => ({ folderId: id })))
                     .then(() => {
                         alert("변경사항이 저장되었습니다.");
                         setTrigger(prev => !prev);
@@ -317,7 +317,7 @@ function FolderSettingPage() {
     }, []);
 
     useEffect(() => {
-        setTargetFolder({...targetFolder, title: ""});
+        setTargetFolder({ ...targetFolder, title: "" });
     }, [openMoveModal]);
 
     return (
@@ -334,13 +334,13 @@ function FolderSettingPage() {
                 handleOnDragEnd={handleOnDragEnd}
                 handleDelete={handleDelete}
                 setOpenMoveModal={setOpenMoveModal}
-                setSelectedFolder={setSelectedFolder}/>
+                setSelectedFolder={setSelectedFolder} />
             <button className="w-full border border-gray-400 h-12 px-4 my-4 text-sm hover:cursor-pointer"
-                    onClick={() => addFolder(null)}>
+                onClick={() => addFolder(null)}>
                 폴더 추가
             </button>
             <div className="flex justify-end">
-                <FillButton text={"변경사항 저장"} onClick={handleSubmit} addStyle={"text-sm"}/>
+                <FillButton text={"변경사항 저장"} onClick={handleSubmit} addStyle={"text-sm"} />
             </div>
             {openMoveModal && (
                 <ModalLayout addStyle={"!w-128"} customRef={modalRef}>
@@ -368,10 +368,10 @@ function FolderSettingPage() {
                                             value={index}
                                             checked={folderMoveType === index}
                                             onChange={() => setFolderMoveType(index)}
-                                            disabled={handleDisabled(index)}/>
+                                            disabled={handleDisabled(index)} />
                                         <label key={`folder-radio-label-${index}`}
-                                               className={`${handleDisabled(index) && "text-gray-400"}`}
-                                               htmlFor={`folderMoveType${index}`}>{moveType}</label>
+                                            className={`${handleDisabled(index) && "text-gray-400"}`}
+                                            htmlFor={`folderMoveType${index}`}>{moveType}</label>
                                     </div>
                                 )}
                             </div>
@@ -379,9 +379,9 @@ function FolderSettingPage() {
                         <div className="flex justify-center items-center gap-x-4">
                             <FillButton text={"취소"} onClick={() => {
                                 setOpenMoveModal(false);
-                            }}/>
+                            }} />
                             <FillButton text={"이동"} onClick={handleMoveFolder}
-                                        addStyle={(handleDisabled(folderMoveType) ? "opacity-40 hover:!cursor-auto" : "")}/>
+                                addStyle={(handleDisabled(folderMoveType) ? "opacity-40 hover:!cursor-auto" : "")} />
                         </div>
                     </div>
                 </ModalLayout>

@@ -1,14 +1,14 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import BasicLayout from "../../layout/BasicLayout.tsx";
-import {useLocation, useNavigate} from "react-router-dom";
-import {formatTimer} from "../../common/util/date.tsx";
+import { useLocation, useNavigate } from "react-router-dom";
+import { formatTimer } from "../../common/util/date.tsx";
 import LoadingLayout from "../../layout/LoadingLayout.tsx";
-import {checkCode} from "../../common/apis/member.tsx";
+import { checkCode } from "../../common/apis/member.tsx";
 
 function CodePage() {
 
-    const {state} = useLocation();
-    const {email} = state;
+    const { state } = useLocation();
+    const { email } = state;
     const navigate = useNavigate();
 
     const [loading, setLoading] = useState(false);
@@ -69,7 +69,7 @@ function CodePage() {
 
             checkCode(email, code)
                 .then(() => {
-                    navigate("/signup", {state: {email: email, code: code}});
+                    navigate("/signup", { state: { email: email, code: code } });
                 })
                 .catch((error) => {
                     alert(error.response.data.message);
@@ -90,7 +90,7 @@ function CodePage() {
                     <p>인증코드 6자리를 입력해주세요.</p>
                 </div>
                 <div className="flex items-center justify-center gap-2 my-4">
-                    {Array.from({length: 6}).map((_, index) => (
+                    {Array.from({ length: 6 }).map((_, index) => (
                         <React.Fragment key={index}>
                             <input
                                 ref={(el) => {
@@ -114,7 +114,7 @@ function CodePage() {
                     유효시간 : {formatTimer(timer)}
                 </div>
             </div>
-            <LoadingLayout loading={loading}/>
+            <LoadingLayout loading={loading} />
         </BasicLayout>
     )
         ;

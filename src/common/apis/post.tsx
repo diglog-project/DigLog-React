@@ -5,7 +5,7 @@ import {
     PostListTagRequest,
     PostRequest,
     PostSearchRequest,
-    PostUpdateRequest
+    PostUpdateRequest,
 } from "../types/post.tsx";
 import {
     postListRequestToParameter,
@@ -36,3 +36,11 @@ export const getMemberTagPosts = async (postListTagRequest: PostListTagRequest) 
 
 export const searchPost = async (postSearchRequest: PostSearchRequest) =>
     await axiosApi.get(`/post/search${postListSearchRequestToParameter(postSearchRequest)}`);
+
+export const incrementPostViewCount = async (id: string) =>
+    await axiosApi.post(`/post/view/increment`, {
+        postId: id
+    });
+
+export const getPostViewCount = async (id: string) =>
+    await axiosApi.get(`/post/view/${id}`);

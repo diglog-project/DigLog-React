@@ -1,15 +1,15 @@
 import BasicLayout from "../../layout/BasicLayout.tsx";
-import {MdArrowDropDown, MdOutlineClear, MdOutlineSearch} from "react-icons/md";
-import {Ref, useEffect, useRef, useState} from "react";
+import { MdArrowDropDown, MdOutlineClear, MdOutlineSearch } from "react-icons/md";
+import { Ref, useEffect, useRef, useState } from "react";
 import * as React from "react";
 import PostCard from "../../components/post/PostCard.tsx";
-import {Link, useSearchParams} from "react-router-dom";
-import {LoadMoreButton} from "../../components/common/FillButton.tsx";
-import {PostResponse, PostSearchRequest} from "../../common/types/post.tsx";
-import {PageResponse} from "../../common/types/common.tsx";
-import {searchPost} from "../../common/apis/post.tsx";
-import {searchProfile} from "../../common/apis/member.tsx";
-import {MemberProfileResponse} from "../../common/types/member.tsx";
+import { Link, useSearchParams } from "react-router-dom";
+import { LoadMoreButton } from "../../components/common/FillButton.tsx";
+import { PostResponse, PostSearchRequest } from "../../common/types/post.tsx";
+import { PageResponse } from "../../common/types/common.tsx";
+import { searchPost } from "../../common/apis/post.tsx";
+import { searchProfile } from "../../common/apis/member.tsx";
+import { MemberProfileResponse } from "../../common/types/member.tsx";
 import ProfileImageCircle from "../../components/common/ProfileImageCircle.tsx";
 
 function SearchPage() {
@@ -72,10 +72,10 @@ function SearchPage() {
         setOpenOrder(cur => !cur);
     }
     const handleSetOption = (menu: MenuItem) => {
-        setSearchRequest({...searchRequest, option: menu.value});
+        setSearchRequest({ ...searchRequest, option: menu.value });
     }
     const handleSetOrder = (menu: MenuItem) => {
-        setSearchRequest({...searchRequest, isDescending: (menu.value === "true")});
+        setSearchRequest({ ...searchRequest, isDescending: (menu.value === "true") });
     }
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -203,19 +203,19 @@ function SearchPage() {
                     <div className="flex">
                         <div className="w-full relative flex justify-between items-center">
                             <input value={searchRequest.keyword}
-                                   onChange={(e) => setSearchRequest({...searchRequest, keyword: e.target.value})}
-                                   placeholder={"검색어를 입력해주세요."}
-                                   className="w-full block mt-0.5 p-3 mr-4 font-jalnan text-xl text-gray-900 border-b-2 border-white focus:outline-none focus:border-black"
-                                   ref={searchRef}
-                                   onKeyDown={handleSearchEnter}/>
+                                onChange={(e) => setSearchRequest({ ...searchRequest, keyword: e.target.value })}
+                                placeholder={"검색어를 입력해주세요."}
+                                className="w-full block mt-0.5 p-3 mr-4 font-jalnan text-xl text-gray-900 border-b-2 border-white focus:outline-none focus:border-black"
+                                ref={searchRef}
+                                onKeyDown={handleSearchEnter} />
                             <button
                                 className={`${searchRequest.keyword === "" ? "hidden" : ""} absolute right-16 rounded-full hover:cursor-pointer hover:bg-gray-1000`}
-                                onClick={() => setSearchRequest({...searchRequest, keyword: ""})}>
-                                <MdOutlineClear className="size-6 p-1"/>
+                                onClick={() => setSearchRequest({ ...searchRequest, keyword: "" })}>
+                                <MdOutlineClear className="size-6 p-1" />
                             </button>
                             <button className="hover:cursor-pointer"
-                                    onClick={handleSearch}>
-                                <MdOutlineSearch className="size-7 text-gray-600 hover:text-gray-900"/>
+                                onClick={handleSearch}>
+                                <MdOutlineSearch className="size-7 text-gray-600 hover:text-gray-900" />
                             </button>
                         </div>
                     </div>
@@ -224,7 +224,7 @@ function SearchPage() {
                     <div className="flex justify-between flex-wrap items-center h-16 sm:h-12">
                         <div className="text-lg">
                             <span className="font-bold">
-                            {selectedTab === "post" ? postPageInfo.totalElements : blogPageInfo.totalElements}
+                                {selectedTab === "post" ? postPageInfo.totalElements : blogPageInfo.totalElements}
                             </span>
                             개의 검색결과
                         </div>
@@ -232,29 +232,29 @@ function SearchPage() {
                             <div className="flex items-center justify-end gap-x-8">
                                 <SearchMenu
                                     menus={[
-                                        {key: "전체 검색", value: "ALL"},
-                                        {key: "제목", value: "TITLE"},
-                                        {key: "태그", value: "TAG"},
+                                        { key: "전체 검색", value: "ALL" },
+                                        { key: "제목", value: "TITLE" },
+                                        { key: "태그", value: "TAG" },
                                     ]}
                                     setMenu={handleSetOption}
                                     open={openOption}
                                     handleOpen={handleOpenOption}
                                     value={searchRequest.option}
-                                    customRef={optionRef}/>
+                                    customRef={optionRef} />
                                 <SearchMenu
                                     menus={[
-                                        {key: "최신순", value: "true"},
-                                        {key: "오래된순", value: "false"},
+                                        { key: "최신순", value: "true" },
+                                        { key: "오래된순", value: "false" },
                                     ]}
                                     setMenu={handleSetOrder}
                                     open={openOrder}
                                     handleOpen={handleOpenOrder}
                                     value={searchRequest.isDescending.toString()}
-                                    customRef={orderRef}/>
+                                    customRef={orderRef} />
                             </div>
                         }
                     </div>
-                    <SearchTab selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>
+                    <SearchTab selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
                     <SearchResults
                         posts={posts}
                         blogs={blogs}
@@ -262,21 +262,21 @@ function SearchPage() {
                         blogPageInfo={blogPageInfo}
                         handlePostPage={handlePostPage}
                         handleBlogPage={handleBlogPage}
-                        selectedTab={selectedTab}/>
+                        selectedTab={selectedTab} />
                 </div>
             </div>
         </BasicLayout>
     );
 }
 
-function SearchTab({selectedTab, setSelectedTab}: {
+function SearchTab({ selectedTab, setSelectedTab }: {
     selectedTab: string,
     setSelectedTab: (tab: string) => void,
 }) {
 
     const tabs = [
-        {key: "게시글", value: "post"},
-        {key: "블로그", value: "blog"},
+        { key: "게시글", value: "post" },
+        { key: "블로그", value: "blog" },
     ];
 
     return (
@@ -286,7 +286,7 @@ function SearchTab({selectedTab, setSelectedTab}: {
                 {tabs.map((tab) => (
                     <div key={tab.key} className="me-2">
                         <button onClick={() => setSelectedTab(tab.value)}
-                                className={`${(selectedTab === tab.value) ? "border-b-2 text-lime-400 border-lime-400" : "hover:border-b-2 hover:text-lime-400 hover:border-lime-400"} inline-block p-4 hover:cursor-pointer`}>
+                            className={`${(selectedTab === tab.value) ? "border-b-2 text-lime-400 border-lime-400" : "hover:border-b-2 hover:text-lime-400 hover:border-lime-400"} inline-block p-4 hover:cursor-pointer`}>
                             {tab.key}
                         </button>
                     </div>
@@ -296,7 +296,7 @@ function SearchTab({selectedTab, setSelectedTab}: {
     );
 }
 
-function SearchResults({posts, blogs, postPageInfo, blogPageInfo, handlePostPage, handleBlogPage, selectedTab}: {
+function SearchResults({ posts, blogs, postPageInfo, blogPageInfo, handlePostPage, handleBlogPage, selectedTab }: {
     posts: PostResponse[],
     blogs: MemberProfileResponse[],
     postPageInfo: PageResponse,
@@ -312,12 +312,12 @@ function SearchResults({posts, blogs, postPageInfo, blogPageInfo, handlePostPage
                 {posts.map((post) => (
                     <PostCard
                         key={post.id}
-                        post={post}/>
+                        post={post} />
                 ))}
                 {postPageInfo.number + 1 < postPageInfo.totalPages &&
                     <LoadMoreButton
                         onClick={handlePostPage}
-                        addStyle={"w-full"}/>}
+                        addStyle={"w-full"} />}
             </div>
         );
     } else if (selectedTab === "blog") {
@@ -325,8 +325,8 @@ function SearchResults({posts, blogs, postPageInfo, blogPageInfo, handlePostPage
             <div className="flex flex-col divide-y divide-gray-200 z-0">
                 {blogs.map((blog) => (
                     <Link key={blog.username} to={`/blog/${blog.username}`}
-                          className="flex justify-start items-center px-4 py-6 gap-8 divide-y divide-gray-200 hover:bg-gray-100 shadow-gray-400 duration-300 ease-out">
-                        <ProfileImageCircle profileUrl={blog.profileUrl} size="lg"/>
+                        className="flex justify-start items-center px-4 py-6 gap-8 divide-y divide-gray-200 hover:bg-gray-100 shadow-gray-400 duration-300 ease-out">
+                        <ProfileImageCircle profileUrl={blog.profileUrl} size="lg" />
                         <div className="flex flex-col gap-y-1 justify-center items-start">
                             <div className="text-2xl font-black">{blog.username}</div>
                         </div>
@@ -335,7 +335,7 @@ function SearchResults({posts, blogs, postPageInfo, blogPageInfo, handlePostPage
                 {blogPageInfo.number + 1 < blogPageInfo.totalPages &&
                     <LoadMoreButton
                         onClick={handleBlogPage}
-                        addStyle={"w-full"}/>}
+                        addStyle={"w-full"} />}
             </div>
         );
     }
@@ -348,7 +348,7 @@ interface MenuItem {
     value: string,
 }
 
-function SearchMenu({menus, setMenu, value, open, handleOpen, customRef}: {
+function SearchMenu({ menus, setMenu, value, open, handleOpen, customRef }: {
     menus: MenuItem[],
     setMenu: (menu: MenuItem) => void,
     value: string,
@@ -366,17 +366,17 @@ function SearchMenu({menus, setMenu, value, open, handleOpen, customRef}: {
                         onClick={handleOpen}
                     >
                         {menus.find(menuItem => menuItem.value === value)?.key}
-                        <MdArrowDropDown className="size-4"/>
+                        <MdArrowDropDown className="size-4" />
                     </button>
                     <div
                         className={`${(open) ? "" : "hidden"} absolute top-10 left-0 flex flex-col z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44`}>
                         <div className="py-2 text-sm text-gray-700">
                             {menus.map((menu) => (
                                 <SortMenu key={menu.value}
-                                          menu={menu}
-                                          setMenu={setMenu}
-                                          value={value}
-                                          handleOpen={handleOpen}/>
+                                    menu={menu}
+                                    setMenu={setMenu}
+                                    value={value}
+                                    handleOpen={handleOpen} />
                             ))}
                         </div>
                     </div>
@@ -386,7 +386,7 @@ function SearchMenu({menus, setMenu, value, open, handleOpen, customRef}: {
     );
 }
 
-function SortMenu({menu, setMenu, value, handleOpen}: {
+function SortMenu({ menu, setMenu, value, handleOpen }: {
     menu: MenuItem,
     setMenu: (menu: MenuItem) => void,
     value: string,
@@ -394,11 +394,11 @@ function SortMenu({menu, setMenu, value, handleOpen}: {
 }) {
     return (
         <button type="button"
-                onClick={() => {
-                    setMenu(menu);
-                    handleOpen();
-                }}
-                className={`${(value === menu.value) ? "bg-gray-100" : ""} inline-flex w-full px-4 py-2 hover:bg-gray-200 hover:cursor-pointer`}>
+            onClick={() => {
+                setMenu(menu);
+                handleOpen();
+            }}
+            className={`${(value === menu.value) ? "bg-gray-100" : ""} inline-flex w-full px-4 py-2 hover:bg-gray-200 hover:cursor-pointer`}>
             {menu.key}
         </button>
     );

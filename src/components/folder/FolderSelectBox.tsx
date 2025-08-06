@@ -1,9 +1,9 @@
-import {FolderType} from "../../common/types/blog.tsx";
-import {MdOutlineArrowDropDown} from "react-icons/md";
-import {useEffect, useRef, useState} from "react";
-import {getFolderTitle} from "../../common/util/string.tsx";
+import { FolderType } from "../../common/types/blog.tsx";
+import { MdOutlineArrowDropDown } from "react-icons/md";
+import { useEffect, useRef, useState } from "react";
+import { getFolderTitle } from "../../common/util/string.tsx";
 
-function FolderSelectBox({folders, depth = 0, selectedFolder, targetFolder, setTargetFolder, center}: {
+function FolderSelectBox({ folders, depth = 0, selectedFolder, targetFolder, setTargetFolder, center }: {
     folders: FolderType[],
     depth?: number,
     selectedFolder?: FolderType | null,
@@ -32,12 +32,12 @@ function FolderSelectBox({folders, depth = 0, selectedFolder, targetFolder, setT
 
     return (
         <div ref={folderRef}
-             className={`w-full relative flex ${center ? "justify-center" : "justify-start"} text-gray-700 items-center my-2 text-sm font-normal`}>
+            className={`w-full relative flex ${center ? "justify-center" : "justify-start"} text-gray-700 items-center my-2 text-sm font-normal`}>
             <button
                 className="w-full flex justify-between items-center gap-x-2 px-4 py-2 border border-gray-200 hover:bg-gray-50 hover:cursor-pointer"
                 onClick={handleFolderOpen}>
                 {targetFolder ? targetFolder.title : "폴더 선택"}
-                <MdOutlineArrowDropDown/>
+                <MdOutlineArrowDropDown />
             </button>
             <div
                 className={`${folderOpen ? "" : "hidden"} h-72 min-h-16 overflow-y-scroll absolute z-50 w-full top-12 left-0 bg-white divide-y divide-gray-300 rounded-lg shadow-sm`}>
@@ -48,14 +48,14 @@ function FolderSelectBox({folders, depth = 0, selectedFolder, targetFolder, setT
                         depth={depth}
                         selectedFolder={selectedFolder}
                         setTargetFolder={setTargetFolder}
-                        setFolderOpen={setFolderOpen}/>
+                        setFolderOpen={setFolderOpen} />
                 )}
             </div>
         </div>
     );
 }
 
-function FolderSelectCard({folder, depth, selectedFolder, setTargetFolder, setFolderOpen}: {
+function FolderSelectCard({ folder, depth, selectedFolder, setTargetFolder, setFolderOpen }: {
     folder: FolderType,
     depth: number,
     selectedFolder?: FolderType | null,
@@ -72,7 +72,7 @@ function FolderSelectCard({folder, depth, selectedFolder, setTargetFolder, setFo
                     setFolderOpen(false);
                 }}>
                 <div className={`flex items-center gap-x-1 ${depth === 0 && "font-bold text-black"}`}>
-                    <div className={`w-${depth * 4}`}/>
+                    <div className={`w-${depth * 4}`} />
                     {getFolderTitle(folder.title, depth)}
                     {folder.id !== "empty" && <p className="text-xs font-light">({folder.postCount})</p>}
                 </div>
@@ -85,7 +85,7 @@ function FolderSelectCard({folder, depth, selectedFolder, setTargetFolder, setFo
                         selectedFolder={selectedFolder}
                         depth={depth + 1}
                         setTargetFolder={setTargetFolder}
-                        setFolderOpen={setFolderOpen}/>))}
+                        setFolderOpen={setFolderOpen} />))}
         </div>
     ) : <></>;
 }

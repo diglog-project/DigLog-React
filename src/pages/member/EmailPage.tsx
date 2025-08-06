@@ -1,11 +1,11 @@
 import BasicLayout from "../../layout/BasicLayout.tsx";
 import LoginTextField from "../../components/member/LoginTextField.tsx";
-import {useEffect, useRef, useState} from "react";
+import { useEffect, useRef, useState } from "react";
 import LoginButton from "../../components/member/LoginButton.tsx";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import * as React from "react";
-import {checkEmail} from "../../common/util/regex.tsx";
-import {sendMail} from "../../common/apis/member.tsx";
+import { checkEmail } from "../../common/util/regex.tsx";
+import { sendMail } from "../../common/apis/member.tsx";
 import LoadingLayout from "../../layout/LoadingLayout.tsx";
 
 function EmailPage() {
@@ -34,7 +34,7 @@ function EmailPage() {
 
         sendMail(email)
             .then(() => {
-                navigate("/signup/code", {state: {email: email}});
+                navigate("/signup/code", { state: { email: email } });
             })
             .catch((error) => alert(error.response.data.message))
             .finally(() => setLoading(false));
@@ -55,10 +55,10 @@ function EmailPage() {
                     value={email}
                     setValue={(value) => setEmail(value)}
                     customRef={emailRef}
-                    onKeyDown={handleEmailEnter}/>
-                <LoginButton text={"인증코드 전송"} onClick={handleVerifyEmail} disable={!checkEmail(email)} bgColor={"bg-lime-400"}/>
+                    onKeyDown={handleEmailEnter} />
+                <LoginButton text={"인증코드 전송"} onClick={handleVerifyEmail} disable={!checkEmail(email)} bgColor={"bg-lime-400"} />
             </div>
-            <LoadingLayout loading={loading}/>
+            <LoadingLayout loading={loading} />
         </BasicLayout>
     );
 }
