@@ -1,21 +1,21 @@
 import BasicLayout from "../../layout/BasicLayout.tsx";
-import {useLocation, useNavigate, useParams} from "react-router-dom";
-import {useEffect, useState} from "react";
-import {PostResponse, TagResponse} from "../../common/types/post.tsx";
-import {PageResponse} from "../../common/types/common.tsx";
-import {getMemberTags} from "../../common/apis/blog.tsx";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { PostResponse, TagResponse } from "../../common/types/post.tsx";
+import { PageResponse } from "../../common/types/common.tsx";
+import { getMemberTags } from "../../common/apis/blog.tsx";
 import TagCard from "../../components/post/TagCard.tsx";
 import PostCard from "../../components/post/PostCard.tsx";
-import {getMemberTagPosts} from "../../common/apis/post.tsx";
+import { getMemberTagPosts } from "../../common/apis/post.tsx";
 import PaginationButton from "../../components/common/PaginationButton.tsx";
-import {TextLink} from "../../components/common/TextButton.tsx";
+import { TextLink } from "../../components/common/TextButton.tsx";
 
 function BlogTagPage() {
 
-    const {username} = useParams();
+    const { username } = useParams();
     const navigate = useNavigate();
-    const {state} = useLocation();
-    const {tagId} = state;
+    const { state } = useLocation();
+    const { tagId } = state;
 
 
     const [tags, setTags] = useState<TagResponse[]>([]);
@@ -77,22 +77,23 @@ function BlogTagPage() {
         <BasicLayout>
             <div className="w-full flex flex-col gap-y-8">
                 <TextLink text={`${username}의 블로그`}
-                          to={`/blog/${username}`}
-                          addStyle="flex justify-start !text-xl !font-jalnan"/>
+                    to={`/blog/${username}`}
+                    addStyle="flex justify-start !text-xl !font-jalnan" />
                 <div className="flex gap-x-4">
                     {tags.map(tag =>
                         <TagCard
+                            key={tag.id}
                             tag={tag}
-                            onClick={() => handleSelectedTag(tag)}/>)}
+                            onClick={() => handleSelectedTag(tag)} />)}
                 </div>
                 <p>
                     {selectedTag && <span className="mr-2 font-bold">"{selectedTag.name}"</span>}
                     {pageInfo.totalElements}개의 게시글
                 </p>
                 <div className="w-full flex flex-col items-center gap-x-4">
-                    {posts.map(post => <PostCard post={post}/>)}
+                    {posts.map(post => <PostCard key={post.id} post={post} />)}
                 </div>
-                <PaginationButton pageInfo={pageInfo} setPage={setPage}/>
+                <PaginationButton pageInfo={pageInfo} setPage={setPage} />
             </div>
         </BasicLayout>
     );

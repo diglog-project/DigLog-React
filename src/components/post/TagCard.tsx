@@ -1,6 +1,6 @@
-import {TagResponse} from "../../common/types/post.tsx";
+import { TagResponse } from "../../common/types/post.tsx";
 
-function TagCard({tag, onClick}: { tag: TagResponse, onClick: () => void }) {
+function TagCard({ tag, onClick }: { tag: TagResponse, onClick: () => void }) {
     return (
         <button
             className="border border-lime-50 shadow text-lime-700 rounded-4xl px-4 py-2 font-semibold text-sm

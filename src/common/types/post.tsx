@@ -52,6 +52,7 @@ export interface PostResponse {
     username: string;
     folder?: PostFolderResponse;
     tags: TagResponse[];
+    viewCount: number;
     createdAt: Date;
 }
 
