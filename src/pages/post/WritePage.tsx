@@ -1,21 +1,21 @@
 import BasicLayout from "../../layout/BasicLayout.tsx";
-import {useEffect, useState} from "react";
-import {useLocation, useNavigate, useParams} from "react-router-dom";
-import {Editor} from "@tinymce/tinymce-react";
-import {FillButton} from "../../components/common/FillButton.tsx";
-import {useSelector} from "react-redux";
-import {RootState} from "../../store.tsx";
-import {MdOutlineClear} from "react-icons/md";
-import {createPost, deletePost, getPost, updatePost} from "../../common/apis/post.tsx";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Editor } from "@tinymce/tinymce-react";
+import { FillButton } from "../../components/common/FillButton.tsx";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store.tsx";
+import { MdOutlineClear } from "react-icons/md";
+import { createPost, deletePost, getPost, updatePost } from "../../common/apis/post.tsx";
 import LoadingLayout from "../../layout/LoadingLayout.tsx";
-import {getImgUrls} from "../../common/util/html.tsx";
-import {uploadImage} from "../../common/apis/image.tsx";
-import {checkUUID} from "../../common/util/regex.tsx";
-import {TagResponse} from "../../common/types/post.tsx";
-import {sortByName} from "../../common/util/sort.tsx";
-import {FolderType, toFolderTypeList} from "../../common/types/blog.tsx";
+import { getImgUrls } from "../../common/util/html.tsx";
+import { uploadImage } from "../../common/apis/image.tsx";
+import { checkUUID } from "../../common/util/regex.tsx";
+import { TagResponse } from "../../common/types/post.tsx";
+import { sortByName } from "../../common/util/sort.tsx";
+import { FolderType, toFolderTypeList } from "../../common/types/blog.tsx";
 import FolderSelectBox from "../../components/folder/FolderSelectBox.tsx";
-import {getMemberFolders} from "../../common/apis/blog.tsx";
+import { getMemberFolders } from "../../common/apis/blog.tsx";
 import * as React from "react";
 
 interface WritePostType {
@@ -30,7 +30,7 @@ function WritePage() {
     const loginState = useSelector((state: RootState) => state.loginSlice);
     const navigate = useNavigate();
     const path = useLocation().pathname.substring(0, location.pathname.lastIndexOf("/"));
-    const {id} = useParams();
+    const { id } = useParams();
 
     const [loading, setLoading] = useState(false);
     const [folders, setFolders] = useState<FolderType[]>([]);
@@ -53,11 +53,11 @@ function WritePage() {
     };
 
     const removeTag = (tag: string | null) => {
-        setPost({...post, tags: post.tags.filter(prevTag => prevTag !== tag)});
+        setPost({ ...post, tags: post.tags.filter(prevTag => prevTag !== tag) });
     }
     const handleInputTag = (tag: string) => {
         if (!tag.endsWith(",")) {
-            setPost({...post, inputTag: tag});
+            setPost({ ...post, inputTag: tag });
             return;
         }
         handleTag(post.inputTag);
@@ -70,15 +70,15 @@ function WritePage() {
     }
     const handleTag = (tag: string) => {
         if (tag.trim() === "") {
-            setPost({...post, inputTag: tag});
+            setPost({ ...post, inputTag: tag });
             return;
         }
 
         if (post.tags.includes(tag.trim())) {
-            setPost({...post, inputTag: ""});
+            setPost({ ...post, inputTag: "" });
             return;
         }
-        setPost({...post, tags: [...post.tags, post.inputTag], inputTag: ""});
+        setPost({ ...post, tags: [...post.tags, post.inputTag], inputTag: "" });
     }
 
     const getFolderId = (targetFolder: FolderType) => {
@@ -237,34 +237,34 @@ function WritePage() {
                 <div className="flex justify-start items-center">
                     <div className="w-108">
                         <FolderSelectBox folders={folders}
-                                         targetFolder={targetFolder}
-                                         setTargetFolder={setTargetFolder}/>
+                            targetFolder={targetFolder}
+                            setTargetFolder={setTargetFolder} />
                     </div>
                 </div>
                 <div className="w-full flex justify-between items-center my-6">
                     <input value={post.title}
-                           onChange={(e) => setPost({...post, title: e.target.value})}
-                           placeholder={"제목을 입력해주세요."}
-                           className="w-full py-2 font-jalnan text-2xl text-gray-900 border-b-2 border-white focus:outline-none focus:border-black"/>
+                        onChange={(e) => setPost({ ...post, title: e.target.value })}
+                        placeholder={"제목을 입력해주세요."}
+                        className="w-full py-2 font-jalnan text-2xl text-gray-900 border-b-2 border-white focus:outline-none focus:border-black" />
                 </div>
                 <div className="relative z-10">
                     <div className="mb-8 flex flex-row flex-wrap items-center gap-4">
                         {post.tags.map((tag, i) =>
                             <button key={i}
-                                    className="flex justify-between items-center gap-x-2 border border-lime-50 shadow text-lime-700 rounded-4xl px-4 py-2 font-semibold text-sm transform transition-all hover:bg-lime-50 hover:cursor-pointer"
-                                    onClick={(event) => removeTag(event.currentTarget.textContent)}>
+                                className="flex justify-between items-center gap-x-2 border border-lime-50 shadow text-lime-700 rounded-4xl px-4 py-2 font-semibold text-sm transform transition-all hover:bg-lime-50 hover:cursor-pointer"
+                                onClick={(event) => removeTag(event.currentTarget.textContent)}>
                                 {tag}
-                                <MdOutlineClear/>
+                                <MdOutlineClear />
                             </button>)}
                         <input className="flex-1 text-lg focus:outline-none"
-                               type="text" placeholder="태그를 입력하세요" value={post.inputTag}
-                               onChange={(event) => handleInputTag(event.target.value)}
-                               onFocus={() => setShowTag(true)}
-                               onBlur={() => {
-                                   setShowTag(false);
-                                   handleTag(post.inputTag);
-                               }}
-                               onKeyDown={handleTagEnter}/>
+                            type="text" placeholder="태그를 입력하세요" value={post.inputTag}
+                            onChange={(event) => handleInputTag(event.target.value)}
+                            onFocus={() => setShowTag(true)}
+                            onBlur={() => {
+                                setShowTag(false);
+                                handleTag(post.inputTag);
+                            }}
+                            onKeyDown={handleTagEnter} />
                     </div>
                     {showTag && <div
                         className="absolute -bottom-6 left-0 flex flex-col rounded-md bg-gray-700 text-white w-[calc(346px)] px-4 py-2 text-sm">
@@ -292,19 +292,19 @@ function WritePage() {
                         }
                     }}
                     value={post.content}
-                    onEditorChange={(content) => setPost({...post, content: content})}
+                    onEditorChange={(content) => setPost({ ...post, content: content })}
                 />
                 <div className="flex justify-between items-center w-full mt-4">
                     {path.endsWith("/edit")
                         ? <FillButton text={"삭제하기"} onClick={() => handleDelete(id)}
-                                      addStyle={"bg-red-400 hover:bg-red-700"}/>
+                            addStyle={"bg-red-400 hover:bg-red-700"} />
                         : <div></div>}
                     {path.endsWith("/edit")
-                        ? <FillButton text={"수정하기"} onClick={handleEdit}/>
-                        : <FillButton text={"게시하기"} onClick={handleSubmit}/>}
+                        ? <FillButton text={"수정하기"} onClick={handleEdit} />
+                        : <FillButton text={"게시하기"} onClick={handleSubmit} />}
                 </div>
             </div>
-            <LoadingLayout loading={loading}/>
+            <LoadingLayout loading={loading} />
         </BasicLayout>
     );
 }

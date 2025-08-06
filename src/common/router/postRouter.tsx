@@ -1,16 +1,16 @@
-import {Suspense} from "react";
-import {Loading, Post, Write} from "./page.tsx";
+import { Suspense } from "react";
+import { Loading, Post, Write } from "./page.tsx";
 
 const postRouter = () => {
 
     return [
         {
             path: 'edit/:id',
-            element: <Suspense fallback={Loading}><Write/></Suspense>
+            element: <Suspense fallback={Loading}><Write /></Suspense>
         },
         {
             path: ':id',
-            element: <Suspense fallback={Loading}><Post/></Suspense>
+            element: <Suspense fallback={Loading}><Post /></Suspense>
         },
     ];
 }

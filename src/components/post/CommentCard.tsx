@@ -1,16 +1,16 @@
-import {relativeDateToKorean} from "../../common/util/date.tsx";
-import {MdOutlineAddComment, MdOutlineComment, MdOutlinePerson} from "react-icons/md";
-import {ChangeEvent, useState} from "react";
+import { relativeDateToKorean } from "../../common/util/date.tsx";
+import { MdOutlineAddComment, MdOutlineComment, MdOutlinePerson } from "react-icons/md";
+import { ChangeEvent, useState } from "react";
 import CommentTextField from "./CommentTextField.tsx";
-import {CommentType} from "../../common/types/comment.tsx";
-import {LoadMoreButton} from "../common/FillButton.tsx";
-import {useSelector} from "react-redux";
-import {RootState} from "../../store.tsx";
-import {TextButton} from "../common/TextButton.tsx";
-import {deleteComment} from "../../common/apis/comment.tsx";
-import {useNavigate} from "react-router-dom";
+import { CommentType } from "../../common/types/comment.tsx";
+import { LoadMoreButton } from "../common/FillButton.tsx";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store.tsx";
+import { TextButton } from "../common/TextButton.tsx";
+import { deleteComment } from "../../common/apis/comment.tsx";
+import { useNavigate } from "react-router-dom";
 
-function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pageSize, depth = 0}: {
+function CommentCard({ comment, handleLoadMoreSubComment, handleCommentSubmit, pageSize, depth = 0 }: {
     comment: CommentType,
     handleLoadMoreSubComment: (page: number, parentId: string) => void,
     handleCommentSubmit: (commentId: string | null, content: string, taggedUsername: string | null, originalComment: CommentType | null) => void,
@@ -64,14 +64,14 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
 
     return (
         <div className={`flex ${depth === 0 && "pb-4"}`}>
-            {depth !== 0 && <div className="w-8"/>}
+            {depth !== 0 && <div className="w-8" />}
             <div className="flex-1 flex flex-col justify-center mt-4 text-sm">
                 <div className="flex flex-col gap-y-2 border rounded-2xl border-gray-300 px-4 pt-4 pb-2">
                     <div className="flex items-center gap-x-2">
                         {comment.member.profileUrl
                             ? <img className="size-6 rounded-full hover:cursor-pointer"
-                                   src={comment.member.profileUrl} alt="user_image"/>
-                            : <MdOutlinePerson className="size-5 text-gray-600"/>}
+                                src={comment.member.profileUrl} alt="user_image" />
+                            : <MdOutlinePerson className="size-5 text-gray-600" />}
                         <p className="font-semibold">
                             {comment.member.username}
                         </p>
@@ -83,8 +83,8 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
                         {!showEditTextField &&
                             comment.taggedUsername &&
                             <span className="text-lime-700">
-                            @{comment.taggedUsername}
-                        </span>}
+                                @{comment.taggedUsername}
+                            </span>}
                         {showEditTextField
                             ? <CommentTextField
                                 value={editCommentInput}
@@ -92,7 +92,7 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
                                 handleSubmit={handleCommentSubmit}
                                 taggedUsername={comment.taggedUsername}
                                 originalComment={comment}
-                                handleShowTextField={handleShowEdit}/>
+                                handleShowTextField={handleShowEdit} />
                             : <div className="leading-relaxed">{comment.content}</div>}
                     </div>
                     <div className="flex justify-between items-center">
@@ -103,22 +103,22 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
                                     handleLoadMoreSubComment(page, comment.id);
                                     setPage(page + 1);
                                 }}>
-                                <MdOutlineComment className="text-gray-600 size-4"/>
+                                <MdOutlineComment className="text-gray-600 size-4" />
                                 답글 ({comment.replyCount})
                             </button>}
-                        <div/>
+                        <div />
                         {loginState.isLogin && !showEditTextField &&
                             <div className="flex items-center gap-x-4 text-gray-600">
                                 {comment.member.username === loginState.username &&
                                     <div className="flex items-center">
-                                        <TextButton text={"수정"} onClick={handleShowEdit} addStyle={"!text-xs"}/>
-                                        <TextButton text={"삭제"} onClick={handleDeleteComment} addStyle={"!text-xs"}/>
+                                        <TextButton text={"수정"} onClick={handleShowEdit} addStyle={"!text-xs"} />
+                                        <TextButton text={"삭제"} onClick={handleDeleteComment} addStyle={"!text-xs"} />
                                     </div>
                                 }
                                 <button
                                     className="w-fit flex justify-center items-center gap-x-1.5 text-xs hover:cursor-pointer rounded-md hover:brightness-120"
                                     onClick={handleOpenTextField}>
-                                    <MdOutlineAddComment className="size-3 mt-0.5"/>
+                                    <MdOutlineAddComment className="size-3 mt-0.5" />
                                     댓글 작성
                                 </button>
                             </div>
@@ -133,7 +133,7 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
                             handleSubmit={handleCommentSubmit}
                             commentId={comment.id}
                             taggedUsername={taggedUsername}
-                            handleShowTextField={handleShowTextField}/>}
+                            handleShowTextField={handleShowTextField} />}
                 </div>
                 {comment.subComments &&
                     <div>
@@ -145,7 +145,7 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
                                     handleLoadMoreSubComment={handleLoadMoreSubComment}
                                     handleCommentSubmit={handleCommentSubmit}
                                     pageSize={pageSize}
-                                    depth={depth + 1}/>
+                                    depth={depth + 1} />
                                 : null)}
                         {page !== 0 && (page) * 10 < comment.replyCount &&
                             <LoadMoreButton
@@ -153,7 +153,7 @@ function CommentCard({comment, handleLoadMoreSubComment, handleCommentSubmit, pa
                                 onClick={() => {
                                     handleLoadMoreSubComment(page, comment.id);
                                     setPage(page + 1);
-                                }}/>}
+                                }} />}
                     </div>}
             </div>
         </div>

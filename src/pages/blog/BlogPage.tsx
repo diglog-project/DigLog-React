@@ -1,22 +1,22 @@
 import BasicLayout from "../../layout/BasicLayout.tsx";
-import {useParams, useSearchParams} from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import PostCard from "../../components/post/PostCard.tsx";
-import {useEffect, useRef, useState} from "react";
-import {MdMenu, MdOutlineExitToApp} from "react-icons/md";
+import { useEffect, useRef, useState } from "react";
+import { MdMenu, MdOutlineExitToApp } from "react-icons/md";
 import PaginationButton from "../../components/common/PaginationButton.tsx";
-import {FolderType, toFolderTypeList} from "../../common/types/blog.tsx";
+import { FolderType, toFolderTypeList } from "../../common/types/blog.tsx";
 import BlogSideBar from "../../components/blog/BlogSideBar.tsx";
 import IconButton from "../../components/common/IconButton.tsx";
-import {PageResponse} from "../../common/types/common.tsx";
-import {getMemberFolders, getMemberPosts, getMemberTags} from "../../common/apis/blog.tsx";
-import {PostResponse, TagResponse} from "../../common/types/post.tsx";
-import {MemberProfileResponse} from "../../common/types/member.tsx";
-import {getProfileByUsername} from "../../common/apis/member.tsx";
-import {TextLink} from "../../components/common/TextButton.tsx";
+import { PageResponse } from "../../common/types/common.tsx";
+import { getMemberFolders, getMemberPosts, getMemberTags } from "../../common/apis/blog.tsx";
+import { PostResponse, TagResponse } from "../../common/types/post.tsx";
+import { MemberProfileResponse } from "../../common/types/member.tsx";
+import { getProfileByUsername } from "../../common/apis/member.tsx";
+import { TextLink } from "../../components/common/TextButton.tsx";
 
 function BlogPage() {
 
-    const {username} = useParams();
+    const { username } = useParams();
     const [folderParam, setFolderParam] = useSearchParams();
 
     const [page, setPage] = useState(0);
@@ -27,7 +27,7 @@ function BlogPage() {
         totalPages: 0
     });
     const [posts, setPosts] = useState<PostResponse[]>([]);
-    const [member, setMember] = useState<MemberProfileResponse>({username: username || "", profileUrl: null});
+    const [member, setMember] = useState<MemberProfileResponse>({ username: username || "", profileUrl: null });
     const [folders, setFolders] = useState<FolderType[]>([]);
     const [tags, setTags] = useState<TagResponse[]>([]);
 
@@ -46,13 +46,13 @@ function BlogPage() {
     };
 
     const handlePage = (page: number) => {
-        setFolderParam({...folderParam, "page": page.toString()});
+        setFolderParam({ ...folderParam, "page": page.toString() });
         setPage(page);
     }
 
     const handleSelectedFolder = (folder: FolderType) => {
         setSelectedFolder(folder);
-        setFolderParam({"folder": folder.id, "page": page.toString()});
+        setFolderParam({ "folder": folder.id, "page": page.toString() });
         setPage(0);
     }
 
@@ -178,12 +178,12 @@ function BlogPage() {
                 className={`${(isOpen) ? "opacity-50 backdrop-blur-sm z-10 overflow-y-hidden" : "z-10"} w-full flex flex-col`}>
                 <div className="flex justify-between items-center px-0 lg:px-5 font-jalnan pb-4">
                     <TextLink text={`${username}의 블로그`}
-                              to={`/blog/${username}`}
-                              addStyle="!text-xl !font-jalnan"/>
+                        to={`/blog/${username}`}
+                        addStyle="!text-xl !font-jalnan" />
                     <IconButton
-                        icon={<MdMenu className="size-8"/>}
+                        icon={<MdMenu className="size-8" />}
                         onClick={handleMenuOpen}
-                        addStyle="lg:hidden"/>
+                        addStyle="lg:hidden" />
                 </div>
                 <div className="grid lg:grid-cols-3">
                     <div
@@ -191,14 +191,14 @@ function BlogPage() {
                         {posts.map((post) => (
                             <PostCard
                                 key={post.id}
-                                post={post}/>
+                                post={post} />
                         ))}
                         {posts.length === 0 &&
                             <div className="mt-8 text-center text-gray-600">
                                 작성된 게시글이 없습니다.
                             </div>}
                         <PaginationButton
-                            pageInfo={pageInfo} setPage={handlePage}/>
+                            pageInfo={pageInfo} setPage={handlePage} />
                     </div>
                     <div className="col-span-1 hidden lg:block flex-col">
                         <BlogSideBar
@@ -207,16 +207,16 @@ function BlogPage() {
                             username={username}
                             profileUrl={member.profileUrl}
                             selectedFolder={selectedFolder}
-                            setSelectedFolder={handleSelectedFolder}/>
+                            setSelectedFolder={handleSelectedFolder} />
                     </div>
                 </div>
             </div>
             <div ref={sideBarRef}
-                 className={`${isOpen ? "block translate-x-0" : "hidden translate-x-full"} absolute top-0 right-0 w-96 flex-col
+                className={`${isOpen ? "block translate-x-0" : "hidden translate-x-full"} absolute top-0 right-0 w-96 flex-col
                      transform transition-transform duration-300 ease-out z-20`}>
                 <button className="absolute top-6 left-6 hover:cursor-pointer"
-                        onClick={() => setIsOpen(false)}>
-                    <MdOutlineExitToApp className="size-8 text-gray-500"/>
+                    onClick={() => setIsOpen(false)}>
+                    <MdOutlineExitToApp className="size-8 text-gray-500" />
                 </button>
                 <BlogSideBar
                     folders={folders}
@@ -226,7 +226,7 @@ function BlogPage() {
                     selectedFolder={selectedFolder}
                     setSelectedFolder={handleSelectedFolder}
                     bgColor={"bg-gray-50"}
-                    side={true}/>
+                    side={true} />
             </div>
         </BasicLayout>
     );

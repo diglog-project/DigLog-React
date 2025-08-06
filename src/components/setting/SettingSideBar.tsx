@@ -3,15 +3,15 @@ interface TabType {
     title: string;
 }
 
-function SettingSideBar({setSelectedSection, side}: {
+function SettingSideBar({ setSelectedSection, side }: {
     setSelectedSection: (section: string) => void,
     side: boolean,
 }) {
 
     const tabList: TabType[] = [
-        {section: "profile", title: "프로필"},
-        {section: "folder", title: "폴더"},
-        {section: "post", title: "게시글"},
+        { section: "profile", title: "프로필" },
+        { section: "folder", title: "폴더" },
+        { section: "post", title: "게시글" },
     ];
 
     const handleSelectedTab = (tabSection: string) => {

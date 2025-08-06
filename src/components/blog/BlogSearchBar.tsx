@@ -1,4 +1,4 @@
-function BlogSearchBar({value, setValue}: {
+function BlogSearchBar({ value, setValue }: {
     value: string,
     setValue: (value: string) => void,
 }) {

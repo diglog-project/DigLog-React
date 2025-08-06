@@ -1,15 +1,15 @@
 import BasicLayout from "../layout/BasicLayout.tsx";
 import PostCard from "../components/post/PostCard.tsx";
-import {useEffect, useRef, useState} from "react";
-import {getPosts} from "../common/apis/post.tsx";
-import {PostResponse} from "../common/types/post.tsx";
+import { useEffect, useRef, useState } from "react";
+import { getPosts } from "../common/apis/post.tsx";
+import { PostResponse } from "../common/types/post.tsx";
 import useInfiniteScroll from "../common/util/infiniteScroll.tsx";
 
 function MainPage() {
 
     const pageRef = useRef<HTMLDivElement>(null);
     const [posts, setPosts] = useState<PostResponse[]>([]);
-    const {page} = useInfiniteScroll({
+    const { page } = useInfiniteScroll({
         target: pageRef,
         targetArray: posts,
         threshold: 0.5,
@@ -37,11 +37,11 @@ function MainPage() {
                     최근 게시글
                 </div>
                 <div ref={pageRef}
-                     className="w-full grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8">
+                    className="w-full grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8">
                     {posts.map((post) => (
                         <PostCard
                             key={post.id}
-                            post={post}/>
+                            post={post} />
                     ))}
                 </div>
             </div>

@@ -1,6 +1,6 @@
-import {createBrowserRouter} from "react-router-dom";
-import {Suspense} from "react";
-import {Loading, Login, Main, Search, Setting, Write} from "./page.tsx";
+import { createBrowserRouter } from "react-router-dom";
+import { Suspense } from "react";
+import { Loading, Login, Main, Search, Setting, Write } from "./page.tsx";
 import postRouter from "./postRouter.tsx";
 import blogRouter from "./blogRouter.tsx";
 import signupRouter from "./signupRouter.tsx";
@@ -8,23 +8,23 @@ import signupRouter from "./signupRouter.tsx";
 const root = createBrowserRouter([
     {
         path: '',
-        element: <Suspense fallback={Loading}><Main/></Suspense>
+        element: <Suspense fallback={Loading}><Main /></Suspense>
     },
     {
         path: '/login',
-        element: <Suspense fallback={Loading}><Login/></Suspense>
+        element: <Suspense fallback={Loading}><Login /></Suspense>
     },
     {
         path: '/setting/:section',
-        element: <Suspense fallback={Loading}><Setting/></Suspense>
+        element: <Suspense fallback={Loading}><Setting /></Suspense>
     },
     {
         path: '/search',
-        element: <Suspense fallback={Loading}><Search/></Suspense>
+        element: <Suspense fallback={Loading}><Search /></Suspense>
     },
     {
         path: '/write',
-        element: <Suspense fallback={Loading}><Write/></Suspense>
+        element: <Suspense fallback={Loading}><Write /></Suspense>
     },
     {
         path: '/signup',

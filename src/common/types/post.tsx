@@ -1,4 +1,4 @@
-import {PageResponse} from "./common.tsx";
+import { PageResponse } from "./common.tsx";
 
 export interface PostRequest {
     title: string,

@@ -38,8 +38,8 @@ export const searchPost = async (postSearchRequest: PostSearchRequest) =>
     await axiosApi.get(`/post/search${postListSearchRequestToParameter(postSearchRequest)}`);
 
 export const incrementPostViewCount = async (id: string) =>
-    await axiosApi.post(`/post/view/increment`, { 
-        postId: id 
+    await axiosApi.post(`/post/view/increment`, {
+        postId: id
     });
 
 export const getPostViewCount = async (id: string) =>

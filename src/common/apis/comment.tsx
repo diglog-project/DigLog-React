@@ -1,6 +1,6 @@
 import axiosApi from "./AxiosApi.tsx";
-import {CommentListRequest, CommentRequest, CommentUpdateRequest} from "../types/comment.tsx";
-import {commentListRequestToParameter} from "../util/url.tsx";
+import { CommentListRequest, CommentRequest, CommentUpdateRequest } from "../types/comment.tsx";
+import { commentListRequestToParameter } from "../util/url.tsx";
 
 export const getComments = async (commentListRequest: CommentListRequest) =>
     await axiosApi.get(`/comment${commentListRequestToParameter(commentListRequest)}`);

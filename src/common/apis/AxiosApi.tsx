@@ -1,6 +1,6 @@
 import axios from "axios";
 import store from "../../store.tsx";
-import {login} from "../slices/loginSlice.tsx";
+import { login } from "../slices/loginSlice.tsx";
 
 const axiosApi = axios.create({
     baseURL: `${import.meta.env.VITE_SERVER_URL}/api`,
@@ -27,7 +27,7 @@ axiosApi.interceptors.response.use(
             originalRequest._retry = true;
 
             try {
-                const refreshResponse = await axiosApi.get('/member/refresh', {withCredentials: true});
+                const refreshResponse = await axiosApi.get('/member/refresh', { withCredentials: true });
 
                 if (refreshResponse.data.status === 200) {
                     store.dispatch(login({

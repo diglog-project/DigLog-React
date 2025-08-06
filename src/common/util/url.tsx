@@ -1,7 +1,7 @@
-import {PostListRequest, PostListTagRequest, PostSearchRequest} from "../types/post.tsx";
-import {CommentListRequest} from "../types/comment.tsx";
-import {PostListMemberRequest} from "../types/blog.tsx";
-import {MemberProfileSearchRequest} from "../types/member.tsx";
+import { PostListRequest, PostListTagRequest, PostSearchRequest } from "../types/post.tsx";
+import { CommentListRequest } from "../types/comment.tsx";
+import { PostListMemberRequest } from "../types/blog.tsx";
+import { MemberProfileSearchRequest } from "../types/member.tsx";
 
 export const postListRequestToParameter = (postListRequest: PostListRequest) => {
     const sorts = postListRequest.sorts.map(sort => `sorts=${sort}`).join("&");

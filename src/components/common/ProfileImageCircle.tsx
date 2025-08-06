@@ -1,6 +1,6 @@
-import {MdOutlinePerson} from "react-icons/md";
+import { MdOutlinePerson } from "react-icons/md";
 
-function ProfileImageCircle({profileUrl, size, onClick, addStyle}: {
+function ProfileImageCircle({ profileUrl, size, onClick, addStyle }: {
     profileUrl: string | null,
     size?: string,
     onClick?: () => void,
@@ -22,12 +22,12 @@ function ProfileImageCircle({profileUrl, size, onClick, addStyle}: {
 
     if (profileUrl) {
         return <img className={`${imageSize} ${addStyle} rounded-full border border-gray-200 ${onClick && "hover:cursor-pointer"}`}
-                    onClick={onClick}
-                    src={profileUrl} alt="user_image"/>;
+            onClick={onClick}
+            src={profileUrl} alt="user_image" />;
     }
 
     return <MdOutlinePerson className={`${iconSize} ${addStyle} text-gray-700 m-1 rounded-full ${onClick && "hover:cursor-pointer"}`}
-                            onClick={onClick}/>;
+        onClick={onClick} />;
 }
 
 export default ProfileImageCircle;
