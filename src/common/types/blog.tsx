@@ -1,31 +1,32 @@
 export interface FolderRequest {
-    id: string | null,
-    title: string,
-    depth: number,
-    orderIndex: number,
-    parentOrderIndex: number,
+    id: string | null;
+    title: string;
+    depth: number;
+    orderIndex: number;
+    parentOrderIndex: number;
 }
 
 export interface FolderType {
-    id: string,
-    title: string,
-    postCount: number,
-    subFolders: FolderType[],
+    id: string;
+    title: string;
+    postCount: number;
+    subFolders: FolderType[];
 }
 
 export interface FolderResponse {
-    folderId: string,
-    title: string,
-    depth: number,
-    orderIndex: number,
-    parentFolderId: string | null,
-    postCount: number,
+    folderId: string;
+    title: string;
+    depth: number;
+    orderIndex: number;
+    parentFolderId: string | null;
+    postCount: number;
 }
 
 export const toFolderTypeList = (folderResponseList: FolderResponse[]) => {
     const result: FolderType[] = [];
 
-    folderResponseList.sort((a, b) => a.orderIndex - b.orderIndex)
+    folderResponseList
+        .sort((a, b) => a.orderIndex - b.orderIndex)
         .forEach(folderResponse => {
             const folderType = toFolderType(folderResponse);
 
@@ -40,7 +41,7 @@ export const toFolderTypeList = (folderResponseList: FolderResponse[]) => {
         });
 
     return result;
-}
+};
 
 const toFolderType = (folderResponse: FolderResponse) => {
     return {
@@ -49,14 +50,14 @@ const toFolderType = (folderResponse: FolderResponse) => {
         postCount: folderResponse.postCount,
         subFolders: [],
     };
-}
+};
 
 export const toFolderRequestList = (folderTypeList: FolderType[]) => {
     const result: FolderRequest[] = [];
 
     const getFolderRequestList = (folderTypeList: FolderType[], depth: number = 0, parentIndex: number = -1) => {
         folderTypeList.forEach(folder => {
-            const id = (!folder.id.startsWith("temp") ? folder.id : null);
+            const id = !folder.id.startsWith('temp') ? folder.id : null;
             result.push({
                 id: id,
                 title: folder.title,
@@ -69,20 +70,20 @@ export const toFolderRequestList = (folderTypeList: FolderType[]) => {
                 getFolderRequestList(folder.subFolders, depth + 1, result.length - 1);
             }
         });
-    }
+    };
 
     getFolderRequestList(folderTypeList);
 
     return result;
-}
+};
 
 export interface FolderDeleteRequest {
-    folderId: string,
+    folderId: string;
 }
 
 export interface PostListMemberRequest {
-    username: string,
-    folderIds: string[] | null,
-    page: number,
-    size: number,
+    username: string;
+    folderIds: string[] | null;
+    page: number;
+    size: number;
 }

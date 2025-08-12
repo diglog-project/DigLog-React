@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useRef, MutableRefObject } from 'react';
-import { PostResponse } from "../types/post.tsx";
+import { PostResponse } from '../types/post.tsx';
 
 export interface InfiniteScrollProps {
     root?: Element | null;
@@ -16,9 +16,8 @@ const useInfiniteScroll = ({
     threshold = 1,
     rootMargin = '0px',
     targetArray,
-    endPoint = 1
+    endPoint = 1,
 }: InfiniteScrollProps) => {
-
     const [page, setPage] = useState<number>(0);
     const currentChild = useRef<Element | null>(null);
 
@@ -30,7 +29,7 @@ const useInfiniteScroll = ({
                     return;
                 }
                 if (entries[0].isIntersecting) {
-                    setPage((v) => v + 1);
+                    setPage(v => v + 1);
                     // setPage 가 무한으로 올라가는 것을 방지하기 위한 연결 끊음
                     observer.disconnect();
                 }
@@ -64,7 +63,7 @@ const useInfiniteScroll = ({
 
     return {
         page,
-        setPage
+        setPage,
     };
 };
 
