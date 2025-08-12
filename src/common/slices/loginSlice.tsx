@@ -1,17 +1,17 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     isLogin: false,
     isReloaded: true,
-    accessToken: "",
-    email: "",
-    username: "",
-    profileUrl: "",
+    accessToken: '',
+    email: '',
+    username: '',
+    profileUrl: '',
     roles: [],
-}
+};
 
 const loginSlice = createSlice({
-    name: "loginSlice",
+    name: 'loginSlice',
     initialState: initialState,
     reducers: {
         login: (state, action) => {
@@ -42,13 +42,13 @@ const loginSlice = createSlice({
                 profileUrl: action.payload.profileUrl,
             };
         },
-        setReloadedFalse: (state) => {
+        setReloadedFalse: state => {
             return {
                 ...state,
                 isReloaded: false,
             };
-        }
-    }
+        },
+    },
 });
 
 export const { login, logout, setUsername, setProfile, setReloadedFalse } = loginSlice.actions;

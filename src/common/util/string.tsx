@@ -1,9 +1,9 @@
 export const getFolderTitle = (title: string, depth: number) => {
-    let prefix = "";
+    let prefix = '';
     if (depth === 1) {
-        prefix = "↳";
+        prefix = '↳';
     } else if (depth === 2) {
-        prefix = "↳";
+        prefix = '↳';
     }
     return `${prefix} ${title}`;
-}
+};

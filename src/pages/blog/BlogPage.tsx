@@ -1,21 +1,20 @@
-import BasicLayout from "../../layout/BasicLayout.tsx";
-import { useParams, useSearchParams } from "react-router-dom";
-import PostCard from "../../components/post/PostCard.tsx";
-import { useEffect, useRef, useState } from "react";
-import { MdMenu, MdOutlineExitToApp } from "react-icons/md";
-import PaginationButton from "../../components/common/PaginationButton.tsx";
-import { FolderType, toFolderTypeList } from "../../common/types/blog.tsx";
-import BlogSideBar from "../../components/blog/BlogSideBar.tsx";
-import IconButton from "../../components/common/IconButton.tsx";
-import { PageResponse } from "../../common/types/common.tsx";
-import { getMemberFolders, getMemberPosts, getMemberTags } from "../../common/apis/blog.tsx";
-import { PostResponse, TagResponse } from "../../common/types/post.tsx";
-import { MemberProfileResponse } from "../../common/types/member.tsx";
-import { getProfileByUsername } from "../../common/apis/member.tsx";
-import { TextLink } from "../../components/common/TextButton.tsx";
+import BasicLayout from '../../layout/BasicLayout.tsx';
+import { useParams, useSearchParams } from 'react-router-dom';
+import PostCard from '../../components/post/PostCard.tsx';
+import { useEffect, useRef, useState } from 'react';
+import { MdMenu, MdOutlineExitToApp } from 'react-icons/md';
+import PaginationButton from '../../components/common/PaginationButton.tsx';
+import { FolderType, toFolderTypeList } from '../../common/types/blog.tsx';
+import BlogSideBar from '../../components/blog/BlogSideBar.tsx';
+import IconButton from '../../components/common/IconButton.tsx';
+import { PageResponse } from '../../common/types/common.tsx';
+import { getMemberFolders, getMemberPosts, getMemberTags } from '../../common/apis/blog.tsx';
+import { PostResponse, TagResponse } from '../../common/types/post.tsx';
+import { MemberProfileResponse } from '../../common/types/member.tsx';
+import { getProfileByUsername } from '../../common/apis/member.tsx';
+import { TextLink } from '../../components/common/TextButton.tsx';
 
 function BlogPage() {
-
     const { username } = useParams();
     const [folderParam, setFolderParam] = useSearchParams();
 
@@ -24,10 +23,10 @@ function BlogPage() {
         number: 0,
         size: 3,
         totalElements: 0,
-        totalPages: 0
+        totalPages: 0,
     });
     const [posts, setPosts] = useState<PostResponse[]>([]);
-    const [member, setMember] = useState<MemberProfileResponse>({ username: username || "", profileUrl: null });
+    const [member, setMember] = useState<MemberProfileResponse>({ username: username || '', profileUrl: null });
     const [folders, setFolders] = useState<FolderType[]>([]);
     const [tags, setTags] = useState<TagResponse[]>([]);
 
@@ -38,7 +37,7 @@ function BlogPage() {
 
     const handleMenuOpen = () => {
         setIsOpen(cur => !cur);
-    }
+    };
     const handleClickOutside = (event: MouseEvent) => {
         if (sideBarRef.current && !sideBarRef.current.contains(event.target as Node)) {
             setIsOpen(false);
@@ -46,15 +45,15 @@ function BlogPage() {
     };
 
     const handlePage = (page: number) => {
-        setFolderParam({ ...folderParam, "page": page.toString() });
+        setFolderParam({ ...folderParam, page: page.toString() });
         setPage(page);
-    }
+    };
 
     const handleSelectedFolder = (folder: FolderType) => {
         setSelectedFolder(folder);
-        setFolderParam({ "folder": folder.id, "page": page.toString() });
+        setFolderParam({ folder: folder.id, page: page.toString() });
         setPage(0);
-    }
+    };
 
     const getSelectedFolderById = (folders: FolderType[], folderId: string): FolderType | null => {
         for (const folder of folders) {
@@ -71,7 +70,7 @@ function BlogPage() {
         }
 
         return null;
-    }
+    };
 
     const getSelectedFolders = (folder: FolderType | null) => {
         if (!folder) {
@@ -86,15 +85,15 @@ function BlogPage() {
             });
         }
         return folderIds;
-    }
+    };
 
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
-        document.title = username || "DIGLOG";
+        document.title = username || 'DIGLOG';
 
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
-            document.title = "DIGLOG";
+            document.title = 'DIGLOG';
         };
     }, []);
 
@@ -116,36 +115,35 @@ function BlogPage() {
         }
 
         getProfileByUsername(username)
-            .then((res) => {
+            .then(res => {
                 setMember(res.data);
             })
             .catch(error => alert(error.response.data.message));
 
-        getMemberFolders(username)
-            .then(res => {
-                const folders = toFolderTypeList(res.data);
-                setFolders(folders);
-                setFolders(prev => [
-                    {
-                        id: "",
-                        title: "전체",
-                        postCount: 0,
-                        subFolders: []
-                    },
-                    ...prev,
-                ])
+        getMemberFolders(username).then(res => {
+            const folders = toFolderTypeList(res.data);
+            setFolders(folders);
+            setFolders(prev => [
+                {
+                    id: '',
+                    title: '전체',
+                    postCount: 0,
+                    subFolders: [],
+                },
+                ...prev,
+            ]);
 
-                setPage(Number(folderParam.get("page")) || 0);
+            setPage(Number(folderParam.get('page')) || 0);
 
-                const initialSelectedFolderId = folderParam.get("folder");
-                if (!initialSelectedFolderId) {
-                    return;
-                }
-                const initialSelectedFolder = getSelectedFolderById(folders, initialSelectedFolderId);
-                if (initialSelectedFolder) {
-                    setSelectedFolder(initialSelectedFolder);
-                }
-            });
+            const initialSelectedFolderId = folderParam.get('folder');
+            if (!initialSelectedFolderId) {
+                return;
+            }
+            const initialSelectedFolder = getSelectedFolderById(folders, initialSelectedFolderId);
+            if (initialSelectedFolder) {
+                setSelectedFolder(initialSelectedFolder);
+            }
+        });
 
         getMemberTags(username)
             .then(res => {
@@ -165,7 +163,7 @@ function BlogPage() {
             page: page,
             size: pageInfo.size,
         })
-            .then((res) => {
+            .then(res => {
                 setPosts(res.data.content);
                 setPageInfo(res.data.page);
             })
@@ -175,48 +173,45 @@ function BlogPage() {
     return (
         <BasicLayout>
             <div
-                className={`${(isOpen) ? "opacity-50 backdrop-blur-sm z-10 overflow-y-hidden" : "z-10"} w-full flex flex-col`}>
-                <div className="flex justify-between items-center px-0 lg:px-5 font-jalnan pb-4">
-                    <TextLink text={`${username}의 블로그`}
-                        to={`/blog/${username}`}
-                        addStyle="!text-xl !font-jalnan" />
-                    <IconButton
-                        icon={<MdMenu className="size-8" />}
-                        onClick={handleMenuOpen}
-                        addStyle="lg:hidden" />
+                className={`${
+                    isOpen ? 'opacity-50 backdrop-blur-sm z-10 overflow-y-hidden' : 'z-10'
+                } w-full flex flex-col`}
+            >
+                <div className='flex justify-between items-center px-0 lg:px-5 font-jalnan pb-4'>
+                    <TextLink text={`${username}의 블로그`} to={`/blog/${username}`} addStyle='!text-xl !font-jalnan' />
+                    <IconButton icon={<MdMenu className='size-8' />} onClick={handleMenuOpen} addStyle='lg:hidden' />
                 </div>
-                <div className="grid lg:grid-cols-3">
-                    <div
-                        className="lg:col-span-2 flex flex-col gap-y-4 px-0 lg:px-8 py-4 lg:border-r border-r-gray-200">
-                        {posts.map((post) => (
-                            <PostCard
-                                key={post.id}
-                                post={post} />
+                <div className='grid lg:grid-cols-3'>
+                    <div className='lg:col-span-2 flex flex-col gap-y-4 px-0 lg:px-8 py-4 lg:border-r border-r-gray-200'>
+                        {posts.map(post => (
+                            <PostCard key={post.id} post={post} />
                         ))}
-                        {posts.length === 0 &&
-                            <div className="mt-8 text-center text-gray-600">
-                                작성된 게시글이 없습니다.
-                            </div>}
-                        <PaginationButton
-                            pageInfo={pageInfo} setPage={handlePage} />
+                        {posts.length === 0 && (
+                            <div className='mt-8 text-center text-gray-600'>작성된 게시글이 없습니다.</div>
+                        )}
+                        <PaginationButton pageInfo={pageInfo} setPage={handlePage} />
                     </div>
-                    <div className="col-span-1 hidden lg:block flex-col">
+                    <div className='col-span-1 hidden lg:block flex-col'>
                         <BlogSideBar
                             folders={folders}
                             tags={tags}
                             username={username}
                             profileUrl={member.profileUrl}
                             selectedFolder={selectedFolder}
-                            setSelectedFolder={handleSelectedFolder} />
+                            setSelectedFolder={handleSelectedFolder}
+                        />
                     </div>
                 </div>
             </div>
-            <div ref={sideBarRef}
-                className={`${isOpen ? "block translate-x-0" : "hidden translate-x-full"} absolute top-0 right-0 w-96 flex-col
-                     transform transition-transform duration-300 ease-out z-20`}>
-                <button className="absolute top-6 left-6 hover:cursor-pointer"
-                    onClick={() => setIsOpen(false)}>
-                    <MdOutlineExitToApp className="size-8 text-gray-500" />
+            <div
+                ref={sideBarRef}
+                className={`${
+                    isOpen ? 'block translate-x-0' : 'hidden translate-x-full'
+                } absolute top-0 right-0 w-96 flex-col
+                     transform transition-transform duration-300 ease-out z-20`}
+            >
+                <button className='absolute top-6 left-6 hover:cursor-pointer' onClick={() => setIsOpen(false)}>
+                    <MdOutlineExitToApp className='size-8 text-gray-500' />
                 </button>
                 <BlogSideBar
                     folders={folders}
@@ -225,8 +220,9 @@ function BlogPage() {
                     profileUrl={member.profileUrl}
                     selectedFolder={selectedFolder}
                     setSelectedFolder={handleSelectedFolder}
-                    bgColor={"bg-gray-50"}
-                    side={true} />
+                    bgColor={'bg-gray-50'}
+                    side={true}
+                />
             </div>
         </BasicLayout>
     );

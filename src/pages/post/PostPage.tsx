@@ -1,47 +1,51 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
-import BasicLayout from "../../layout/BasicLayout.tsx";
-import DOMPurify from "dompurify";
-import { fullDateToKorean } from "../../common/util/date.tsx";
-import TagCard from "../../components/post/TagCard.tsx";
-import { getPost, getPostViewCount, incrementPostViewCount } from "../../common/apis/post.tsx";
-import { ChangeEvent, useEffect, useState } from "react";
-import { PostResponse } from "../../common/types/post.tsx";
-import { checkUUID } from "../../common/util/regex.tsx";
-import { sortTagByName } from "../../common/util/sort.tsx";
-import CommentCard from "../../components/post/CommentCard.tsx";
-import CommentTextField from "../../components/post/CommentTextField.tsx";
-import { FillLink, LoadMoreButton } from "../../components/common/FillButton.tsx";
-import { getComments, saveComment, updateComment } from "../../common/apis/comment.tsx";
-import { CommentResponse, CommentType } from "../../common/types/comment.tsx";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store.tsx";
-import { PageResponse } from "../../common/types/common.tsx";
-import { FaEye } from "react-icons/fa6";
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import BasicLayout from '../../layout/BasicLayout.tsx';
+import DOMPurify from 'dompurify';
+import { fullDateToKorean } from '../../common/util/date.tsx';
+import TagCard from '../../components/post/TagCard.tsx';
+import { getPost, getPostViewCount, incrementPostViewCount } from '../../common/apis/post.tsx';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { PostResponse } from '../../common/types/post.tsx';
+import { checkUUID } from '../../common/util/regex.tsx';
+import { sortTagByName } from '../../common/util/sort.tsx';
+import CommentCard from '../../components/post/CommentCard.tsx';
+import CommentTextField from '../../components/post/CommentTextField.tsx';
+import { FillLink, LoadMoreButton } from '../../components/common/FillButton.tsx';
+import { getComments, saveComment, updateComment } from '../../common/apis/comment.tsx';
+import { CommentResponse, CommentType } from '../../common/types/comment.tsx';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store.tsx';
+import { PageResponse } from '../../common/types/common.tsx';
+import { FaEye } from 'react-icons/fa6';
 
 function PostPage() {
-
     const { id } = useParams();
     const navigate = useNavigate();
     const loginState = useSelector((state: RootState) => state.loginSlice);
 
     const [post, setPost] = useState<PostResponse>({
-        id: "",
-        title: "",
-        content: "",
-        username: "",
+        id: '',
+        title: '',
+        content: '',
+        username: '',
         tags: [],
         viewCount: 0,
         createdAt: new Date(),
     });
-    const [commentInput, setCommentInput] = useState("");
+    const [commentInput, setCommentInput] = useState('');
     const [comments, setComments] = useState<CommentType[]>([]);
     const [pageInfo, setPageInfo] = useState<PageResponse>({ number: 0, size: 10, totalPages: 0, totalElements: 0 });
     const [trigger, setTrigger] = useState(false);
 
     const handleCommentInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
         setCommentInput(e.target.value);
-    }
-    const handleCommentSubmit = (parentCommentId: string | null, content: string, taggedUsername: string | null, originalComment: CommentType | null) => {
+    };
+    const handleCommentSubmit = (
+        parentCommentId: string | null,
+        content: string,
+        taggedUsername: string | null,
+        originalComment: CommentType | null,
+    ) => {
         if (originalComment) {
             handleUpdateComment(content, taggedUsername, originalComment);
             return;
@@ -60,11 +64,11 @@ function PostPage() {
 
         saveComment(commentRequest)
             .then(() => {
-                alert("등록되었습니다.");
+                alert('등록되었습니다.');
                 navigate(0);
             })
-            .catch((error) => alert(error.response.data.message));
-    }
+            .catch(error => alert(error.response.data.message));
+    };
     const findParentCommentId = (comments: CommentType[], parentCommentId: string) => {
         for (const comment of comments) {
             if (comment.id === parentCommentId) {
@@ -79,10 +83,14 @@ function PostPage() {
             }
         }
         return null;
-    }
-    const handleUpdateComment = (content: string, taggedUsername: string | null, originalComment: CommentType | null) => {
+    };
+    const handleUpdateComment = (
+        content: string,
+        taggedUsername: string | null,
+        originalComment: CommentType | null,
+    ) => {
         if (!originalComment) {
-            alert("업데이트 할 댓글이 존재하지 않습니다.");
+            alert('업데이트 할 댓글이 존재하지 않습니다.');
             return;
         }
 
@@ -94,16 +102,16 @@ function PostPage() {
 
         updateComment(commentUpdateRequest)
             .then(() => {
-                alert("수정되었습니다.");
+                alert('수정되었습니다.');
                 navigate(0);
             })
-            .catch((error) => alert(error.response.data.message));
-    }
+            .catch(error => alert(error.response.data.message));
+    };
 
     const handleLoadMoreComment = () => {
         setPageInfo({ ...pageInfo, number: pageInfo.number + 1 });
         setTrigger(prev => !prev);
-    }
+    };
     const handleLoadMoreSubComment = (page: number, parentId: string) => {
         getComments({
             postId: post.id,
@@ -111,37 +119,37 @@ function PostPage() {
             page: page,
             size: pageInfo.size,
         })
-            .then((res) => {
+            .then(res => {
                 setComments(prevComments =>
                     prevComments.map(comment => {
                         if (comment.id === parentId) {
                             return {
                                 ...comment,
-                                subComments: [...comment.subComments, ...res.data.content]
-                            }
+                                subComments: [...comment.subComments, ...res.data.content],
+                            };
                         }
                         return comment;
-                    }));
+                    }),
+                );
             })
-            .catch((error) => alert(error.response.data.message));
-    }
+            .catch(error => alert(error.response.data.message));
+    };
 
     useEffect(() => {
         if (id === null || id === undefined || !checkUUID(id)) {
-            alert("올바르지 않은 주소입니다.");
+            alert('올바르지 않은 주소입니다.');
             navigate(-1);
             return;
         }
 
         incrementPostViewCount(id);
 
-        getPostViewCount(id)
-            .then((res) => {
-                setPost(prev => ({ ...prev, viewCount: res.data.viewCount }));
-            });
+        getPostViewCount(id).then(res => {
+            setPost(prev => ({ ...prev, viewCount: res.data.viewCount }));
+        });
 
         getPost(id)
-            .then((res) => {
+            .then(res => {
                 setPost(prev => ({
                     ...prev,
                     id: res.data.id,
@@ -151,15 +159,14 @@ function PostPage() {
                     folder: res.data.folder,
                     tags: sortTagByName(res.data.tags),
                     createdAt: new Date(res.data.createdAt),
-                }))
+                }));
                 setTrigger(prev => !prev);
             })
-            .catch((error) => alert(error.response.data.message));
-
+            .catch(error => alert(error.response.data.message));
     }, []);
 
     useEffect(() => {
-        if (post.id === "") return;
+        if (post.id === '') return;
 
         getComments({
             postId: post.id,
@@ -167,11 +174,11 @@ function PostPage() {
             page: pageInfo.number,
             size: pageInfo.size,
         })
-            .then((res) => {
+            .then(res => {
                 setComments(prev => [...prev, ...getCommentType(res.data.content)]);
                 setPageInfo(res.data.page);
             })
-            .catch((error) => alert(error.response.data.message));
+            .catch(error => alert(error.response.data.message));
     }, [trigger]);
 
     const getCommentType = (content: CommentResponse[]): CommentType[] => {
@@ -185,85 +192,99 @@ function PostPage() {
             deleted: res.deleted,
             subComments: [],
         }));
-    }
+    };
 
     const safeContent = DOMPurify.sanitize(post.content);
 
     return (
         <BasicLayout>
-            <div className="w-full flex flex-col">
-                <div className="flex flex-col gap-y-8">
-                    <div className="flex justify-between items-center">
-                        <div className="flex-1 flex flex-wrap justify-center items-center gap-x-4">
-                            <Link to={`/blog/${post.username}`} className="text-xs">
+            <div className='w-full flex flex-col'>
+                <div className='flex flex-col gap-y-8'>
+                    <div className='flex justify-between items-center'>
+                        <div className='flex-1 flex flex-wrap justify-center items-center gap-x-4'>
+                            <Link to={`/blog/${post.username}`} className='text-xs'>
                                 Home
                             </Link>
-                            {post.folder &&
-                                <div className="flex gap-x-4">
-                                    <div className="text-xs">{` > `}</div>
-                                    <Link to={`/blog/${post.username}?folder=${post.folder.id}`}
-                                        className="text-xs">{post.folder.title}</Link>
-                                </div>}
+                            {post.folder && (
+                                <div className='flex gap-x-4'>
+                                    <div className='text-xs'>{` > `}</div>
+                                    <Link to={`/blog/${post.username}?folder=${post.folder.id}`} className='text-xs'>
+                                        {post.folder.title}
+                                    </Link>
+                                </div>
+                            )}
                         </div>
                     </div>
-                    <div className="flex flex-row flex-wrap w-full justify-center text-center items-center gap-4">
-                        <Link to={`/blog/${post.username}`}
-                            className="text-md font-semibold text-lime-700 hover:text-lime-400">
+                    <div className='flex flex-row flex-wrap w-full justify-center text-center items-center gap-4'>
+                        <Link
+                            to={`/blog/${post.username}`}
+                            className='text-md font-semibold text-lime-700 hover:text-lime-400'
+                        >
                             {post.username}
                         </Link>
-                        <div className="text-md text-gray-600">
-                            {fullDateToKorean(post.createdAt)}
-                        </div>
+                        <div className='text-md text-gray-600'>{fullDateToKorean(post.createdAt)}</div>
                     </div>
-                    <div className="text-center leading-relaxed text-3xl text-gray-900 font-jalnan break-words">
+                    <div className='text-center leading-relaxed text-3xl text-gray-900 font-jalnan break-words'>
                         {post.title}
                     </div>
-                    <div className="flex flex-wrap justify-center items-center gap-4">
-                        {post.tags.map(tag =>
-                            <TagCard key={tag.id} tag={tag} onClick={() => {
-                                navigate(`/search?keyword=${tag.name}&option=TAG&sort=createdAt&isDescending=true&tab=post`)
-                            }} />)}
+                    <div className='flex flex-wrap justify-center items-center gap-4'>
+                        {post.tags.map(tag => (
+                            <TagCard
+                                key={tag.id}
+                                tag={tag}
+                                onClick={() => {
+                                    navigate(
+                                        `/search?keyword=${tag.name}&option=TAG&sort=createdAt&isDescending=true&tab=post`,
+                                    );
+                                }}
+                            />
+                        ))}
                     </div>
-                    <div className="w-full max-w-3xl mx-auto flex justify-end items-center gap-x-2 text-gray-600">
-                        <FaEye />{post.viewCount}
+                    <div className='w-full max-w-3xl mx-auto flex justify-end items-center gap-x-2 text-gray-600'>
+                        <FaEye />
+                        {post.viewCount}
                     </div>
                 </div>
-                <div className="w-full max-w-3xl mx-auto py-8 space-y-4 break-words"
-                    dangerouslySetInnerHTML={{ __html: safeContent }} />
-                <div>
-                </div>
-                <div className="w-full max-w-3xl mx-auto py-8 rounded-2xl flex flex-col gap-y-0 my-8">
-                    {loginState.isLogin
-                        ? <CommentTextField
+                <div
+                    className='w-full max-w-3xl mx-auto py-8 space-y-4 break-words'
+                    dangerouslySetInnerHTML={{ __html: safeContent }}
+                />
+                <div></div>
+                <div className='w-full max-w-3xl mx-auto py-8 rounded-2xl flex flex-col gap-y-0 my-8'>
+                    {loginState.isLogin ? (
+                        <CommentTextField
                             value={commentInput}
                             onChange={handleCommentInput}
-                            handleSubmit={handleCommentSubmit} />
-                        : <div className="flex flex-col items-end gap-y-2">
-                            <textarea className="w-full border border-gray-400 bg-gray-100 opacity-50"
+                            handleSubmit={handleCommentSubmit}
+                        />
+                    ) : (
+                        <div className='flex flex-col items-end gap-y-2'>
+                            <textarea
+                                className='w-full border border-gray-400 bg-gray-100 opacity-50'
                                 disabled={true}
                                 rows={5}
-                                minLength={5} />
-                            <FillLink text={"로그인"} to={"/login"} addStyle={"w-fit"} />
+                                minLength={5}
+                            />
+                            <FillLink text={'로그인'} to={'/login'} addStyle={'w-fit'} />
                         </div>
-                    }
+                    )}
                     <p>댓글 ({pageInfo.totalElements})</p>
-                    {comments.map((comment, i) =>
+                    {comments.map((comment, i) => (
                         <CommentCard
                             key={i}
                             comment={comment}
                             handleLoadMoreSubComment={handleLoadMoreSubComment}
                             handleCommentSubmit={handleCommentSubmit}
-                            pageSize={pageInfo.size} />)}
-                    {pageInfo.number + 1 < pageInfo.totalPages &&
-                        <LoadMoreButton
-                            onClick={handleLoadMoreComment}
-                            addStyle={"!bg-gray-400"} />}
+                            pageSize={pageInfo.size}
+                        />
+                    ))}
+                    {pageInfo.number + 1 < pageInfo.totalPages && (
+                        <LoadMoreButton onClick={handleLoadMoreComment} addStyle={'!bg-gray-400'} />
+                    )}
                 </div>
-
             </div>
         </BasicLayout>
-    )
-        ;
+    );
 }
 
 export default PostPage;

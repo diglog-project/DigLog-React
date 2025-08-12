@@ -1,4 +1,4 @@
-import { TagResponse } from "../types/post.tsx";
+import { TagResponse } from '../types/post.tsx';
 
 export const sortByName = (names: string[]) => {
     names.sort((a: string, b: string) => {
@@ -7,7 +7,7 @@ export const sortByName = (names: string[]) => {
         return 0;
     });
     return names;
-}
+};
 
 export const sortTagByName = (tags: TagResponse[]) => {
     tags.sort((a: TagResponse, b: TagResponse) => {
@@ -16,4 +16,4 @@ export const sortTagByName = (tags: TagResponse[]) => {
         return 0;
     });
     return tags;
-}
+};
