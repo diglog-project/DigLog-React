@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store.tsx';
 import { useEffect, useRef, useState } from 'react';
 import { TextLink } from './TextButton.tsx';
-import { MdOutlineSearch } from 'react-icons/md';
+import { MdNotificationsNone, MdOutlineSearch } from 'react-icons/md';
 import IconButton from './IconButton.tsx';
 import { getProfile, logoutApi } from '../../common/apis/member.tsx';
 import { logout, setProfile, setReloadedFalse } from '../../common/slices/loginSlice.tsx';
@@ -14,8 +14,22 @@ function Header() {
     const loginState = useSelector((state: RootState) => state.loginSlice);
     const navigate = useNavigate();
 
+    const [notification, setNotification] = useState<string[]>([]);
+
     const dashboardRef = useRef<HTMLDivElement | null>(null);
-    const [isOpen, setIsOpen] = useState(false);
+    const [isDashBoardOpen, setIsDashBoardOpen] = useState(false);
+
+    const notificationRef = useRef<HTMLDivElement | null>(null);
+    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+
+    useEffect(() => {
+        const eventSource = new EventSource(`${import.meta.env.VITE_SERVER_URL}/sse/subscribe`);
+
+        eventSource.addEventListener('message', event => {
+            const data = JSON.parse(event.data);
+            setNotification(prev => [...prev, data.message]);
+        });
+    }, []);
 
     useEffect(() => {
         if (!loginState.isReloaded) {
@@ -41,13 +55,27 @@ function Header() {
             });
     }, []);
 
-    const handleDropDown = () => {
-        setIsOpen(cur => !cur);
+    const handleDashBoardDropDown = () => {
+        setIsDashBoardOpen(cur => !cur);
+        setIsNotificationOpen(false);
+    };
+
+    const handleNotificationDropDown = () => {
+        setIsNotificationOpen(cur => !cur);
+        setIsDashBoardOpen(false);
     };
 
     const handleClickOutside = (event: MouseEvent) => {
-        if (dashboardRef.current && !dashboardRef.current.contains(event.target as Node)) {
-            setIsOpen(false);
+        const target = event.target as Node;
+
+        const isDashboardOutside = dashboardRef.current && !dashboardRef.current.contains(target);
+        const isNotificationOutside = notificationRef.current && !notificationRef.current.contains(target);
+
+        if (isDashboardOutside) {
+            setIsDashBoardOpen(false);
+        }
+        if (isNotificationOutside) {
+            setIsNotificationOpen(false);
         }
     };
 
@@ -84,13 +112,48 @@ function Header() {
                     icon={<MdOutlineSearch className='size-5' />}
                     onClick={() => navigate('/search?word=&option=ALL&sort=createdAt&isDescending=true&tab=post')}
                 />
+                {loginState.isLogin && (
+                    <div ref={notificationRef}>
+                        <div className='relative flex justify-around items-center w-full'>
+                            <IconButton
+                                icon={<MdNotificationsNone className='size-5' />}
+                                onClick={handleNotificationDropDown}
+                            />
+                            <div
+                                className={`${
+                                    isNotificationOpen ? '' : 'hidden'
+                                } absolute z-99 top-12 -right-12 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-72`}
+                            >
+                                <div className='py-1'>
+                                    <button
+                                        onClick={() => {}}
+                                        className='w-full block px-4 py-2 text-start text-sm text-gray-700 hover:bg-gray-100 hover:cursor-pointer'
+                                    >
+                                        {notification.map(notification => (
+                                            <div key={notification} className='flex justify-between items-center'>
+                                                notification
+                                            </div>
+                                        ))}
+                                        <div>
+                                            <div>test 의 새 글이 등록되었습니다.</div>
+                                            <div>몇 분 전</div>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
                 {loginState.isLogin ? (
                     <div ref={dashboardRef}>
                         <div className='relative flex justify-around items-center w-full'>
-                            <ProfileImageCircle profileUrl={loginState.profileUrl} onClick={handleDropDown} />
+                            <IconButton
+                                icon={<ProfileImageCircle profileUrl={loginState.profileUrl} />}
+                                onClick={handleDashBoardDropDown}
+                            />
                             <div
                                 className={`${
-                                    isOpen ? '' : 'hidden'
+                                    isDashBoardOpen ? '' : 'hidden'
                                 } absolute z-99 top-12 right-0 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44`}
                             >
                                 <div className='flex flex-col gap-1 px-4 py-3 text-sm text-gray-900'>
