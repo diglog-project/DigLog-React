@@ -6,12 +6,14 @@ import BlogTagCard from './BlogTagCard.tsx';
 import { getFolderTitle } from '../../common/util/string.tsx';
 import ProfileImageCircle from '../common/ProfileImageCircle.tsx';
 import { TagResponse } from '../../common/types/post.tsx';
+import { FillButton } from '../common/FillButton.tsx';
+import { MemberProfileResponse } from '../../common/types/member.tsx';
 
 function BlogSideBar({
     folders,
     tags,
-    username,
-    profileUrl,
+    member,
+    handleSubscription,
     selectedFolder,
     setSelectedFolder,
     bgColor,
@@ -19,8 +21,8 @@ function BlogSideBar({
 }: {
     folders: FolderType[];
     tags: TagResponse[];
-    username: string | undefined;
-    profileUrl: string | null;
+    member: MemberProfileResponse;
+    handleSubscription: () => void;
     selectedFolder: FolderType | null;
     setSelectedFolder: (folder: FolderType) => void;
     bgColor?: string;
@@ -31,9 +33,9 @@ function BlogSideBar({
     return (
         <div className={`${bgColor} ${side && 'h-screen overflow-y-scroll'}`}>
             <div className='flex flex-col justify-start items-center py-4 gap-4 z-200'>
-                <ProfileImageCircle profileUrl={profileUrl} size='md' />
-                <div className='flex justify-center items-center text-xl font-black'>{username}</div>
-                {username === loginState.username && (
+                <ProfileImageCircle profileUrl={member.profileUrl} size='md' />
+                <div className='flex justify-center items-center text-xl font-black'>{member.username}</div>
+                {member.username === loginState.username ? (
                     <div className='flex justify-between items-center gap-x-4 my-2 text-xs'>
                         <OutlineLink text={'게시글 작성'} to={'/write'} />
                         <OutlineLink
@@ -42,6 +44,20 @@ function BlogSideBar({
                             addStyle={'!border-neutral-500 !text-neutral-500 hover:bg-neutral-500 hover:!text-white'}
                         />
                     </div>
+                ) : (
+                    loginState.isLogin && (
+                        <div className='flex justify-between items-center my-2 text-xs'>
+                            {member.isSubscribed ? (
+                                <FillButton
+                                    text='구독 취소'
+                                    onClick={handleSubscription}
+                                    addStyle='bg-red-400 hover:bg-red-700'
+                                />
+                            ) : (
+                                <FillButton text='구독' onClick={handleSubscription} />
+                            )}
+                        </div>
+                    )
                 )}
             </div>
             <div className='w-72 mx-auto flex flex-col justify-center items-start gap-4 py-8'>
@@ -56,7 +72,7 @@ function BlogSideBar({
                 <div className='font-bold text-lime-700 text-center'>태그</div>
                 <div className='w-72 flex flex-wrap justify-center gap-x-2 gap-y-4'>
                     {tags.map(tag => (
-                        <BlogTagCard key={tag.id} tag={tag} username={username || ''} />
+                        <BlogTagCard key={tag.id} tag={tag} username={member.username || ''} />
                     ))}
                     {tags.length === 0 && <div className='text-center text-gray-600'>생성된 태그가 없습니다.</div>}
                 </div>

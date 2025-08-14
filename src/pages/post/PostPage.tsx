@@ -10,13 +10,16 @@ import { checkUUID } from '../../common/util/regex.tsx';
 import { sortTagByName } from '../../common/util/sort.tsx';
 import CommentCard from '../../components/post/CommentCard.tsx';
 import CommentTextField from '../../components/post/CommentTextField.tsx';
-import { FillLink, LoadMoreButton } from '../../components/common/FillButton.tsx';
+import { FillButton, FillLink, LoadMoreButton } from '../../components/common/FillButton.tsx';
 import { getComments, saveComment, updateComment } from '../../common/apis/comment.tsx';
 import { CommentResponse, CommentType } from '../../common/types/comment.tsx';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store.tsx';
 import { PageResponse } from '../../common/types/common.tsx';
 import { FaEye } from 'react-icons/fa6';
+import { getProfileByUsername } from '../../common/apis/member.tsx';
+import ProfileImageCircle from '../../components/common/ProfileImageCircle.tsx';
+import { createSubscription, deleteSubscription, getIsSubscribed } from '../../common/apis/subscription.tsx';
 
 function PostPage() {
     const { id } = useParams();
@@ -31,6 +34,11 @@ function PostPage() {
         tags: [],
         viewCount: 0,
         createdAt: new Date(),
+    });
+    const [postUser, setPostUser] = useState({
+        imageUrl: '',
+        isSubscribed: false,
+        subscriptionId: '',
     });
     const [commentInput, setCommentInput] = useState('');
     const [comments, setComments] = useState<CommentType[]>([]);
@@ -168,6 +176,27 @@ function PostPage() {
     useEffect(() => {
         if (post.id === '') return;
 
+        getProfileByUsername(post.username)
+            .then(res => {
+                setPostUser(prev => ({
+                    ...prev,
+                    imageUrl: res.data.profileUrl || '',
+                }));
+            })
+            .catch(error => alert(error.response.data.message));
+
+        if (loginState.isLogin) {
+            getIsSubscribed(post.username)
+                .then(res => {
+                    setPostUser(prev => ({
+                        ...prev,
+                        isSubscribed: res.data.hasSubscription,
+                        subscriptionId: res.data.subscriptionId || '',
+                    }));
+                })
+                .catch(error => alert(error.response.data.message));
+        }
+
         getComments({
             postId: post.id,
             parentCommentId: null,
@@ -180,6 +209,38 @@ function PostPage() {
             })
             .catch(error => alert(error.response.data.message));
     }, [trigger]);
+
+    const handleSubscription = () => {
+        if (!loginState.isLogin) {
+            navigate('/login');
+            return;
+        }
+
+        const notificationEnabled = confirm('해당 작가의 알림을 받으시겠습니까?');
+        createSubscription({ authorName: post.username, notificationEnabled: notificationEnabled })
+            .then(() => {
+                getIsSubscribed(post.username)
+                    .then(res => {
+                        setPostUser(prev => ({
+                            ...prev,
+                            isSubscribed: res.data.hasSubscription,
+                            subscriptionId: res.data.subscriptionId || '',
+                        }));
+                    })
+                    .catch(error => alert(error.response.data.message));
+                alert(`구독을 추가했습니다.`);
+            })
+            .catch(error => alert(error.response.data.message));
+    };
+
+    const handleDeleteSubscription = () => {
+        deleteSubscription(postUser.subscriptionId)
+            .then(() => {
+                setPostUser(prev => ({ ...prev, isSubscribed: false }));
+                alert('구독이 취소되었습니다.');
+            })
+            .catch(error => alert(error.response.data.message));
+    };
 
     const getCommentType = (content: CommentResponse[]): CommentType[] => {
         return content.map(res => ({
@@ -249,7 +310,25 @@ function PostPage() {
                     className='w-full max-w-3xl mx-auto py-8 space-y-4 break-words'
                     dangerouslySetInnerHTML={{ __html: safeContent }}
                 />
-                <div></div>
+                <div className='w-full max-w-3xl mx-auto px-4 py-8 flex justify-between items-center border-b border-gray-300'>
+                    <button
+                        onClick={() => navigate(`/blog/${post.username}`)}
+                        className='flex items-center gap-x-6 hover:text-lime-600 hover:cursor-pointer'
+                    >
+                        <ProfileImageCircle profileUrl={postUser.imageUrl} size='md' />
+                        <div className='font-bold text-xl'>{post.username}</div>
+                    </button>
+                    {loginState.username !== post.username &&
+                        (postUser.isSubscribed ? (
+                            <FillButton
+                                text='구독 취소'
+                                onClick={handleDeleteSubscription}
+                                addStyle='bg-red-400 hover:bg-red-700'
+                            />
+                        ) : (
+                            <FillButton text='구독' onClick={handleSubscription} />
+                        ))}
+                </div>
                 <div className='w-full max-w-3xl mx-auto py-8 rounded-2xl flex flex-col gap-y-0 my-8'>
                     {loginState.isLogin ? (
                         <CommentTextField

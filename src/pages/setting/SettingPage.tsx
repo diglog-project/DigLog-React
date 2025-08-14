@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store.tsx';
 import IconButton from '../../components/common/IconButton.tsx';
 import { MdMenu, MdOutlineExitToApp } from 'react-icons/md';
+import SubscriptionSettingPage from './SubscriptionSettingPage.tsx';
 
 function SettingPage() {
     const loginState = useSelector((state: RootState) => state.loginSlice);
@@ -85,6 +86,11 @@ function SettingPage() {
                 {selectedSection === 'post' && (
                     <div className='md:border-l border-gray-200 w-full ps-8'>
                         <PostSettingPage />
+                    </div>
+                )}
+                {selectedSection === 'subscription' && (
+                    <div className='md:border-l border-gray-200 w-full ps-8'>
+                        <SubscriptionSettingPage />
                     </div>
                 )}
             </div>

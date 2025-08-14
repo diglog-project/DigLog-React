@@ -13,10 +13,15 @@ import { PostResponse, TagResponse } from '../../common/types/post.tsx';
 import { MemberProfileResponse } from '../../common/types/member.tsx';
 import { getProfileByUsername } from '../../common/apis/member.tsx';
 import { TextLink } from '../../components/common/TextButton.tsx';
+import { createSubscription, deleteSubscription, getIsSubscribed } from '../../common/apis/subscription.tsx';
+import { RootState } from '../../store.tsx';
+import { useSelector } from 'react-redux';
 
 function BlogPage() {
     const { username } = useParams();
     const [folderParam, setFolderParam] = useSearchParams();
+
+    const loginState = useSelector((state: RootState) => state.loginSlice);
 
     const [page, setPage] = useState(0);
     const [pageInfo, setPageInfo] = useState<PageResponse>({
@@ -26,7 +31,12 @@ function BlogPage() {
         totalPages: 0,
     });
     const [posts, setPosts] = useState<PostResponse[]>([]);
-    const [member, setMember] = useState<MemberProfileResponse>({ username: username || '', profileUrl: null });
+    const [member, setMember] = useState<MemberProfileResponse>({
+        username: username || '',
+        profileUrl: null,
+        isSubscribed: false,
+        subscriptionId: '',
+    });
     const [folders, setFolders] = useState<FolderType[]>([]);
     const [tags, setTags] = useState<TagResponse[]>([]);
 
@@ -87,6 +97,37 @@ function BlogPage() {
         return folderIds;
     };
 
+    const handleSubscription = () => {
+        if (!loginState.isLogin) {
+            return;
+        }
+
+        if (member.isSubscribed) {
+            deleteSubscription(member.subscriptionId)
+                .then(() => {
+                    setMember(prev => ({ ...prev, isSubscribed: false, subscriptionId: '' }));
+                    alert('구독을 취소했습니다.');
+                })
+                .catch(error => alert(error.response.data.message));
+        } else {
+            const notificationEnabled = confirm('해당 작가의 알림을 받으시겠습니까?');
+            createSubscription({ authorName: member.username, notificationEnabled: notificationEnabled })
+                .then(() => {
+                    getIsSubscribed(member.username)
+                        .then(res => {
+                            setMember(prev => ({
+                                ...prev,
+                                isSubscribed: res.data.hasSubscription,
+                                subscriptionId: res.data.subscriptionId || '',
+                            }));
+                        })
+                        .catch(error => alert(error.response.data.message));
+                    alert(`구독을 추가했습니다.`);
+                })
+                .catch(error => alert(error.response.data.message));
+        }
+    };
+
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
         document.title = username || 'DIGLOG';
@@ -116,9 +157,25 @@ function BlogPage() {
 
         getProfileByUsername(username)
             .then(res => {
-                setMember(res.data);
+                setMember(prev => ({
+                    ...prev,
+                    username: res.data.username,
+                    profileUrl: res.data.profileUrl,
+                }));
             })
             .catch(error => alert(error.response.data.message));
+
+        if (loginState.isLogin) {
+            getIsSubscribed(username)
+                .then(res => {
+                    setMember(prev => ({
+                        ...prev,
+                        isSubscribed: res.data.hasSubscription,
+                        subscriptionId: res.data.subscriptionId || '',
+                    }));
+                })
+                .catch(error => alert(error.response.data.message));
+        }
 
         getMemberFolders(username).then(res => {
             const folders = toFolderTypeList(res.data);
@@ -195,8 +252,8 @@ function BlogPage() {
                         <BlogSideBar
                             folders={folders}
                             tags={tags}
-                            username={username}
-                            profileUrl={member.profileUrl}
+                            member={member}
+                            handleSubscription={handleSubscription}
                             selectedFolder={selectedFolder}
                             setSelectedFolder={handleSelectedFolder}
                         />
@@ -207,8 +264,7 @@ function BlogPage() {
                 ref={sideBarRef}
                 className={`${
                     isOpen ? 'block translate-x-0' : 'hidden translate-x-full'
-                } absolute top-0 right-0 w-96 flex-col
-                     transform transition-transform duration-300 ease-out z-20`}
+                } absolute top-0 right-0 w-96 flex-col transform transition-transform duration-300 ease-out z-20`}
             >
                 <button className='absolute top-6 left-6 hover:cursor-pointer' onClick={() => setIsOpen(false)}>
                     <MdOutlineExitToApp className='size-8 text-gray-500' />
@@ -216,8 +272,8 @@ function BlogPage() {
                 <BlogSideBar
                     folders={folders}
                     tags={tags}
-                    username={username}
-                    profileUrl={member.profileUrl}
+                    member={member}
+                    handleSubscription={handleSubscription}
                     selectedFolder={selectedFolder}
                     setSelectedFolder={handleSelectedFolder}
                     bgColor={'bg-gray-50'}
