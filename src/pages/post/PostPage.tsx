@@ -20,6 +20,7 @@ import { FaEye } from 'react-icons/fa6';
 import { getProfileByUsername } from '../../common/apis/member.tsx';
 import ProfileImageCircle from '../../components/common/ProfileImageCircle.tsx';
 import { createSubscription, deleteSubscription, getIsSubscribed } from '../../common/apis/subscription.tsx';
+import { createNotification } from '../../common/apis/notification.tsx';
 
 function PostPage() {
     const { id } = useParams();
@@ -71,11 +72,42 @@ function PostPage() {
         };
 
         saveComment(commentRequest)
-            .then(() => {
+            .then(res => {
+                createNotification({
+                    notificationType: 'COMMENT_CREATION',
+                    dataId: res.data.id,
+                });
+
                 alert('등록되었습니다.');
-                navigate(0);
+
+                setCommentInput('');
+                setComments(prev => [
+                    ...prev,
+                    {
+                        id: res.data.id,
+                        member: { username: loginState.username, profileUrl: loginState.profileUrl },
+                        content: commentRequest.content,
+                        taggedUsername: null,
+                        replyCount: 0,
+                        createdAt: new Date(),
+                        deleted: false,
+                        subComments: [],
+                    },
+                ]);
             })
             .catch(error => alert(error.response.data.message));
+    };
+    const handleCommentRemove = (commentId: string) => {
+        if (comments.findIndex(comment => comment.id === commentId) === -1) {
+            setComments(prev =>
+                prev.map(comment => ({
+                    ...comment,
+                    subComments: comment.subComments?.filter(subComment => subComment.id !== commentId) || [],
+                })),
+            );
+        } else {
+            setComments(prev => prev.filter(comment => comment.id !== commentId));
+        }
     };
     const findParentCommentId = (comments: CommentType[], parentCommentId: string) => {
         for (const comment of comments) {
@@ -111,7 +143,19 @@ function PostPage() {
         updateComment(commentUpdateRequest)
             .then(() => {
                 alert('수정되었습니다.');
-                navigate(0);
+                setCommentInput('');
+                setPageInfo({ ...pageInfo, number: 0 });
+                getComments({
+                    postId: post.id,
+                    parentCommentId: null,
+                    page: 0,
+                    size: pageInfo.size,
+                })
+                    .then(res => {
+                        setComments(getCommentType(res.data.content));
+                        setPageInfo(res.data.page);
+                    })
+                    .catch(error => alert(error.response.data.message));
             })
             .catch(error => alert(error.response.data.message));
     };
@@ -347,13 +391,14 @@ function PostPage() {
                             <FillLink text={'로그인'} to={'/login'} addStyle={'w-fit'} />
                         </div>
                     )}
-                    <p>댓글 ({pageInfo.totalElements})</p>
+                    <p>댓글 ({comments.length})</p>
                     {comments.map((comment, i) => (
                         <CommentCard
                             key={i}
                             comment={comment}
                             handleLoadMoreSubComment={handleLoadMoreSubComment}
                             handleCommentSubmit={handleCommentSubmit}
+                            handleCommentRemove={handleCommentRemove}
                             pageSize={pageInfo.size}
                         />
                     ))}

@@ -6,11 +6,9 @@ import { FillButton } from '../../components/common/FillButton.tsx';
 import { setUsername } from '../../common/slices/loginSlice.tsx';
 import { TextButton } from '../../components/common/TextButton.tsx';
 import { updateProfileImage, updateUsername } from '../../common/apis/member.tsx';
-import { useNavigate } from 'react-router-dom';
 import ProfileImageCircle from '../../components/common/ProfileImageCircle.tsx';
 
 function ProfileSettingPage() {
-    const navigate = useNavigate();
     const loginState = useSelector((state: RootState) => state.loginSlice);
     const dispatch = useDispatch();
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -69,7 +67,6 @@ function ProfileSettingPage() {
         updateProfileImage(file)
             .then(() => {
                 alert('변경되었습니다.');
-                navigate(0);
             })
             .catch(error => alert(error.response.data.message));
     };

@@ -9,16 +9,6 @@ export const postListRequestToParameter = (postListRequest: PostListRequest) => 
     return `?${sorts}&page=${postListRequest.page}&size=${postListRequest.size}&isDescending=${postListRequest.isDescending}`;
 };
 
-export const commentListRequestToParameter = (commentListRequest: CommentListRequest) => {
-    let query = `?postId=${commentListRequest.postId}&page=${commentListRequest.page}&size=${commentListRequest.size}`;
-
-    if (commentListRequest.parentCommentId) {
-        query += `&parentCommentId=${commentListRequest.parentCommentId}`;
-    }
-
-    return query;
-};
-
 export const postListMemberRequestToParameter = (postListMemberRequest: PostListMemberRequest) => {
     let query = `?username=${postListMemberRequest.username}&page=${postListMemberRequest.page}&size=${postListMemberRequest.size}`;
 
@@ -45,4 +35,14 @@ export const postListTagRequestToParameter = (postListTagRequest: PostListTagReq
 
 export const memberProfileSearchRequestToParameter = (memberProfileSearchRequest: MemberProfileSearchRequest) => {
     return `?username=${memberProfileSearchRequest.username}&page=${memberProfileSearchRequest.page}&size=${memberProfileSearchRequest.size}`;
+};
+
+export const commentListRequestToParameter = (commentListRequest: CommentListRequest) => {
+    let query = `?postId=${commentListRequest.postId}&page=${commentListRequest.page}&size=${commentListRequest.size}`;
+
+    if (commentListRequest.parentCommentId) {
+        query += `&parentCommentId=${commentListRequest.parentCommentId}`;
+    }
+
+    return query;
 };

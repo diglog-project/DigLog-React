@@ -48,9 +48,12 @@ function CommentTextField(props: CommentTextFieldProps) {
                     )}
                     <FillButton
                         text={!originalComment ? '등록' : '수정'}
-                        onClick={() =>
-                            handleSubmit(commentId || null, value, username || null, originalComment || null)
-                        }
+                        onClick={() => {
+                            handleSubmit(commentId || null, value, username || null, originalComment || null);
+                            if (handleShowTextField) {
+                                handleShowTextField();
+                            }
+                        }}
                     />
                 </div>
             </div>

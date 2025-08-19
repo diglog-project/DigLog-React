@@ -17,6 +17,7 @@ import { FolderType, toFolderTypeList } from '../../common/types/blog.tsx';
 import FolderSelectBox from '../../components/folder/FolderSelectBox.tsx';
 import { getMemberFolders } from '../../common/apis/blog.tsx';
 import * as React from 'react';
+import { createNotification } from '../../common/apis/notification.tsx';
 
 interface WritePostType {
     inputTag: string;
@@ -108,7 +109,8 @@ function WritePage() {
             tagNames: post.tags,
             urls: urls,
         })
-            .then(() => {
+            .then(res => {
+                createNotification({ notificationType: 'POST_CREATION', dataId: res.data.id });
                 alert('작성되었습니다.');
                 navigate(`/blog/${loginState.username}`);
             })

@@ -8,12 +8,12 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store.tsx';
 import { TextButton } from '../common/TextButton.tsx';
 import { deleteComment } from '../../common/apis/comment.tsx';
-import { useNavigate } from 'react-router-dom';
 
 function CommentCard({
     comment,
     handleLoadMoreSubComment,
     handleCommentSubmit,
+    handleCommentRemove,
     pageSize,
     depth = 0,
 }: {
@@ -25,10 +25,10 @@ function CommentCard({
         taggedUsername: string | null,
         originalComment: CommentType | null,
     ) => void;
+    handleCommentRemove: (commentId: string) => void;
     pageSize: number;
     depth?: number;
 }) {
-    const navigate = useNavigate();
     const loginState = useSelector((state: RootState) => state.loginSlice);
 
     const [commentInput, setCommentInput] = useState('');
@@ -64,7 +64,7 @@ function CommentCard({
         deleteComment(comment.id)
             .then(() => {
                 alert('삭제되었습니다.');
-                navigate(0);
+                handleCommentRemove(comment.id);
             })
             .catch(error => alert(error.response.data.message));
     };
@@ -116,7 +116,7 @@ function CommentCard({
                                 }}
                             >
                                 <MdOutlineComment className='text-gray-600 size-4' />
-                                답글 ({comment.replyCount})
+                                답글 ({comment.subComments.length})
                             </button>
                         )}
                         <div />
@@ -160,6 +160,7 @@ function CommentCard({
                                     comment={comment}
                                     handleLoadMoreSubComment={handleLoadMoreSubComment}
                                     handleCommentSubmit={handleCommentSubmit}
+                                    handleCommentRemove={handleCommentRemove}
                                     pageSize={pageSize}
                                     depth={depth + 1}
                                 />
