@@ -14,3 +14,17 @@ export interface SubscriberListRequest {
     page: number;
     size: number;
 }
+
+export interface SubscriptionResponse {
+    subscriptionId: string;
+    authorUsername: string;
+    notificationEnabled: boolean;
+    createdAt: Date;
+}
+
+export interface SubscriberResponse {
+    subscriptionId: string;
+    subscriberUsername: string;
+    notificationEnabled: true;
+    createdAt: Date;
+}
