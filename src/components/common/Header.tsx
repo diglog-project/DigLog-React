@@ -6,15 +6,18 @@ import { TextLink } from './TextButton.tsx';
 import { MdNotificationsNone, MdOutlineSearch } from 'react-icons/md';
 import IconButton from './IconButton.tsx';
 import { getProfile, logoutApi } from '../../common/apis/member.tsx';
-import { logout, setProfile, setReloadedFalse, setSseConnected } from '../../common/slices/loginSlice.tsx';
+import { logout, setProfile, setReloadedFalse } from '../../common/slices/loginSlice.tsx';
 import ProfileImageCircle from './ProfileImageCircle.tsx';
 import { NotificationResponse } from '../../common/types/notification.tsx';
 import { Event, EventSourcePolyfill } from 'event-source-polyfill';
 import { relativeDateToKorean } from '../../common/util/date.tsx';
+import { getNotificationList } from '../../common/apis/notification.tsx';
+import { resetCount, setMessage, setSseConnected } from '../../common/slices/sseSlice.tsx';
 
 function Header() {
     const dispatch = useDispatch();
     const loginState = useSelector((state: RootState) => state.loginSlice);
+    const sseState = useSelector((state: RootState) => state.sseSlice);
     const navigate = useNavigate();
 
     const [notifications, setNotifications] = useState<NotificationResponse[]>([]);
@@ -24,6 +27,7 @@ function Header() {
 
     const notificationRef = useRef<HTMLDivElement | null>(null);
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+    const [showMessage, setShowMessage] = useState(false);
 
     useEffect(() => {
         if (!loginState.isReloaded) {
@@ -56,7 +60,7 @@ function Header() {
                 return;
             }
 
-            if (loginState.sseConnected) {
+            if (sseState.sseConnected) {
                 return;
             }
 
@@ -72,14 +76,7 @@ function Header() {
 
             eventSource.addEventListener('notify', (res: Event) => {
                 const messageEvent = res as MessageEvent;
-                setNotifications(prev => [
-                    ...prev,
-                    {
-                        date: new Date(),
-                        message: messageEvent.data,
-                    },
-                ]);
-                console.log('새로운 스레드 알림 수신');
+                dispatch(setMessage({ message: messageEvent.data }));
             });
 
             // 연결 상태 확인
@@ -92,6 +89,8 @@ function Header() {
                         return 'connected';
                     case EventSource.CLOSED:
                         dispatch(setSseConnected({ sseConnected: false }));
+                        clearInterval(connectionCheckInterval);
+                        eventSource.close();
                         return 'disconnected';
                     default:
                         return 'unknown';
@@ -99,17 +98,28 @@ function Header() {
             }
 
             // 주기적으로 상태 확인
-            setInterval(() => {
+            const connectionCheckInterval = setInterval(() => {
                 console.log('현재 SSE 상태:', checkConnectionStatus());
-            }, 5000);
-
-            return () => {
-                eventSource.close();
-            };
+            }, 3000);
         };
 
         return connect();
     }, [loginState.isLogin, loginState.accessToken, dispatch]);
+
+    // SSE 메시지 표시 관리
+    useEffect(() => {
+        if (sseState.message && sseState.message !== '') {
+            setShowMessage(true);
+
+            // 5초 후 자동으로 숨김
+            const timer = setTimeout(() => {
+                setShowMessage(false);
+                dispatch(setMessage({ message: '' }));
+            }, 5000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [sseState.message]);
 
     const handleDashBoardDropDown = () => {
         setIsDashBoardOpen(cur => !cur);
@@ -117,8 +127,20 @@ function Header() {
     };
 
     const handleNotificationDropDown = () => {
+        getNotificationList({
+            page: 0,
+            size: 5,
+        })
+            .then(res => {
+                setNotifications(res.data.content);
+            })
+            .catch(() => {
+                setNotifications([]);
+            });
+
         setIsNotificationOpen(cur => !cur);
         setIsDashBoardOpen(false);
+        dispatch(resetCount());
     };
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -171,10 +193,17 @@ function Header() {
                 {loginState.isLogin && (
                     <div ref={notificationRef}>
                         <div className='relative flex justify-around items-center w-full'>
-                            <IconButton
-                                icon={<MdNotificationsNone className='size-5' />}
-                                onClick={handleNotificationDropDown}
-                            />
+                            <div className='relative'>
+                                <IconButton
+                                    icon={<MdNotificationsNone className='size-5' />}
+                                    onClick={handleNotificationDropDown}
+                                />
+                                {sseState.messageCount > 0 && (
+                                    <span className='absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium'>
+                                        {sseState.messageCount > 9 ? '9+' : sseState.messageCount}
+                                    </span>
+                                )}
+                            </div>
                             <div
                                 className={`${
                                     isNotificationOpen ? '' : 'hidden'
@@ -190,7 +219,7 @@ function Header() {
                                             <div className='flex flex-col gap-y-1'>
                                                 <div className='font-semibold'>{notification.message}</div>
                                                 <div className='font-normal'>
-                                                    {relativeDateToKorean(notification.date)}
+                                                    {relativeDateToKorean(notification.createdAt)}
                                                 </div>
                                             </div>
                                         </button>
@@ -200,6 +229,12 @@ function Header() {
                                             알림이 없습니다.
                                         </div>
                                     )}
+                                    <button
+                                        className='w-full block px-4 py-2 gap-y-2 text-center text-sm text-gray-700 bg-gray-200 hover:bg-gray-300 hover:cursor-pointer'
+                                        onClick={() => navigate('/setting/notification')}
+                                    >
+                                        모든 알림 보기
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -263,6 +298,24 @@ function Header() {
                     </div>
                 )}
             </div>
+
+            {/* SSE 메시지 알림 */}
+            {showMessage && sseState.message && (
+                <div className='fixed bottom-4 right-4 bg-lime-800 text-white px-4 py-3 rounded-lg shadow-lg max-w-sm z-50 animate-fade-in'>
+                    <div className='flex items-center justify-between'>
+                        <div className='flex items-center'>
+                            <div className='mr-2'>🔔</div>
+                            <div>{sseState.message}</div>
+                        </div>
+                        <button
+                            onClick={() => setShowMessage(false)}
+                            className='ml-3 text-white hover:text-gray-200 cursor-pointer'
+                        >
+                            ✕
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -14,7 +14,8 @@ function SettingSideBar({
         { section: 'profile', title: '프로필' },
         { section: 'folder', title: '폴더' },
         { section: 'post', title: '게시글' },
-        { section: 'subscription', title: '구독' },
+        // { section: 'subscription', title: '구독' },
+        { section: 'notification', title: '알림' },
     ];
 
     const handleSelectedTab = (tabSection: string) => {

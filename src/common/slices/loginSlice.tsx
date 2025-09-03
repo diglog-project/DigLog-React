@@ -3,7 +3,6 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
     isLogin: false,
     isReloaded: true,
-    sseConnected: false,
     accessToken: '',
     email: '',
     username: '',
@@ -49,15 +48,9 @@ const loginSlice = createSlice({
                 isReloaded: false,
             };
         },
-        setSseConnected: (state, action) => {
-            return {
-                ...state,
-                sseConnected: action.payload.sseConnected,
-            };
-        },
     },
 });
 
-export const { login, logout, setUsername, setProfile, setReloadedFalse, setSseConnected } = loginSlice.actions;
+export const { login, logout, setUsername, setProfile, setReloadedFalse } = loginSlice.actions;
 
 export default loginSlice.reducer;

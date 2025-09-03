@@ -73,10 +73,13 @@ function PostPage() {
 
         saveComment(commentRequest)
             .then(res => {
+                // todo: 테스트 종료 후 활성화
+                // if (loginState.username !== post.username) {
                 createNotification({
                     notificationType: 'COMMENT_CREATION',
                     dataId: res.data.id,
                 });
+                // }
 
                 alert('등록되었습니다.');
 
@@ -229,18 +232,6 @@ function PostPage() {
             })
             .catch(error => alert(error.response.data.message));
 
-        if (loginState.isLogin) {
-            getIsSubscribed(post.username)
-                .then(res => {
-                    setPostUser(prev => ({
-                        ...prev,
-                        isSubscribed: res.data.hasSubscription,
-                        subscriptionId: res.data.subscriptionId || '',
-                    }));
-                })
-                .catch(error => alert(error.response.data.message));
-        }
-
         getComments({
             postId: post.id,
             parentCommentId: null,
@@ -253,6 +244,20 @@ function PostPage() {
             })
             .catch(error => alert(error.response.data.message));
     }, [trigger]);
+
+    useEffect(() => {
+        if (loginState.isLogin && post.username !== '') {
+            getIsSubscribed(post.username)
+                .then(res => {
+                    setPostUser(prev => ({
+                        ...prev,
+                        isSubscribed: res.data.hasSubscription,
+                        subscriptionId: res.data.subscriptionId || '',
+                    }));
+                })
+                .catch(error => alert(error.response.data.message));
+        }
+    }, [loginState.isLogin, post.username]);
 
     const handleSubscription = () => {
         if (!loginState.isLogin) {

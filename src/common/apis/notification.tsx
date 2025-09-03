@@ -6,3 +6,11 @@ export const createNotification = async (notificationRequest: NotificationReques
 
 export const getNotificationList = async (notificationListRequest: NotificationListRequest) =>
     await axiosApi.get('/notifications', { params: notificationListRequest });
+
+export const readAllNotifications = async () => await axiosApi.patch('/notifications/read-all');
+
+export const readNotification = async (notificationId: string) =>
+    await axiosApi.patch(`/notifications/${notificationId}/read`);
+
+export const removeNotification = async (notificationIds: string[]) =>
+    await axiosApi.delete(`/notifications`, { data: { notificationIds } });

@@ -10,6 +10,7 @@ import { RootState } from '../../store.tsx';
 import IconButton from '../../components/common/IconButton.tsx';
 import { MdMenu, MdOutlineExitToApp } from 'react-icons/md';
 import SubscriptionSettingPage from './SubscriptionSettingPage.tsx';
+import NotificationSettingPage from './NotificationSettingPage.tsx';
 
 function SettingPage() {
     const loginState = useSelector((state: RootState) => state.loginSlice);
@@ -91,6 +92,11 @@ function SettingPage() {
                 {selectedSection === 'subscription' && (
                     <div className='md:border-l border-gray-200 w-full ps-8'>
                         <SubscriptionSettingPage />
+                    </div>
+                )}
+                {selectedSection === 'notification' && (
+                    <div className='md:border-l border-gray-200 w-full ps-8'>
+                        <NotificationSettingPage />
                     </div>
                 )}
             </div>

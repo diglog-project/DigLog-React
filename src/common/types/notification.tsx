@@ -9,6 +9,9 @@ export interface NotificationListRequest {
 }
 
 export interface NotificationResponse {
-    date: Date;
+    notificationId: string;
+    notificationType: string;
     message: string;
+    isRead: boolean;
+    createdAt: Date;
 }
