@@ -205,7 +205,7 @@ function NotificationSettingPage() {
                             </div>
 
                             <div className='flex flex-col gap-2 lg:flex-row lg:items-end'>
-                                {!notification.isRead && (
+                                {!isEditMode && !notification.isRead && (
                                     <button
                                         onClick={() => handleReadNotification(notification.notificationId)}
                                         className={`flex-shrink-0 px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200 cursor-pointer`}

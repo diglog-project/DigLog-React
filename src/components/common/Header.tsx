@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store.tsx';
 import { useEffect, useRef, useState } from 'react';
 import { TextLink } from './TextButton.tsx';
-import { MdNotificationsNone, MdOutlineSearch } from 'react-icons/md';
+import { MdNotificationsNone, MdOutlineSearch, MdArrowForward } from 'react-icons/md';
 import IconButton from './IconButton.tsx';
 import { getProfile, logoutApi } from '../../common/apis/member.tsx';
 import { logout, setProfile, setReloadedFalse } from '../../common/slices/loginSlice.tsx';
@@ -11,8 +11,14 @@ import ProfileImageCircle from './ProfileImageCircle.tsx';
 import { NotificationResponse } from '../../common/types/notification.tsx';
 import { Event, EventSourcePolyfill } from 'event-source-polyfill';
 import { relativeDateToKorean } from '../../common/util/date.tsx';
-import { getNotificationList } from '../../common/apis/notification.tsx';
-import { resetCount, setMessage, setSseConnected } from '../../common/slices/sseSlice.tsx';
+import {
+    getNotificationList,
+    readNotification,
+    readAllNotifications,
+    removeNotification,
+} from '../../common/apis/notification.tsx';
+import { addCount, resetCount, setMessage, setSseConnected } from '../../common/slices/sseSlice.tsx';
+import PaginationButton from './PaginationButton.tsx';
 
 function Header() {
     const dispatch = useDispatch();
@@ -21,6 +27,50 @@ function Header() {
     const navigate = useNavigate();
 
     const [notifications, setNotifications] = useState<NotificationResponse[]>([]);
+    const [pageInfo, setPageInfo] = useState({ number: 0, size: 4, totalElements: 0, totalPages: 0 });
+
+    const handleNotificationClick = async (notification: NotificationResponse) => {
+        if (!notification.isRead) {
+            try {
+                await readNotification(notification.notificationId);
+                // Update the local state to mark as read
+                setNotifications(prev =>
+                    prev.map(n => (n.notificationId === notification.notificationId ? { ...n, isRead: true } : n)),
+                );
+            } catch (error) {
+                console.error('Failed to mark notification as read:', error);
+            }
+        }
+    };
+
+    const handleReadAllNotifications = async () => {
+        try {
+            await readAllNotifications();
+            setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+        } catch (error) {
+            console.error('Failed to mark all notifications as read:', error);
+        }
+    };
+
+    const handleDeleteAllNotifications = async () => {
+        if (!confirm('해당 페이지의 알림을 모두 삭제하시겠습니까?')) {
+            return;
+        }
+
+        try {
+            const notificationIds = notifications.map(n => n.notificationId);
+            if (notificationIds.length > 0) {
+                await removeNotification(notificationIds);
+                alert('알림이 삭제되었습니다.');
+
+                getNotificationList({ page: 0, size: pageInfo.size }).then(res => {
+                    setNotifications(res.data.content);
+                });
+            }
+        } catch (error) {
+            console.error('Failed to delete notifications:', error);
+        }
+    };
 
     const dashboardRef = useRef<HTMLDivElement | null>(null);
     const [isDashBoardOpen, setIsDashBoardOpen] = useState(false);
@@ -77,6 +127,7 @@ function Header() {
             eventSource.addEventListener('notify', (res: Event) => {
                 const messageEvent = res as MessageEvent;
                 dispatch(setMessage({ message: messageEvent.data }));
+                dispatch(addCount());
             });
 
             // 연결 상태 확인
@@ -127,12 +178,10 @@ function Header() {
     };
 
     const handleNotificationDropDown = () => {
-        getNotificationList({
-            page: 0,
-            size: 5,
-        })
+        getNotificationList({ page: 0, size: pageInfo.size })
             .then(res => {
                 setNotifications(res.data.content);
+                setPageInfo(res.data.page);
             })
             .catch(() => {
                 setNotifications([]);
@@ -167,6 +216,17 @@ function Header() {
             })
             .finally(() => {
                 navigate(0);
+            });
+    };
+
+    const setPage = (newPage: number) => {
+        getNotificationList({ page: newPage, size: pageInfo.size })
+            .then(res => {
+                setNotifications(res.data.content);
+                setPageInfo(res.data.page);
+            })
+            .catch(() => {
+                setNotifications([]);
             });
     };
 
@@ -209,17 +269,39 @@ function Header() {
                                     isNotificationOpen ? '' : 'hidden'
                                 } absolute z-99 top-12 -right-12 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-72`}
                             >
+                                <div className='pl-4 pr-2 -my-1 border-b border-gray-100 flex justify-between items-center'>
+                                    <h3 className='text-sm font-semibold text-gray-900'>알림</h3>
+                                    <button
+                                        onClick={() => navigate('/setting/notification')}
+                                        className='p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer'
+                                        title='모든 알림 보기'
+                                    >
+                                        <MdArrowForward className='w-4 h-4 text-gray-600' />
+                                    </button>
+                                </div>
                                 <div className='py-1'>
                                     {notifications.map((notification, index) => (
                                         <button
                                             key={index}
-                                            onClick={() => {}}
-                                            className='w-full block px-4 py-2 gap-y-2 text-start text-sm text-gray-700 hover:bg-gray-100 hover:cursor-pointer'
+                                            onClick={() => handleNotificationClick(notification)}
+                                            className={`w-full block px-4 py-2 gap-y-2 text-start text-sm hover:bg-gray-100 hover:cursor-pointer ${
+                                                notification.isRead
+                                                    ? 'text-gray-500 bg-gray-50'
+                                                    : 'text-gray-700 bg-white'
+                                            }`}
                                         >
-                                            <div className='flex flex-col gap-y-1'>
-                                                <div className='font-semibold'>{notification.message}</div>
-                                                <div className='font-normal'>
-                                                    {relativeDateToKorean(notification.createdAt)}
+                                            <div className='flex items-start gap-x-3'>
+                                                <div className='flex flex-col gap-y-1 flex-1'>
+                                                    <div
+                                                        className={`${
+                                                            notification.isRead ? 'font-normal' : 'font-semibold'
+                                                        }`}
+                                                    >
+                                                        {notification.message}
+                                                    </div>
+                                                    <div className='font-normal text-xs'>
+                                                        {relativeDateToKorean(notification.createdAt)}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </button>
@@ -229,12 +311,29 @@ function Header() {
                                             알림이 없습니다.
                                         </div>
                                     )}
-                                    <button
-                                        className='w-full block px-4 py-2 gap-y-2 text-center text-sm text-gray-700 bg-gray-200 hover:bg-gray-300 hover:cursor-pointer'
-                                        onClick={() => navigate('/setting/notification')}
-                                    >
-                                        모든 알림 보기
-                                    </button>
+                                    <div className='bg-gray-50'>
+                                        <PaginationButton pageInfo={pageInfo} setPage={setPage} />
+                                    </div>
+                                    <div className='border-t border-gray-100'>
+                                        <div className='flex'>
+                                            <button
+                                                className='flex-1 px-4 py-2 text-center text-xs text-gray-700 bg-blue-50 hover:bg-blue-100 hover:cursor-pointer'
+                                                onClick={handleReadAllNotifications}
+                                                disabled={
+                                                    notifications.length === 0 || notifications.every(n => n.isRead)
+                                                }
+                                            >
+                                                모든 알림 읽기
+                                            </button>
+                                            <button
+                                                className='flex-1 px-4 py-2 text-center text-xs text-gray-700 bg-red-50 hover:bg-red-100 hover:cursor-pointer'
+                                                onClick={handleDeleteAllNotifications}
+                                                disabled={notifications.length === 0}
+                                            >
+                                                알림 모두 삭제
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

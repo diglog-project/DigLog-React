@@ -20,6 +20,11 @@ const sseSlice = createSlice({
             return {
                 ...state,
                 message: action.payload.message,
+            };
+        },
+        addCount: state => {
+            return {
+                ...state,
                 messageCount: state.messageCount + 1,
             };
         },
@@ -39,6 +44,6 @@ const sseSlice = createSlice({
     },
 });
 
-export const { setSseConnected, setMessage, setCount, resetCount } = sseSlice.actions;
+export const { setSseConnected, setMessage, addCount, setCount, resetCount } = sseSlice.actions;
 
 export default sseSlice.reducer;
