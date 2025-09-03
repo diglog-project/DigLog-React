@@ -7,4 +7,6 @@ export interface MemberProfileSearchRequest {
 export interface MemberProfileResponse {
     username: string;
     profileUrl: string | null;
+    isSubscribed: boolean;
+    subscriptionId: string;
 }
