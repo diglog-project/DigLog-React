@@ -1,10 +1,11 @@
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { NotificationResponse } from '../../common/types/notification';
 import {
     getNotificationList,
+    getUnreadNotificationCount,
     readAllNotifications,
     readNotification,
     removeNotification,
@@ -13,10 +14,13 @@ import { PageResponse } from '../../common/types/common';
 import { fullDateToKorean } from '../../common/util/date';
 import { FillButton } from '../../components/common/FillButton';
 import PaginationButton from '../../components/common/PaginationButton';
+import { resetCount, setCount, setTrigger, subtractCount } from '../../common/slices/sseSlice';
 
 function NotificationSettingPage() {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const loginState = useSelector((state: RootState) => state.loginSlice);
+    const sseState = useSelector((state: RootState) => state.sseSlice);
 
     const [notifications, setNotifications] = useState<NotificationResponse[]>([]);
     const [pageInfo, setPageInfo] = useState<PageResponse>({
@@ -26,7 +30,6 @@ function NotificationSettingPage() {
         totalPages: 0,
     });
     const [isEditMode, setIsEditMode] = useState(false);
-    const [trigger, setTrigger] = useState(false);
     const [selectedNotifications, setSelectedNotifications] = useState<string[]>([]);
 
     useEffect(() => {
@@ -49,22 +52,20 @@ function NotificationSettingPage() {
             .catch(error => {
                 alert(error.response?.data?.message || '알림 목록을 불러오지 못했습니다.');
             });
-    }, [loginState.isReloaded, loginState.isLogin, pageInfo.number, trigger]);
+    }, [loginState.isReloaded, loginState.isLogin, pageInfo.number, sseState.trigger]);
 
     const handleReadAll = () => {
-        if (!confirm('모든 알림을 읽음 처리하시겠습니까?')) {
-            return;
-        }
-
         readAllNotifications()
             .then(() => {
+                dispatch(resetCount());
                 alert('모든 알림을 읽음 처리했습니다.');
+                dispatch(setTrigger());
             })
             .catch(error => {
                 alert(error.response?.data?.message || '알림 읽음 처리에 실패했습니다.');
             });
 
-        setTrigger(prev => !prev);
+        dispatch(setTrigger());
     };
 
     const handleToggleNotification = (notificationId: string) => {
@@ -93,7 +94,8 @@ function NotificationSettingPage() {
     const handleReadNotification = (notificationId: string) => {
         readNotification(notificationId)
             .then(() => {
-                setTrigger(prev => !prev);
+                dispatch(subtractCount());
+                dispatch(setTrigger());
             })
             .catch(error => {
                 alert(error.response?.data?.message || '알림 읽음 처리에 실패했습니다.');
@@ -108,9 +110,15 @@ function NotificationSettingPage() {
         removeNotification(notificationIds)
             .then(() => {
                 alert('알림을 삭제했습니다.');
-                handleEditMode();
+                setIsEditMode(false);
                 setPageInfo(prev => ({ ...prev, number: 0 }));
-                setTrigger(prev => !prev);
+
+                getUnreadNotificationCount().then(res => {
+                    console.log(res.data.unreadCount);
+                    dispatch(setCount({ count: res.data.unreadCount }));
+                });
+
+                dispatch(setTrigger());
             })
             .catch(error => {
                 alert(error.response?.data?.message || '알림 삭제에 실패했습니다.');
