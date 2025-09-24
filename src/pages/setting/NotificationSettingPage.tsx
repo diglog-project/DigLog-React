@@ -114,7 +114,6 @@ function NotificationSettingPage() {
                 setPageInfo(prev => ({ ...prev, number: 0 }));
 
                 getUnreadNotificationCount().then(res => {
-                    console.log(res.data.unreadCount);
                     dispatch(setCount({ count: res.data.unreadCount }));
                 });
 
