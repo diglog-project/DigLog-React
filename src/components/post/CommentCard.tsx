@@ -1,4 +1,4 @@
-import { relativeDateToKorean } from '../../common/util/date.tsx';
+import { fullDateToKorean, relativeDateToKorean } from '../../common/util/date.tsx';
 import { MdOutlineAddComment, MdOutlineComment, MdOutlinePerson } from 'react-icons/md';
 import { ChangeEvent, useState } from 'react';
 import CommentTextField from './CommentTextField.tsx';
@@ -87,7 +87,7 @@ function CommentCard({
                             <MdOutlinePerson className='size-5 text-gray-600' />
                         )}
                         <p className='font-semibold'>{comment.member.username}</p>
-                        <p className='text-gray-500 text-xs ml-2'>{relativeDateToKorean(comment.createdAt)}</p>
+                        <p className='text-gray-500 text-xs ml-2'>{fullDateToKorean(comment.createdAt)}</p>
                     </div>
                     <div className='my-2 text-gray-900 flex items-center gap-x-2'>
                         {!showEditTextField && comment.taggedUsername && (
@@ -116,7 +116,7 @@ function CommentCard({
                                 }}
                             >
                                 <MdOutlineComment className='text-gray-600 size-4' />
-                                답글 ({comment.subComments.length})
+                                답글 ({comment.replyCount})
                             </button>
                         )}
                         <div />
