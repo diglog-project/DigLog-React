@@ -46,6 +46,7 @@ function LoginPage() {
                 });
 
                 navigate('/');
+                navigate(0);
             })
             .catch(error => alert(error.response.data.message));
     };

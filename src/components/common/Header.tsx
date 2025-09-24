@@ -104,16 +104,16 @@ function Header() {
     }, [loginState.isReloaded, loginState.isLogin, dispatch]);
 
     useEffect(() => {
+        if (!loginState.isLogin) {
+            dispatch(setSseConnected({ sseConnected: false }));
+            return;
+        }
+
+        if (sseState.sseConnected) {
+            return;
+        }
+
         const connect = () => {
-            if (!loginState.isLogin) {
-                dispatch(setSseConnected({ sseConnected: false }));
-                return;
-            }
-
-            if (sseState.sseConnected) {
-                return;
-            }
-
             const eventSource = new EventSourcePolyfill(
                 `${import.meta.env.VITE_SERVER_URL}/api/notifications/sse/subscribe`,
                 {
@@ -128,6 +128,12 @@ function Header() {
                 const messageEvent = res as MessageEvent;
                 dispatch(setMessage({ message: messageEvent.data }));
                 dispatch(addCount());
+            });
+
+            eventSource.addEventListener('connect', (res: Event) => {
+                const messageEvent = res as MessageEvent;
+                console.log('SSE Message: ' + messageEvent.data);
+                dispatch(setSseConnected({ sseConnected: true }));
             });
 
             // 연결 상태 확인
@@ -155,7 +161,7 @@ function Header() {
         };
 
         return connect();
-    }, [loginState.isLogin, loginState.accessToken, dispatch]);
+    }, [loginState.isLogin, loginState.accessToken, sseState.sseConnected, dispatch]);
 
     // SSE 메시지 표시 관리
     useEffect(() => {
