@@ -73,30 +73,15 @@ function PostPage() {
 
         saveComment(commentRequest)
             .then(res => {
-                // todo: 테스트 종료 후 활성화
-                // if (loginState.username !== post.username) {
-                createNotification({
-                    notificationType: 'COMMENT_CREATION',
-                    dataId: res.data.id,
-                });
-                // }
+                if (loginState.username !== post.username) {
+                    createNotification({
+                        notificationType: 'COMMENT_CREATION',
+                        dataId: res.data.id,
+                    });
+                }
 
                 alert('등록되었습니다.');
-
-                setCommentInput('');
-                setComments(prev => [
-                    ...prev,
-                    {
-                        id: res.data.id,
-                        member: { username: loginState.username, profileUrl: loginState.profileUrl },
-                        content: commentRequest.content,
-                        taggedUsername: null,
-                        replyCount: 0,
-                        createdAt: new Date(),
-                        deleted: false,
-                        subComments: [],
-                    },
-                ]);
+                navigate(0);
             })
             .catch(error => alert(error.response.data.message));
     };
