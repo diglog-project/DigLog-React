@@ -1,4 +1,4 @@
-import { fullDateToKorean, relativeDateToKorean } from '../../common/util/date.tsx';
+import { fullDateToKorean } from '../../common/util/date.tsx';
 import { MdOutlineAddComment, MdOutlineComment, MdOutlinePerson } from 'react-icons/md';
 import { ChangeEvent, useState } from 'react';
 import CommentTextField from './CommentTextField.tsx';
