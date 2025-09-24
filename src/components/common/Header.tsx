@@ -16,8 +16,16 @@ import {
     readNotification,
     readAllNotifications,
     removeNotification,
+    getUnreadNotificationCount,
 } from '../../common/apis/notification.tsx';
-import { addCount, resetCount, setMessage, setSseConnected } from '../../common/slices/sseSlice.tsx';
+import {
+    addCount,
+    resetCount,
+    setCount,
+    setMessage,
+    setSseConnected,
+    subtractCount,
+} from '../../common/slices/sseSlice.tsx';
 import PaginationButton from './PaginationButton.tsx';
 
 function Header() {
@@ -33,10 +41,10 @@ function Header() {
         if (!notification.isRead) {
             try {
                 await readNotification(notification.notificationId);
-                // Update the local state to mark as read
                 setNotifications(prev =>
                     prev.map(n => (n.notificationId === notification.notificationId ? { ...n, isRead: true } : n)),
                 );
+                dispatch(subtractCount());
             } catch (error) {
                 console.error('Failed to mark notification as read:', error);
             }
@@ -47,6 +55,7 @@ function Header() {
         try {
             await readAllNotifications();
             setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+            dispatch(resetCount());
         } catch (error) {
             console.error('Failed to mark all notifications as read:', error);
         }
@@ -102,6 +111,20 @@ function Header() {
                 dispatch(setReloadedFalse());
             });
     }, [loginState.isReloaded, loginState.isLogin, dispatch]);
+
+    useEffect(() => {
+        if (!loginState.isLogin) {
+            return;
+        }
+
+        getUnreadNotificationCount()
+            .then(res => {
+                dispatch(setCount({ count: res.data.unreadCount }));
+            })
+            .catch(() => {
+                alert('알림 개수를 불러오지 못했습니다.');
+            });
+    }, [loginState.isLogin, dispatch]);
 
     useEffect(() => {
         if (!loginState.isLogin) {
@@ -195,7 +218,6 @@ function Header() {
 
         setIsNotificationOpen(cur => !cur);
         setIsDashBoardOpen(false);
-        dispatch(resetCount());
     };
 
     const handleClickOutside = (event: MouseEvent) => {
