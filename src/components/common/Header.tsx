@@ -24,6 +24,7 @@ import {
     setCount,
     setMessage,
     setSseConnected,
+    setTrigger,
     subtractCount,
 } from '../../common/slices/sseSlice.tsx';
 import PaginationButton from './PaginationButton.tsx';
@@ -151,6 +152,7 @@ function Header() {
                 const messageEvent = res as MessageEvent;
                 dispatch(setMessage({ message: messageEvent.data }));
                 dispatch(addCount());
+                dispatch(setTrigger());
             });
 
             eventSource.addEventListener('connect', (res: Event) => {
