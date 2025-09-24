@@ -40,11 +40,11 @@ function SubscriptionSettingPage() {
             navigate('/login');
         }
 
-        getSubscriptionList({ username: loginState.username, page: 0, size: 100 }).then(res => {
+        getSubscriptionList({ authorName: loginState.username, page: 0, size: 100 }).then(res => {
             setSubscriptions(res.data.content);
             setSubscriptionPageInfo(res.data.page);
         });
-        getSubscriberList({ authorName: loginState.username, page: 0, size: 100 }).then(res => {
+        getSubscriberList({ subscriberName: loginState.username, page: 0, size: 100 }).then(res => {
             setSubscribers(res.data.content);
             setSubscriberPageInfo(res.data.page);
         });
@@ -53,7 +53,7 @@ function SubscriptionSettingPage() {
     useEffect(() => {
         if (tab === 'subscriptions') {
             getSubscriptionList({
-                username: loginState.username,
+                authorName: loginState.username,
                 page: subscriptionPageInfo.number,
                 size: subscriptionPageInfo.size,
             }).then(res => {
@@ -62,7 +62,7 @@ function SubscriptionSettingPage() {
             });
         } else {
             getSubscriberList({
-                authorName: loginState.username,
+                subscriberName: loginState.username,
                 page: subscriberPageInfo.number,
                 size: subscriberPageInfo.size,
             }).then(res => {
@@ -99,7 +99,7 @@ function SubscriptionSettingPage() {
     };
 
     const handleSetSubscriptionPage = (page: number) => {
-        getSubscriptionList({ username: loginState.username, page, size: subscriptionPageInfo.size }).then(res => {
+        getSubscriptionList({ authorName: loginState.username, page, size: subscriptionPageInfo.size }).then(res => {
             setSubscriptions(res.data.content);
             setSubscriptionPageInfo(res.data.page);
         });
@@ -118,7 +118,7 @@ function SubscriptionSettingPage() {
 
             // 현재 페이지 데이터 새로고침
             getSubscriptionList({
-                username: loginState.username,
+                authorName: loginState.username,
                 page: subscriptionPageInfo.number,
                 size: subscriptionPageInfo.size,
             }).then(res => {
@@ -143,10 +143,10 @@ function SubscriptionSettingPage() {
                                 <div
                                     key={subscription.subscriptionId}
                                     className='flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors'
-                                    onClick={() => navigate(`/blog/${subscription.authorUsername}`)}
+                                    onClick={() => navigate(`/blog/${subscription.authorName}`)}
                                 >
                                     <div className='flex-1'>
-                                        <p className='font-medium'>{subscription.authorUsername}</p>
+                                        <p className='font-medium'>{subscription.authorName}</p>
                                         <p className='text-sm text-gray-500'>
                                             {new Date(subscription.createdAt).toLocaleDateString()}
                                         </p>
@@ -172,7 +172,7 @@ function SubscriptionSettingPage() {
                                             onClick={e =>
                                                 handleUnsubscribe(
                                                     subscription.subscriptionId,
-                                                    subscription.authorUsername,
+                                                    subscription.authorName,
                                                     e,
                                                 )
                                             }
@@ -201,10 +201,10 @@ function SubscriptionSettingPage() {
                                 <div
                                     key={subscriber.subscriptionId}
                                     className='flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors'
-                                    onClick={() => navigate(`/blog/${subscriber.subscriberUsername}`)}
+                                    onClick={() => navigate(`/blog/${subscriber.subscriberName}`)}
                                 >
                                     <div className='flex-1'>
-                                        <p className='font-medium'>{subscriber.subscriberUsername}</p>
+                                        <p className='font-medium'>{subscriber.subscriberName}</p>
                                         <p className='text-sm text-gray-500'>
                                             {new Date(subscriber.createdAt).toLocaleDateString()}
                                         </p>

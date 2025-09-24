@@ -11,9 +11,13 @@ export const getIsSubscribed = async (authorName: string) =>
     await axiosApi.get(`/subscriptions/current-member/authors/${authorName}`);
 
 export const getSubscriptionList = async (subscriptionListRequest: SubscriptionListRequest) =>
-    await axiosApi.get(`/subscriptions/users/${subscriptionListRequest.username}`, { params: subscriptionListRequest });
+    await axiosApi.get(`/subscriptions/subscribers/${subscriptionListRequest.authorName}`, {
+        params: subscriptionListRequest,
+    });
 
 export const getSubscriberList = async (subscriberListRequest: SubscriberListRequest) =>
-    await axiosApi.get(`/subscriptions/authors/${subscriberListRequest.authorName}`, { params: subscriberListRequest });
+    await axiosApi.get(`/subscriptions/authors/${subscriberListRequest.subscriberName}`, {
+        params: subscriberListRequest,
+    });
 
 export const deleteSubscription = async (username: string) => await axiosApi.delete(`/subscriptions/${username}`);

@@ -7,6 +7,8 @@ export const createNotification = async (notificationRequest: NotificationReques
 export const getNotificationList = async (notificationListRequest: NotificationListRequest) =>
     await axiosApi.get('/notifications', { params: notificationListRequest });
 
+export const getUnreadNotificationCount = async () => await axiosApi.get('/notifications/unread-count');
+
 export const readAllNotifications = async () => await axiosApi.patch('/notifications/read-all');
 
 export const readNotification = async (notificationId: string) =>

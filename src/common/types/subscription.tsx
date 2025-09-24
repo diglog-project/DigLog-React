@@ -4,27 +4,27 @@ export interface SubscriptionRequest {
 }
 
 export interface SubscriptionListRequest {
-    username: string;
+    authorName: string;
     page: number;
     size: number;
 }
 
 export interface SubscriberListRequest {
-    authorName: string;
+    subscriberName: string;
     page: number;
     size: number;
 }
 
 export interface SubscriptionResponse {
     subscriptionId: string;
-    authorUsername: string;
+    authorName: string;
     notificationEnabled: boolean;
     createdAt: Date;
 }
 
 export interface SubscriberResponse {
     subscriptionId: string;
-    subscriberUsername: string;
+    subscriberName: string;
     notificationEnabled: true;
     createdAt: Date;
 }
