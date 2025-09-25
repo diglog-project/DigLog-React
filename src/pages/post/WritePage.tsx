@@ -1,0 +1,333 @@
+import BasicLayout from '../../layout/BasicLayout.tsx';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Editor } from '@tinymce/tinymce-react';
+import { FillButton } from '../../components/common/FillButton.tsx';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store.tsx';
+import { MdOutlineClear } from 'react-icons/md';
+import { createPost, deletePost, getPost, updatePost } from '../../common/apis/post.tsx';
+import LoadingLayout from '../../layout/LoadingLayout.tsx';
+import { getImgUrls } from '../../common/util/html.tsx';
+import { uploadImage } from '../../common/apis/image.tsx';
+import { checkUUID } from '../../common/util/regex.tsx';
+import { TagResponse } from '../../common/types/post.tsx';
+import { sortByName } from '../../common/util/sort.tsx';
+import { FolderType, toFolderTypeList } from '../../common/types/blog.tsx';
+import FolderSelectBox from '../../components/folder/FolderSelectBox.tsx';
+import { getMemberFolders } from '../../common/apis/blog.tsx';
+import * as React from 'react';
+import { createNotification } from '../../common/apis/notification.tsx';
+
+interface WritePostType {
+    inputTag: string;
+    tags: string[];
+    title: string;
+    content: string;
+}
+
+function WritePage() {
+    const loginState = useSelector((state: RootState) => state.loginSlice);
+    const navigate = useNavigate();
+    const path = useLocation().pathname.substring(0, location.pathname.lastIndexOf('/'));
+    const { id } = useParams();
+
+    const [loading, setLoading] = useState(false);
+    const [folders, setFolders] = useState<FolderType[]>([]);
+    const [post, setPost] = useState<WritePostType>({
+        inputTag: '',
+        tags: [],
+        title: '',
+        content: '',
+    });
+    const [showTag, setShowTag] = useState(false);
+
+    const [targetFolder, setTargetFolder] = useState<FolderType | null>(null);
+    const [uploadCount, setUploadCount] = useState(0);
+
+    const emptyFolder = {
+        id: 'empty',
+        title: '폴더 없음',
+        postCount: 0,
+        subFolders: [],
+    };
+
+    const removeTag = (tag: string | null) => {
+        setPost({ ...post, tags: post.tags.filter(prevTag => prevTag !== tag) });
+    };
+    const handleInputTag = (tag: string) => {
+        if (!tag.endsWith(',')) {
+            setPost({ ...post, inputTag: tag });
+            return;
+        }
+        handleTag(post.inputTag);
+    };
+    const handleTagEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key !== 'Enter') {
+            return;
+        }
+        handleTag(post.inputTag);
+    };
+    const handleTag = (tag: string) => {
+        if (tag.trim() === '') {
+            setPost({ ...post, inputTag: tag });
+            return;
+        }
+
+        if (post.tags.includes(tag.trim())) {
+            setPost({ ...post, inputTag: '' });
+            return;
+        }
+        setPost({ ...post, tags: [...post.tags, post.inputTag], inputTag: '' });
+    };
+
+    const getFolderId = (targetFolder: FolderType) => {
+        if (!targetFolder || targetFolder.id === 'empty') {
+            return null;
+        }
+
+        return targetFolder.id;
+    };
+    const handleSubmit = () => {
+        if (uploadCount > 0) {
+            alert('업로드 중인 이미지가 있습니다. 잠시만 기다려주세요.');
+            return;
+        }
+        if (!targetFolder) {
+            alert('폴더를 선택해주세요.');
+            return;
+        }
+
+        setLoading(true);
+
+        const urls: string[] = getImgUrls(post.content);
+
+        createPost({
+            title: post.title,
+            content: post.content,
+            folderId: getFolderId(targetFolder),
+            tagNames: post.tags,
+            urls: urls,
+        })
+            .then(res => {
+                createNotification({ notificationType: 'POST_CREATION', dataId: res.data.id });
+                alert('작성되었습니다.');
+                navigate(`/blog/${loginState.username}`);
+            })
+            .catch(error => alert(error.response.data.message))
+            .finally(() => setLoading(false));
+    };
+
+    const handleEdit = () => {
+        if (uploadCount > 0) {
+            alert('업로드 중인 이미지가 있습니다. 잠시만 기다려주세요.');
+            return;
+        }
+        if (!targetFolder) {
+            alert('폴더를 선택해주세요.');
+            return;
+        }
+        if (!id) return;
+
+        setLoading(true);
+
+        const urls: string[] = getImgUrls(post.content);
+
+        updatePost({
+            id: id,
+            title: post.title,
+            content: post.content,
+            folderId: getFolderId(targetFolder),
+            tagNames: post.tags,
+            urls: urls,
+        })
+            .then(() => {
+                alert('수정되었습니다.');
+                navigate(`/post/${id}`);
+            })
+            .catch(error => alert(error.response.data.message))
+            .finally(() => setLoading(false));
+    };
+
+    const handleDelete = (id: string | undefined) => {
+        if (!id || !confirm('정말 삭제하시겠습니까?')) {
+            return;
+        }
+
+        deletePost(id)
+            .then(() => {
+                alert('삭제되었습니다.');
+                navigate(`/setting/post`);
+            })
+            .catch(error => alert(error.response.data.message));
+    };
+
+    useEffect(() => {
+        // 새로고침 방지
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+            event.preventDefault();
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (loginState.isReloaded) {
+            return;
+        }
+
+        if (!loginState.isReloaded && !loginState.isLogin) {
+            alert('로그인이 필요한 페이지입니다.');
+            navigate('/login');
+        }
+
+        getMemberFolders(loginState.username).then(res => {
+            setFolders(toFolderTypeList(res.data));
+            setFolders(prev => [emptyFolder, ...prev]);
+        });
+
+        if (!path.endsWith('edit')) {
+            return;
+        }
+
+        if (!id || !checkUUID(id)) {
+            alert('올바르지 않은 url입니다.');
+            navigate(-1);
+            return;
+        }
+
+        getPost(id)
+            .then(res => {
+                setPost({
+                    ...post,
+                    title: res.data.title,
+                    content: res.data.content,
+                    tags: sortByName(res.data.tags.map((tag: TagResponse) => tag.name)),
+                });
+
+                if (res.data.folder === null) {
+                    setTargetFolder(emptyFolder);
+                    return;
+                }
+
+                setTargetFolder({
+                    id: res.data.folder.id,
+                    title: res.data.folder.title,
+                    postCount: res.data.folder.postCount,
+                    subFolders: [],
+                });
+            })
+            .catch(error => alert(error.response.data.message));
+    }, [loginState.isReloaded]);
+
+    useEffect(() => {
+        if (uploadCount > 0) {
+            setLoading(true);
+        }
+        setLoading(false);
+    }, [uploadCount]);
+
+    return (
+        <BasicLayout>
+            <div className='flex flex-col w-full max-w-3xl mx-auto'>
+                <div className='flex justify-start items-center'>
+                    <div className='w-108'>
+                        <FolderSelectBox
+                            folders={folders}
+                            targetFolder={targetFolder}
+                            setTargetFolder={setTargetFolder}
+                        />
+                    </div>
+                </div>
+                <div className='w-full flex justify-between items-center my-6'>
+                    <input
+                        value={post.title}
+                        onChange={e => setPost({ ...post, title: e.target.value })}
+                        placeholder={'제목을 입력해주세요.'}
+                        className='w-full py-2 font-jalnan text-2xl text-gray-900 border-b-2 border-white focus:outline-none focus:border-black'
+                    />
+                </div>
+                <div className='relative z-10'>
+                    <div className='mb-8 flex flex-row flex-wrap items-center gap-4'>
+                        {post.tags.map((tag, i) => (
+                            <button
+                                key={i}
+                                className='flex justify-between items-center gap-x-2 border border-lime-50 shadow text-lime-700 rounded-4xl px-4 py-2 font-semibold text-sm transform transition-all hover:bg-lime-50 hover:cursor-pointer'
+                                onClick={event => removeTag(event.currentTarget.textContent)}
+                            >
+                                {tag}
+                                <MdOutlineClear />
+                            </button>
+                        ))}
+                        <input
+                            className='flex-1 text-lg focus:outline-none'
+                            type='text'
+                            placeholder='태그를 입력하세요'
+                            value={post.inputTag}
+                            onChange={event => handleInputTag(event.target.value)}
+                            onFocus={() => setShowTag(true)}
+                            onBlur={() => {
+                                setShowTag(false);
+                                handleTag(post.inputTag);
+                            }}
+                            onKeyDown={handleTagEnter}
+                        />
+                    </div>
+                    {showTag && (
+                        <div className='absolute -bottom-6 left-0 flex flex-col rounded-md bg-gray-700 text-white w-[calc(346px)] px-4 py-2 text-sm'>
+                            <span className='pb-1'>쉼표나 엔터를 입력하여 태그를 등록할 수 있습니다.</span>
+                        </div>
+                    )}
+                </div>
+                <Editor
+                    apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
+                    init={{
+                        min_height: 400,
+                        max_height: 4000,
+                        plugins:
+                            'anchor autolink autoresize charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
+                        autoresize: true,
+                        menubar: false,
+                        statusbar: false,
+                        inline_boundaries: false,
+                        toolbar:
+                            'undo redo | h1 h2 h3 h4 | bold italic underline strikethrough blockquote | alignjustify alignleft aligncenter alignright lineheight | checklist numlist bullist indent outdent',
+                        placeholder: '내용을 작성해주세요.',
+                        file_picker_types: 'image',
+                        images_upload_handler: async blobInfo => {
+                            setUploadCount(prev => prev + 1);
+                            const res = await uploadImage(blobInfo);
+                            setUploadCount(prev => prev - 1);
+                            return res.data.url;
+                        },
+                    }}
+                    value={post.content}
+                    onEditorChange={content => setPost({ ...post, content: content })}
+                />
+                <div className='flex justify-between items-center w-full mt-4'>
+                    {path.endsWith('/edit') ? (
+                        <FillButton
+                            text={'삭제하기'}
+                            onClick={() => handleDelete(id)}
+                            addStyle={'bg-red-400 hover:bg-red-700'}
+                        />
+                    ) : (
+                        <div></div>
+                    )}
+                    {path.endsWith('/edit') ? (
+                        <FillButton text={'수정하기'} onClick={handleEdit} />
+                    ) : (
+                        <FillButton text={'게시하기'} onClick={handleSubmit} />
+                    )}
+                </div>
+            </div>
+            <LoadingLayout loading={loading} />
+        </BasicLayout>
+    );
+}
+
+export default WritePage;

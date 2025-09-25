@@ -1,1 +1,111 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+@layer base {
+  h1 {
+    font-size: 2em;
+    font-weight: bold;
+    margin-top: 0.67em;
+    margin-bottom: 0.67em;
+  }
+  h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-top: 0.83em;
+    margin-bottom: 0.83em;
+  }
+  h3 {
+    font-size: 1.17em;
+    font-weight: bold;
+    margin-top: 1em;
+    margin-bottom: 1em;
+  }
+  h4 {
+    font-size: 1em;
+    font-weight: bold;
+    margin-top: 1.33em;
+    margin-bottom: 1.33em;
+  }
+  blockquote {
+    margin: 0 32px;
+    padding-left: 1rem;
+    border-left: 2px solid #e5e7eb;
+  }
+  ul {
+    list-style: disc;
+    margin-left: 1.5em;
+    padding-left: 1.5em;
+  }
+  ol {
+    list-style: decimal;
+    margin-left: 1.5em;
+    padding-left: 1.5em;
+  }
+}
+
+@theme {
+  --font-*: initial;
+  --default-font-family: 'SCDream';
+  --font-jalnan: 'Jalnan2';
+}
+
+@font-face {
+  font-family: 'Jalnan2';
+  src: url('./common/assets/fonts/Jalnan2.otf');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SCDream';
+  src: url('./common/assets/fonts/s-core/SCDream1.otf');
+  font-weight: 100;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'SCDream';
+  src: url('./common/assets/fonts/s-core/SCDream2.otf');
+  font-weight: 200;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'SCDream';
+  src: url('./common/assets/fonts/s-core/SCDream3.otf');
+  font-weight: 300;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'SCDream';
+  src: url('./common/assets/fonts/s-core/SCDream4.otf');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'SCDream';
+  src: url('./common/assets/fonts/s-core/SCDream5.otf');
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'SCDream';
+  src: url('./common/assets/fonts/s-core/SCDream6.otf');
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'SCDream';
+  src: url('./common/assets/fonts/s-core/SCDream7.otf');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'SCDream';
+  src: url('./common/assets/fonts/s-core/SCDream8.otf');
+  font-weight: 800;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'SCDream';
+  src: url('./common/assets/fonts/s-core/SCDream9.otf');
+  font-weight: 900;
+  font-style: normal;
+}
